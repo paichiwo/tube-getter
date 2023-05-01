@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import PySimpleGUI as sg
 from pytube import YouTube
 from pytube.cli import on_progress
