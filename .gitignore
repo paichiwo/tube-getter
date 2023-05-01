@@ -1,0 +1,6 @@
+# PyCharm Folders
+/venv/
+/.idea/
+# Application Output
+/.mp4
+/.mp3
