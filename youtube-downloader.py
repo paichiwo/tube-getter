@@ -39,7 +39,8 @@ while True:
                 content_size = int(req.headers.get('Content-Length'))
                 chunk_size = 1024
                 bytes_read = 0
-                with open('video', 'wb') as f:
+                file_name = f"{yt.title}.mp4"
+                with open(file_name, 'wb') as f:
                     for chunk in req.iter_content(chunk_size=chunk_size):
                         f.write(chunk)
                         bytes_read += len(chunk)
