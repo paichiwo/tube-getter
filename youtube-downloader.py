@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
 
+# 1. Make skeleton with download feature that works
+#    - update table with list of stream and resolutions
+#    - when clicked create popup window asking if user wabts to download (yes/no)
+#
+# 2. Implement mp4 to mp3 conversion if user wants to download only audioop
+
+
 import time
 import PySimpleGUI as sg
 import requests
@@ -25,7 +32,7 @@ def create_window():
             size=(25, 10),
             bar_color=('#199FD0', '#FFFFFF'),
             key='-PROGRESS-BAR-')],
-        [sg.Table(values=[], headings=["Title", "Resolution", "Download"],
+        [sg.Table(values=[], headings=["Title", "Resolution"],
                   col_widths=[100, 100, 100],
                   justification="left",
                   selected_row_colors="red on white",
