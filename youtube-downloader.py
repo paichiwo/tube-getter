@@ -18,9 +18,10 @@ def jpg_to_png(url, title):
     image = Image.open(io.BytesIO(response.content))
     max_size = (200, 112)
     image.thumbnail(max_size)
-    if not os.path.exists("thumbs"):
-        os.mkdir("thumbs")
-    file_path = os.path.join("thumbs/", "thumb.png")
+    if not os.path.exists("Download/thumbnails"):
+        os.mkdir("Download")
+        os.mkdir("Download/thumbnails")
+    file_path = os.path.join("Download/thumbnails/", "thumb.png")
     image.save(file_path, "PNG")
     return file_path
 
@@ -28,12 +29,12 @@ def jpg_to_png(url, title):
 def progress_check(stream, chunk, bytes_remaining):
     progress_amount = 100 - round(bytes_remaining / stream.filesize * 100)
     window['-PROGRESS-BAR-'].update(progress_amount,
-                                    bar_color=('blue', 'red'))
-    sg.popup("Done")
+                                    bar_color=('red', 'white'))
 
 
 def on_complete(stream, file_path):
-    window['-PROGRESSBAR-'].update(0,  bar_color=('white', 'white'))
+    window['-PROGRESS-BAR-'].update(0,  bar_color=('white', 'white'))
+    sg.popup("Done!")
 
 
 sg.theme('black')
@@ -106,6 +107,8 @@ while True:
                              allow_oauth_cache=True,
                              on_progress_callback=progress_check,
                              on_complete_callback=on_complete)
-                yt.streams.get_by_itag(i_tag).download()
+                if not os.path.exists("Downloads"):
+                    os.mkdir("Downloads")
+                yt.streams.get_by_itag(i_tag).download("Downloads/")
 
 window.close()
