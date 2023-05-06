@@ -28,8 +28,12 @@ def jpg_to_png(url, title):
 def progress_check(stream, chunk, bytes_remaining):
     progress_amount = 100 - round(bytes_remaining / stream.filesize * 100)
     window['-PROGRESS-BAR-'].update(progress_amount,
-                                    bar_color=('blue', 'lightblue'))
+                                    bar_color=('blue', 'red'))
     sg.popup("Done")
+
+
+def on_complete(stream, file_path):
+    window['-PROGRESSBAR-'].update(0,  bar_color=('white', 'white'))
 
 
 sg.theme('black')
@@ -46,8 +50,8 @@ layout = [
                     size=(25, 10),
                     bar_color=('#199FD0', '#FFFFFF'),
                     key='-PROGRESS-BAR-')],
-    [sg.Table(values=[], headings=["Title", "Resolution", "ITag"],
-              col_widths=[36, 6, 4],
+    [sg.Table(values=[], headings=["Title", "Resolution", "Size", "ITag"],
+              col_widths=[36, 6, 8, 4],
               auto_size_columns=False,
               justification="center",
               selected_row_colors="red on white",
@@ -58,13 +62,13 @@ layout = [
 ]
 
 window = sg.Window('YouTube Downloader', layout,
-                   size=(500, 500),
+                   size=(600, 500),
                    resizable=True)
 
 list_of_streams = []
 
 while True:
-    event, values = window.read()
+    event, values = window.read(timeout=0.0005)
 
     if event == sg.WIN_CLOSED:
         break
@@ -73,25 +77,35 @@ while True:
         # update the table
         table = window["-TABLE-"]
         url = values["-URL-"]
-        list_of_streams.clear()
-        yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
-        for stream in yt.streams.filter(file_extension="mp4").order_by("resolution").desc():
-            list_of_streams.append([yt.title, stream.resolution, stream.itag])
-            print(yt.title, stream.itag, stream.resolution, stream.itag)  # for DEBUGGING
-        # get thumbnail
-        thumbnail_string = jpg_to_png(yt.thumbnail_url, yt.title)
-        window["-THUMBNAIL-"].update(thumbnail_string)
-        table.update(list_of_streams)
+        if url:
+            list_of_streams.clear()
+            yt = YouTube(url, use_oauth=True,
+                         allow_oauth_cache=True)
+            for stream in yt.streams.filter(file_extension="mp4").order_by("resolution").desc():
+                list_of_streams.append([yt.title,
+                                        stream.resolution,
+                                        f"{round(stream.filesize / 1048576, 1)} MB",
+                                        stream.itag])
+                print(yt.title, stream.resolution, stream.itag)  # for DEBUGGING
+            table.update(list_of_streams)
+            # get thumbnail
+            thumbnail_string = jpg_to_png(yt.thumbnail_url, yt.title)
+            window["-THUMBNAIL-"].update(thumbnail_string)
+        else:
+            sg.Popup("ERROR: No url detected.")
 
     if event == "-TABLE-":
         selected_row_index = values["-TABLE-"][0]
         if selected_row_index != sg.TABLE_SELECT_MODE_NONE:
             selected_row = list_of_streams[selected_row_index]
-            i_tag = selected_row[2]
+            i_tag = selected_row[3]
             choice = sg.popup_yes_no("Download?")
             if choice == "Yes":
                 url = values["-URL-"]
-                yt = YouTube(url, use_oauth=True, allow_oauth_cache=True, on_progress_callback=progress_check)
+                yt = YouTube(url, use_oauth=True,
+                             allow_oauth_cache=True,
+                             on_progress_callback=progress_check,
+                             on_complete_callback=on_complete)
                 yt.streams.get_by_itag(i_tag).download()
 
 window.close()
