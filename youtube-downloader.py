@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 
-# 1. Make skeleton with download feature that works
-#    - update table with list of stream and resolutions
-#    - when clicked create popup window asking if user wants to download (yes/no)
-#      - get itags for each entry on the table and use download by itag
-#
 # 2. Implement mp4 to mp3 conversion if user wants to download only audio
-
 
 import time
 import PySimpleGUI as sg
 import requests
 from pytube import YouTube
-from pytube.cli import on_progress
 
 # https://youtu.be/eEQh4qvj-qo
+
+
+def progress_check(stream, bytes_remaining):
+    progress_amount = 100 - round(bytes_remaining / stream.filesize * 100)
+    window['-PROGRESS-BAR-'].update(progress_amount,
+                                    bar_color=('blue', 'skyblue'))
+    sg.popup("Done")
+
 
 sg.theme('black')
 
@@ -23,13 +24,12 @@ layout = [
     [sg.Text('Enter YouTube Video URL:', size=20), sg.InputText(key='-URL-')],
     [sg.Button('Download', size=11, key="-DOWNLOAD-"),
      sg.Push(),
-     sg.ProgressBar(
-        max_value=100,
-        orientation='h',
-        border_width=1,
-        size=(25, 10),
-        bar_color=('#199FD0', '#FFFFFF'),
-        key='-PROGRESS-BAR-')],
+     sg.ProgressBar(max_value=100,
+                    orientation='h',
+                    border_width=1,
+                    size=(25, 10),
+                    bar_color=('#199FD0', '#FFFFFF'),
+                    key='-PROGRESS-BAR-')],
     [sg.Table(values=[], headings=["Title", "Resolution", "ITag"],
               auto_size_columns=True,
               justification="center",
@@ -70,7 +70,7 @@ while True:
             choice = sg.popup_yes_no("Download?")
             if choice == "Yes":
                 url = values["-URL-"]
-                yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
+                yt = YouTube(url, use_oauth=True, allow_oauth_cache=True, on_progress_callback=progress_check)
                 yt.streams.get_by_itag(i_tag).download()
 
 window.close()
