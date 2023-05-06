@@ -10,7 +10,7 @@ from pytube import YouTube
 # https://youtu.be/eEQh4qvj-qo
 
 
-def progress_check(stream, bytes_remaining):
+def progress_check(stream, chunk, bytes_remaining):
     progress_amount = 100 - round(bytes_remaining / stream.filesize * 100)
     window['-PROGRESS-BAR-'].update(progress_amount,
                                     bar_color=('blue', 'skyblue'))
@@ -31,7 +31,8 @@ layout = [
                     bar_color=('#199FD0', '#FFFFFF'),
                     key='-PROGRESS-BAR-')],
     [sg.Table(values=[], headings=["Title", "Resolution", "ITag"],
-              auto_size_columns=True,
+              col_widths=[50, 6, 4],
+              auto_size_columns=False,
               justification="center",
               selected_row_colors="red on white",
               enable_events=True,
