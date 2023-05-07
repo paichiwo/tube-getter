@@ -19,9 +19,9 @@ def jpg_to_png(url, title):
     max_size = (200, 112)
     image.thumbnail(max_size)
     if not os.path.exists("Download/thumbnails"):
-        os.mkdir("Download")
-        os.mkdir("Download/thumbnails")
-    file_path = os.path.join("Download/thumbnails/", "thumb.png")
+        os.mkdir("Downloads")
+        os.mkdir("Downloads/thumbnails")
+    file_path = os.path.join("Downloads/thumbnails/", "thumb.png")
     image.save(file_path, "PNG")
     return file_path
 
@@ -63,7 +63,7 @@ layout = [
 ]
 
 window = sg.Window('YouTube Downloader', layout,
-                   size=(600, 500),
+                   size=(500, 500),
                    resizable=True)
 
 list_of_streams = []
