@@ -34,6 +34,14 @@ def count_size():
 
 
 def download():
+    choice = sg.popup_yes_no("Download?", font=font_used)
+    if choice == "Yes":
+        url = values["-URL-"]
+        yt = YouTube(url, use_oauth=True, allow_oauth_cache=True,
+                     on_progress_callback=progress_check, on_complete_callback=on_complete)
+        if not os.path.exists("Downloads"):
+            os.mkdir("Downloads")
+        yt.streams.get_by_itag(i_tag).download("Downloads/")
 
 
 def progress_check(stream, chunk, bytes_remaining):
@@ -117,25 +125,11 @@ while True:
             i_tag = selected_row[3]
 
             if i_tag not in audio_tags:
-                choice = sg.popup_yes_no("Download?")
-                if choice == "Yes":
-                    url = values["-URL-"]
-                    yt = YouTube(url, use_oauth=True, allow_oauth_cache=True,
-                                 on_progress_callback=progress_check, on_complete_callback=on_complete)
-                    if not os.path.exists("Downloads"):
-                        os.mkdir("Downloads")
-                    yt.streams.get_by_itag(i_tag).download("Downloads/")
-                    os.remove("Downloads/thumb.png")
+                download()
+                os.remove("Downloads/thumb.png")
 
             if i_tag in audio_tags:
-                choice = sg.popup_yes_no("Download?", font=font_used)
-                if choice == "Yes":
-                    url = values["-URL-"]
-                    yt = YouTube(url, use_oauth=True, allow_oauth_cache=True,
-                                 on_progress_callback=progress_check, on_complete_callback=on_complete)
-                    if not os.path.exists("Downloads"):
-                        os.mkdir("Downloads")
-                    yt.streams.get_by_itag(i_tag).download("Downloads/")
-                    change_extension()
-                    os.remove("Downloads/thumb.png")
+                download()
+                change_extension()
+                os.remove("Downloads/thumb.png")
 window.close()
