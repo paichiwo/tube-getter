@@ -21,8 +21,19 @@ def jpg_to_png(link):
     return file_path
 
 
+def change_extension():
+    for filename in os.listdir("Downloads/"):
+        if filename.endswith(".mp4"):
+            filename_parts = filename.split(".")
+            new_filename = f"{filename_parts[0]}.mp3"
+            os.rename(os.path.join("Downloads/", filename), os.path.join("Downloads/", new_filename))
+
+
 def count_size():
     return round(stream.filesize / 1048576, 1)
+
+
+def download():
 
 
 def progress_check(stream, chunk, bytes_remaining):
@@ -36,26 +47,28 @@ def on_complete(stream, file_path):
 
 
 # Application layout
+font_used = ("Tahoma", 9)
+
 sg.theme('black')
 
 layout = [
     [sg.Stretch(), sg.Image("image/logo.png"), sg.Stretch()],
     [sg.Stretch(), sg.Image("image/dummy_thumb.png", key="-THUMBNAIL-"), sg.Stretch()],
-    [sg.Text("Video URL:", font=("Any", 9))],
+    [sg.VPush()],
+    [sg.Text("Video URL:", font=font_used)],
     [sg.Input(size=60, enable_events=True, key="-URL-")],
-    [sg.Button("Video", size=10, key="-VIDEO-"),
-     sg.Button("Audio", size=10, key="-AUDIO-")],
+    [sg.Button("Video", font=font_used, size=10, key="-VIDEO-"),
+     sg.Button("Audio", font=font_used, size=10, key="-AUDIO-")],
     [sg.Table(values=[], headings=["Title", "Resolution", "Size", "ITag"],
-              col_widths=[33, 7, 8, 4], auto_size_columns=False, justification="center",
-              selected_row_colors="red on white", enable_events=True, expand_x=True, expand_y=True, key="-TABLE-")],
-    [sg.ProgressBar(max_value=100, orientation='h', border_width=1,
-                    size=(25, 7), bar_color=('#199FD0', '#FFFFFF'), expand_x=True, key='-PROGRESS-BAR-')],
+              col_widths=[33, 7, 8, 4], auto_size_columns=False, justification="center", enable_events=True,
+              font=font_used, selected_row_colors="red on white", expand_x=True, expand_y=True, key="-TABLE-")],
+    [sg.ProgressBar(max_value=100, orientation='h', border_width=1, size=(25, 7),
+                    bar_color=('#199FD0', '#FFFFFF'), expand_x=True, key='-PROGRESS-BAR-')],
     # [sg.VPush()]
 ]
 
-window = sg.Window('YouTube Downloader by paichiwo', layout, element_justification="center",
-                   size=(520, 520),
-                   resizable=True)
+window = sg.Window("YouTube Downloader by paichiwo", layout,
+                   element_justification="center", size=(520, 520), resizable=True)
 
 list_of_streams = []
 
@@ -70,8 +83,7 @@ while True:
         url = values["-URL-"]
         if url:
             list_of_streams.clear()
-            yt = YouTube(url, use_oauth=True,
-                         allow_oauth_cache=True)
+            yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
             for stream in yt.streams.filter(file_extension="mp4").order_by("resolution").desc():
                 list_of_streams.append([yt.title, stream.resolution, f"{count_size()} MB", stream.itag])
             window["-TABLE-"].update(list_of_streams)
@@ -79,7 +91,7 @@ while True:
             thumbnail_string = jpg_to_png(yt.thumbnail_url)
             window["-THUMBNAIL-"].update(thumbnail_string)
         else:
-            sg.Popup("ERROR: No url detected.")
+            sg.Popup("ERROR: No url detected.", font=font_used)
 
     if event == "-AUDIO-":
         # update the table
@@ -94,7 +106,7 @@ while True:
             thumbnail_string = jpg_to_png(yt.thumbnail_url)
             window["-THUMBNAIL-"].update(thumbnail_string)
         else:
-            sg.Popup("ERROR: No url detected.")
+            sg.Popup("ERROR: No url detected.", font=font_used)
 
     if event == "-TABLE-":
         selected_row_index = values["-TABLE-"][0]
@@ -116,7 +128,7 @@ while True:
                     os.remove("Downloads/thumb.png")
 
             if i_tag in audio_tags:
-                choice = sg.popup_yes_no("Download?")
+                choice = sg.popup_yes_no("Download?", font=font_used)
                 if choice == "Yes":
                     url = values["-URL-"]
                     yt = YouTube(url, use_oauth=True, allow_oauth_cache=True,
@@ -124,10 +136,6 @@ while True:
                     if not os.path.exists("Downloads"):
                         os.mkdir("Downloads")
                     yt.streams.get_by_itag(i_tag).download("Downloads/")
-                    for filename in os.listdir("Downloads/"):
-                        if filename.endswith(".mp4"):
-                            filename_parts = filename.split(".")
-                            new_filename = f"{filename_parts[0]}.mp3"
-                            os.rename(os.path.join("Downloads/", filename), os.path.join("Downloads/", new_filename))
-                            os.remove("Downloads/thumb.png")
+                    change_extension()
+                    os.remove("Downloads/thumb.png")
 window.close()
