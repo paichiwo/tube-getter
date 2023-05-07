@@ -36,7 +36,7 @@ def on_complete(stream, file_path):
     window['-PROGRESS-BAR-'].update(0,  bar_color=('white', 'white'))
     sg.popup("Done!")
 
-
+# Application layout
 sg.theme('black')
 
 layout = [
@@ -69,7 +69,7 @@ window = sg.Window('YouTube Downloader', layout,
 list_of_streams = []
 
 while True:
-    event, values = window.read(timeout=0.0005)
+    event, values = window.read()
 
     if event == sg.WIN_CLOSED:
         break
