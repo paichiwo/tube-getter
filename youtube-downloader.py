@@ -15,7 +15,7 @@ def jpg_to_png(url):
     image = Image.open(io.BytesIO(response.content))
     max_size = (200, 112)
     image.thumbnail(max_size)
-    if not os.path.exists("Downloads/thumbnails"):
+    if not os.path.exists("Downloads"):
         os.mkdir("Downloads")
     file_path = os.path.join("Downloads/", "thumb.png")
     image.save(file_path, "PNG")
@@ -126,7 +126,7 @@ while True:
                     if not os.path.exists("Downloads"):
                         os.mkdir("Downloads")
                     yt.streams.get_by_itag(i_tag).download("Downloads/")
-
+                    os.remove("Downloads/thumb.png")
             if i_tag in audio_tags:
                 choice = sg.popup_yes_no("Download?")
                 if choice == "Yes":
@@ -143,5 +143,5 @@ while True:
                             filename_parts = filename.split(".")
                             new_filename = f"{filename_parts[0]}.mp3"
                             os.rename(os.path.join("Downloads/", filename), os.path.join("Downloads/", new_filename))
-os.remove("thumb.jpg")
+                            os.remove("Downloads/thumb.png")
 window.close()
