@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 
+# handle errors
+# replace '' with ""
+# add comments
+
 import PySimpleGUI as sg
 import requests
 import io
@@ -11,6 +15,7 @@ from moviepy.editor import *
 
 
 def jpg_to_png(link):
+    """ Convert .jpg to .png to properly display thumbnail in pysimplegui"""
     response = requests.get(link)
     image = Image.open(io.BytesIO(response.content))
     image.thumbnail((250, 140))
@@ -22,6 +27,7 @@ def jpg_to_png(link):
 
 
 def change_extension():
+    """ Changes .mp4 to .mp3 extension for downloaded audio files (PyTube for some reason saves audio as .mp4) """
     for filename in os.listdir("Downloads/"):
         if filename.endswith(".mp4"):
             filename_parts = filename.split(".")
@@ -30,10 +36,12 @@ def change_extension():
 
 
 def count_size():
+    """ Count the streams file size """
     return round(stream.filesize / 1048576, 1)
 
 
 def download():
+    """ Download chosen file form the table"""
     choice = sg.popup_yes_no("Download?", font=font_used)
     if choice == "Yes":
         url = values["-URL-"]
@@ -45,11 +53,13 @@ def download():
 
 
 def progress_check(stream, chunk, bytes_remaining):
+    """ Display progress status in the [-PROGRESS-BAR-] """
     progress_amount = 100 - round(bytes_remaining / stream.filesize * 100)
     window['-PROGRESS-BAR-'].update(progress_amount, bar_color=('red', 'white'))
 
 
 def on_complete(stream, file_path):
+    """ Clear the progress bar and display message when download completed """
     window['-PROGRESS-BAR-'].update(0, bar_color=('white', 'white'))
     sg.popup("Done!")
 
