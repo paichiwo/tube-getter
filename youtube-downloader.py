@@ -2,17 +2,8 @@
 
 """
 YouTube Downloader allows users to download videos or audios from YouTube.
-The user interface is built using PySimpleGUI library, and the video downloading functionality is implemented
-using PyTube library. The script also uses requests, io, PIL, and os libraries for various purposes.
-
-When the user enters a YouTube video URL and clicks on the "Video" or "Audio" button, the script retrieves
-the available video or audio streams and displays them in a table. The user can then select a stream from the table
-and click on the "Yes" in popup window to download the selected file to the "Downloads" folder.
-
-The script also converts the thumbnail image from .jpg to .png format and resizes it to fit in the GUI.
-In addition, the script changes the file extension of the downloaded audio files from .mp4 to .mp3,
-as PyTube saves audio files as .mp4 files for some reason.
-
+The user interface is built using PySimpleGUI library, and the video downloading
+functionality is implemented using PyTube library.
 Overall, the script provides a simple and user-friendly way to download YouTube videos or audios.
 """
 
@@ -28,7 +19,7 @@ def jpg_to_png(link):
     """ Convert .jpg to .png to properly display thumbnail in PySimpleGUI """
     response = requests.get(link)
     image = Image.open(io.BytesIO(response.content))
-    image.thumbnail((250, 140))
+    image.thumbnail((300, 168))
     file_path = os.path.join("Downloads", "thumb.png")
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     image.save(file_path, "PNG")
