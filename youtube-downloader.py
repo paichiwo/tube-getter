@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-This is a Python script that allows users to download videos or audios from YouTube by entering the URL of the video.
+YouTube Downloader allows users to download videos or audios from YouTube.
 The user interface is built using PySimpleGUI library, and the video downloading functionality is implemented
 using PyTube library. The script also uses requests, io, PIL, and os libraries for various purposes.
 
@@ -43,12 +43,12 @@ def change_extension():
 
 
 def count_size():
-    """ Count the streams file size """
+    """ Count the streams file sizes """
     return round(stream.filesize / (1024 * 1024), 1)
 
 
 def download():
-    """ Download chosen file form the table"""
+    """ Download chosen file from the table"""
     choice = sg.popup_yes_no("Download?", font=font_used)
     if choice == "Yes":
         url = values["-URL-"]
@@ -56,7 +56,13 @@ def download():
                      on_progress_callback=progress_check, on_complete_callback=on_complete)
         if not os.path.exists("Downloads"):
             os.mkdir("Downloads")
-        yt.streams.get_by_itag(i_tag).download("Downloads/")
+        stream = yt.streams.get_by_itag(i_tag)
+        if stream.mime_type == "audio/mp4":
+            # Set a suffix for audio files
+            filename = stream.default_filename.rsplit(".", 1)[0] + ".mp3"
+        else:
+            filename = stream.default_filename
+        stream.download(output_path="Downloads", filename=filename)
 
 
 def progress_check(stream, chunk, bytes_remaining):
@@ -143,10 +149,15 @@ while True:
         # Download Video
         if i_tag not in audio_tags:
             download()
-            os.remove("Downloads/thumb.png")
+            try:
+                os.remove("Downloads/thumb.png")
+            except FileNotFoundError:
+                continue
         # Download Audio
         if i_tag in audio_tags:
             download()
-            change_extension()
-            os.remove("Downloads/thumb.png")
+            try:
+                os.remove("Downloads/thumb.png")
+            except FileNotFoundError:
+                continue
 window.close()
