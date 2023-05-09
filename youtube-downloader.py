@@ -71,6 +71,7 @@ sg.theme('black')
 
 layout = [
     [sg.Stretch(), sg.Image("image/logo.png"), sg.Stretch()],
+    [sg.VPush()],
     [sg.Stretch(), sg.Image("image/dummy_thumb.png", key="-THUMBNAIL-"), sg.Stretch()],
     [sg.VPush()],
     [sg.Text("Video URL:", font=font_used)],
@@ -127,19 +128,21 @@ while True:
             sg.Popup("ERROR: No url detected.", font=font_used)
 
     if event == "-TABLE-":
-        selected_row_index = values["-TABLE-"][0]
+        try:
+            selected_row_index = values["-TABLE-"][0]
+        except IndexError:
+            continue
 
-        if selected_row_index != sg.TABLE_SELECT_MODE_NONE:
-            selected_row = list_of_streams[selected_row_index]
-            audio_tags = [139, 140, 249, 250, 251]
-            i_tag = selected_row[3]
+        selected_row = list_of_streams[selected_row_index]
+        audio_tags = [139, 140, 249, 250, 251]
+        i_tag = selected_row[3]
 
-            if i_tag not in audio_tags:
-                download()
-                os.remove("Downloads/thumb.png")
+        if i_tag not in audio_tags:
+            download()
+            os.remove("Downloads/thumb.png")
 
-            if i_tag in audio_tags:
-                download()
-                change_extension()
-                os.remove("Downloads/thumb.png")
+        if i_tag in audio_tags:
+            download()
+            change_extension()
+            os.remove("Downloads/thumb.png")
 window.close()
