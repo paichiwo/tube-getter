@@ -6,14 +6,17 @@ The user interface is built using PySimpleGUI library, and the video downloading
 functionality is implemented using PyTube library.
 Overall, the script provides a simple and user-friendly way to download YouTube videos or audios.
 """
-import sys
+
 import PySimpleGUI as sg
 import requests
+import sys
 import io
 import os
+from PIL import Image
+import pytube.exceptions
 from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
-from PIL import Image
+
 
 font_used = ("Tahoma", 9)
 
@@ -57,7 +60,7 @@ def count_size():
 
 def download():
     """Download chosen file from the table."""
-    choice = sg.popup_yes_no("Download?", font=font_used)
+    choice = sg.popup_yes_no("Download?", font=font_used, grab_anywhere=True)
     if choice == "Yes":
         url = values["-URL-"]
         yt = YouTube(url, on_progress_callback=progress_check, on_complete_callback=on_complete)
@@ -97,15 +100,32 @@ def create_window():
         [sg.Input(size=60, enable_events=True, key="-URL-")],
         [sg.Button("Video", font=font_used, size=10, key="-VIDEO-"),
          sg.Button("Audio", font=font_used, size=10, key="-AUDIO-")],
-        [sg.Table(values=[], headings=["Title", "Resolution", "Size", "Tag"],
-                  col_widths=[33, 7, 8, 4], auto_size_columns=False, justification="center", enable_events=True,
-                  font=font_used, selected_row_colors="red on white", expand_x=True, expand_y=True, key="-TABLE-")],
-        [sg.ProgressBar(max_value=100, orientation='h', border_width=0, size=(25, 2),
-                        bar_color=("red", "white"), expand_x=True, key='-PROGRESS-BAR-')],
+        [sg.Table(values=[],
+                  headings=["Title", "Resolution", "Size"],
+                  col_widths=[33, 7, 8, 4],
+                  auto_size_columns=False,
+                  justification="center",
+                  enable_events=True,
+                  font=font_used,
+                  selected_row_colors="red on white",
+                  expand_x=True,
+                  expand_y=True,
+                  key="-TABLE-")],
+        [sg.ProgressBar(max_value=100,
+                        orientation='h',
+                        border_width=0,
+                        size=(25, 2),
+                        bar_color=("red", "white"),
+                        expand_x=True,
+                        key='-PROGRESS-BAR-')],
     ]
-
-    return sg.Window("YouTube Downloader by paichiwo", layout, icon="icon.ico",
-                     element_justification="center", size=(520, 520), resizable=True)
+    return sg.Window("YouTube Downloader by paichiwo",
+                     layout,
+                     icon="icon.ico",
+                     element_justification="center",
+                     size=(520, 520),
+                     resizable=True,
+                     finalize=True)
 
 
 list_of_streams = []
@@ -124,13 +144,14 @@ while True:
                 yt_data = YouTube(link, use_oauth=False)  # use_oauth=True, allow_oauth_cache=True
                 for stream_data in yt_data.streams.filter(file_extension="mp4").order_by("resolution").desc():
                     list_of_streams.append(
-                        [yt_data.title, stream_data.resolution, f"{count_size()} MB", stream_data.itag]
-                    )
-                window["-TABLE-"].update(list_of_streams)
+                        [yt_data.title, stream_data.resolution, f"{count_size()} MB", stream_data.itag])
                 thumbnail_string = jpg_to_png(yt_data.thumbnail_url)
+                window["-TABLE-"].update(list_of_streams)
                 window["-THUMBNAIL-"].update(thumbnail_string)
             except VideoUnavailable:
-                sg.popup("Video is age restricted")
+                sg.popup("ERROR: Video is age restricted", font=font_used)
+            except pytube.exceptions.RegexMatchError:
+                sg.popup("ERROR: Wrong URL", font=font_used)
         else:
             sg.Popup("ERROR: No url detected.", font=font_used)
 
@@ -139,15 +160,16 @@ while True:
         if link:
             try:
                 list_of_streams.clear()
-                yt_data = YouTube(link)  # use_oauth=True, allow_oauth_cache=True
+                yt_data = YouTube(values["-URL-"])  # use_oauth=True, allow_oauth_cache=True
                 for stream_data in yt_data.streams.filter(only_audio=True).order_by("abr").desc():
                     list_of_streams.append([yt_data.title, stream_data.abr, f"{count_size()} MB", stream_data.itag])
-                window["-TABLE-"].update(list_of_streams)
-
                 thumbnail_string = jpg_to_png(yt_data.thumbnail_url)
+                window["-TABLE-"].update(list_of_streams)
                 window["-THUMBNAIL-"].update(thumbnail_string)
             except VideoUnavailable:
-                sg.popup("Video is age restricted.")
+                sg.popup("ERROR: Video is age restricted.", font=font_used)
+            except pytube.exceptions.RegexMatchError:
+                sg.popup("ERROR: Wrong URL !", font=font_used)
         else:
             sg.Popup("ERROR: No url detected.", font=font_used)
 
