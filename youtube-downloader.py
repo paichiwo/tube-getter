@@ -6,7 +6,7 @@ The user interface is built using PySimpleGUI library, and the video downloading
 functionality is implemented using PyTube library.
 Overall, the script provides a simple and user-friendly way to download YouTube videos or audios.
 """
-
+import sys
 import PySimpleGUI as sg
 import requests
 import io
@@ -15,6 +15,12 @@ from pytube import YouTube
 from PIL import Image
 
 font_used = ("Tahoma", 9)
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
 
 def jpg_to_png(url):
@@ -74,9 +80,9 @@ def create_window():
     sg.theme("black")
 
     layout = [
-        [sg.Stretch(), sg.Image("image/logo.png"), sg.Stretch()],
+        [sg.Stretch(), sg.Image(resource_path("logo.png")), sg.Stretch()],
         [sg.VPush()],
-        [sg.Stretch(), sg.Image("image/dummy_thumb.png", key="-THUMBNAIL-"), sg.Stretch()],
+        [sg.Stretch(), sg.Image(resource_path("dummy_thumb.png"), key="-THUMBNAIL-"), sg.Stretch()],
         [sg.VPush()],
         [sg.Text("Video URL:", font=font_used)],
         [sg.Input(size=60, enable_events=True, key="-URL-")],
@@ -89,7 +95,7 @@ def create_window():
                         bar_color=("red", "white"), expand_x=True, key='-PROGRESS-BAR-')],
     ]
 
-    return sg.Window("YouTube Downloader by paichiwo", layout,
+    return sg.Window("YouTube Downloader by paichiwo", layout, icon="icon.ico",
                      element_justification="center", size=(520, 520), resizable=True)
 
 
@@ -128,7 +134,6 @@ while True:
             window["-THUMBNAIL-"].update(thumbnail_string)
         else:
             sg.Popup("ERROR: No url detected.", font=font_used)
-
 
     if event == "-TABLE-":
         try:
