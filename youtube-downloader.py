@@ -35,9 +35,10 @@ def jpg_to_png(url):
     return file_path
 
 
-def delete_file():
+def delete_file(file):
+    """Delete unwanted file."""
     try:
-        os.remove("Downloads/thumb.png")
+        os.remove(file)
     except FileNotFoundError:
         pass
 
@@ -78,7 +79,7 @@ def progress_check(stream, chunk, bytes_remaining):
 
 
 def on_complete(stream, file_path):
-    """ Clear the progress bar and display message when download completed """
+    """Clear the progress bar and display message when download completed."""
     window["-PROGRESS-BAR-"].update(0, bar_color=("white", "white"))
     sg.popup("Done!")
 
@@ -157,18 +158,11 @@ while True:
             continue
 
         selected_row = list_of_streams[selected_row_index]
-        audio_tags = [139, 140, 249, 250, 251]
         i_tag = selected_row[3]
 
-        # Download Video
-        if i_tag not in audio_tags:
-            download()
-            delete_file()
-            continue
-        # Download Audio
-        else:
-            download()
-            delete_file()
-            continue
+        download()
+        delete_file("Downloads/thumb.png")
+        continue
+
 
 window.close()
