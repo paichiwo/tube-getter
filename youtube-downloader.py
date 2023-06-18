@@ -12,6 +12,7 @@ import requests
 import io
 import os
 from pytube import YouTube
+from pytube.exceptions import VideoUnavailable
 from PIL import Image
 
 font_used = ("Tahoma", 9)
@@ -111,27 +112,32 @@ while True:
         link = values["-URL-"]
         if link:
             list_of_streams.clear()
-            yt_data = YouTube(link, use_oauth=False)  # use_oauth=True, allow_oauth_cache=True
-            for stream_data in yt_data.streams.filter(file_extension="mp4").order_by("resolution").desc():
-                list_of_streams.append([yt_data.title, stream_data.resolution, f"{count_size()} MB", stream_data.itag])
-            window["-TABLE-"].update(list_of_streams)
-
-            thumbnail_string = jpg_to_png(yt_data.thumbnail_url)
-            window["-THUMBNAIL-"].update(thumbnail_string)
+            try:
+                yt_data = YouTube(link, use_oauth=False)  # use_oauth=True, allow_oauth_cache=True
+                for stream_data in yt_data.streams.filter(file_extension="mp4").order_by("resolution").desc():
+                    list_of_streams.append([yt_data.title, stream_data.resolution, f"{count_size()} MB", stream_data.itag])
+                window["-TABLE-"].update(list_of_streams)
+                thumbnail_string = jpg_to_png(yt_data.thumbnail_url)
+                window["-THUMBNAIL-"].update(thumbnail_string)
+            except VideoUnavailable:
+                sg.popup("Video is age restricted")
         else:
             sg.Popup("ERROR: No url detected.", font=font_used)
 
     if event == "-AUDIO-":
         link = values["-URL-"]
         if link:
-            list_of_streams.clear()
-            yt_data = YouTube(link)  # use_oauth=True, allow_oauth_cache=True
-            for stream_data in yt_data.streams.filter(only_audio=True).order_by("abr").desc():
-                list_of_streams.append([yt_data.title, stream_data.abr, f"{count_size()} MB", stream_data.itag])
-            window["-TABLE-"].update(list_of_streams)
+            try:
+                list_of_streams.clear()
+                yt_data = YouTube(link)  # use_oauth=True, allow_oauth_cache=True
+                for stream_data in yt_data.streams.filter(only_audio=True).order_by("abr").desc():
+                    list_of_streams.append([yt_data.title, stream_data.abr, f"{count_size()} MB", stream_data.itag])
+                window["-TABLE-"].update(list_of_streams)
 
-            thumbnail_string = jpg_to_png(yt_data.thumbnail_url)
-            window["-THUMBNAIL-"].update(thumbnail_string)
+                thumbnail_string = jpg_to_png(yt_data.thumbnail_url)
+                window["-THUMBNAIL-"].update(thumbnail_string)
+            except VideoUnavailable:
+                sg.popup("Video is age restricted.")
         else:
             sg.Popup("ERROR: No url detected.", font=font_used)
 
