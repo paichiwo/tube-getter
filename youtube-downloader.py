@@ -19,13 +19,13 @@ font_used = ("Tahoma", 9)
 
 
 def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
+    """Get an absolute path to resource, works for dev and for PyInstaller."""
     base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
     return os.path.join(base_path, relative_path)
 
 
 def jpg_to_png(url):
-    """ Convert .jpg to .png to properly display thumbnail in PySimpleGUI """
+    """Convert .jpg to .png to properly display thumbnail in PySimpleGUI."""
     response = requests.get(url)
     image = Image.open(io.BytesIO(response.content))
     image.thumbnail((300, 168))
@@ -35,20 +35,27 @@ def jpg_to_png(url):
     return file_path
 
 
+def delete_file():
+    try:
+        os.remove("Downloads/thumb.png")
+    except FileNotFoundError:
+        pass
+
+
 def change_extension():
-    """ Changes .mp4 to .mp3 extension for downloaded audio files (PyTube for some reason saves audio as .mp4) """
+    """Changes .mp4 to .mp3 extension for downloaded audio files (PyTube for some reason saves audio as .mp4)."""
     for f_name in os.listdir("Downloads"):
         if f_name.endswith(".mp4"):
             os.rename(os.path.join("Downloads", f_name), os.path.join("Downloads", f"{f_name.rsplit('.', 1)[0]}.mp3"))
 
 
 def count_size():
-    """ Count the stream file sizes """
+    """Count the stream file sizes."""
     return round(stream_data.filesize / (1024 * 1024), 1)
 
 
 def download():
-    """ Download chosen file from the table"""
+    """Download chosen file from the table."""
     choice = sg.popup_yes_no("Download?", font=font_used)
     if choice == "Yes":
         url = values["-URL-"]
@@ -115,7 +122,9 @@ while True:
             try:
                 yt_data = YouTube(link, use_oauth=False)  # use_oauth=True, allow_oauth_cache=True
                 for stream_data in yt_data.streams.filter(file_extension="mp4").order_by("resolution").desc():
-                    list_of_streams.append([yt_data.title, stream_data.resolution, f"{count_size()} MB", stream_data.itag])
+                    list_of_streams.append(
+                        [yt_data.title, stream_data.resolution, f"{count_size()} MB", stream_data.itag]
+                    )
                 window["-TABLE-"].update(list_of_streams)
                 thumbnail_string = jpg_to_png(yt_data.thumbnail_url)
                 window["-THUMBNAIL-"].update(thumbnail_string)
@@ -146,21 +155,20 @@ while True:
             selected_row_index = values["-TABLE-"][0]
         except IndexError:
             continue
+
         selected_row = list_of_streams[selected_row_index]
         audio_tags = [139, 140, 249, 250, 251]
         i_tag = selected_row[3]
+
         # Download Video
         if i_tag not in audio_tags:
             download()
-            try:
-                os.remove("Downloads/thumb.png")
-            except FileNotFoundError:
-                continue
+            delete_file()
+            continue
         # Download Audio
-        if i_tag in audio_tags:
+        else:
             download()
-            try:
-                os.remove("Downloads/thumb.png")
-            except FileNotFoundError:
-                continue
+            delete_file()
+            continue
+
 window.close()
