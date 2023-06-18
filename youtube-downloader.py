@@ -18,6 +18,7 @@ from pytube import YouTube
 from pytube.exceptions import VideoUnavailable
 
 
+version = "v1.0"
 font_used = ("Tahoma", 9)
 
 
@@ -119,7 +120,7 @@ def create_window():
                         expand_x=True,
                         key='-PROGRESS-BAR-')],
     ]
-    return sg.Window("YouTube Downloader by paichiwo",
+    return sg.Window(f"YouTube Downloader by paichiwo {version}",
                      layout,
                      icon="icon.ico",
                      element_justification="center",
