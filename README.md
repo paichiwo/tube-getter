@@ -10,13 +10,12 @@ Additionally, you need to install the following Python libraries:
 
 *   PySimpleGUI
 *   requests
-*   io
 *   PyTube
 *   PIL
 
 You can install these libraries using pip.
 
-`pip install PySimpleGUI requests io PyTube Pillow`
+`pip install PySimpleGUI requests PyTube Pillow`
 
 Or you can use the requirements file:
 
