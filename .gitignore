@@ -1,6 +1,7 @@
 # PyCharm Folders
 /venv/
 /.idea/
+/__pycache__/
 # Application Output
 /.mp4
 /.mp3
