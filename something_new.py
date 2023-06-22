@@ -27,6 +27,7 @@ colors = ["#FBFBFB", "#52524E"]
 font_path = resource_path("./fonts/Manrope-Regular.ttf")
 font = (font_path, 10)
 yt_playlist = []
+table_list = []
 
 
 def settings_popup():
@@ -50,6 +51,11 @@ def settings_popup():
     if event in "GitHub":
         webbrowser.open(data.github_link)
     window.close()
+
+
+def count_file_size(size_data):
+    """Count the stream file sizes."""
+    return round(size_data / (1024 * 1024), 1)
 
 
 def download_video(playlist, output_path):
@@ -87,8 +93,10 @@ def create_window(theme):
          psg.Push()],
 
         [psg.Input("",
+                   focus=True,
                    background_color="light grey",
                    text_color="black",
+                   expand_x=True,
                    border_width=0,
                    pad=5,
                    k="-URL-"),
@@ -123,29 +131,31 @@ def create_window(theme):
                           button_color=("black", colors[0])),
          psg.Push(),
          psg.Text("Format"),
-         psg.Combo(values=["Video mp4", "Audio mp3"],
+         psg.Combo(values=["mp4", "mp3"],
                    k="-FORMAT-"),
          psg.Push(),
-         psg.Button("Download",
-                    k="-DOWNLOAD-")
+         psg.Button("Add",
+                    k="-ADD-")
          ],
 
         [psg.Table(values=[],
                    headings=["Title", "Ext", "Size", "Complete", "Speed", "Status"],
                    col_widths=[33, 7, 8, 6, 8, 12],
                    auto_size_columns=False,
+                   justification="c",
                    background_color="light grey",
                    text_color="black",
                    size=(10, 10),
                    expand_x=True,
                    border_width=0,
-                   pad=5)]
+                   pad=5,
+                   k="-TABLE-")]
     ]
     return psg.Window(f"YouTube Getter v{version}",
                       layout=layout,
-                      size=(800, 500),
+                      size=(800, 550),
                       element_justification="c",
-                      no_titlebar=True,
+                      no_titlebar=False,
                       grab_anywhere=True,
                       finalize=True)
 
@@ -175,14 +185,27 @@ def main():
         if event == "-OK-":
             if "playlist" in values["-URL-"]:
                 p = Playlist(values["-URL-"])
-                for video in p.videos:
-                    print(video)
                 for url in p.video_urls:
                     yt_playlist.append(url)
                 window["-LINKS-"].update("\n".join(yt_playlist))
             else:
                 yt_playlist.append(values["-URL-"])
                 window["-LINKS-"].update("\n".join(yt_playlist))
+
+        if event == "-ADD-":
+            if values["-FORMAT-"]:
+                for url in yt_playlist:
+                    yt = YouTube(url)
+                    table_list.append(
+                        [yt.streams.get_highest_resolution().title,
+                         values["-FORMAT-"],
+                         f"{count_file_size(yt.streams.get_highest_resolution().filesize)} MB",
+                         "0 %",
+                         "13.4 Mb/s",
+                         "testing"])
+                window["-TABLE-"].update(table_list)
+            else:
+                print("no format selected.")
 
         if event == "-DOWNLOAD-":
             output_format = values["-FORMAT-"]
