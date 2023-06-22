@@ -46,11 +46,13 @@ def settings_popup():
                         grab_anywhere=True,
                         finalize=True,
                         icon=resource_path("./images/youtube.png"))
-
-    event, values = window.read()
-    if event in "GitHub":
-        webbrowser.open(data.github_link)
-    window.close()
+    while True:
+        event, values = window.read()
+        if event == psg.WIN_CLOSED:
+            break
+        if event in "GitHub":
+            webbrowser.open(data.github_link)
+        window.close()
 
 
 def count_file_size(size_data):
@@ -128,10 +130,12 @@ def create_window(theme):
                    text_color="black",
                    k="-DOWNLOAD-FOLDER-"),
          psg.FolderBrowse("•••",
-                          button_color=("black", colors[0])),
+                          button_color=("black", colors[0]),
+                          initial_folder="C:/Users/lzeru/Desktop/Nowy folder"),
          psg.Push(),
          psg.Text("Format"),
          psg.Combo(values=["mp4", "mp3"],
+                   default_value="mp3",
                    k="-FORMAT-"),
          psg.Push(),
          psg.Button("Add",
@@ -151,7 +155,10 @@ def create_window(theme):
                    pad=5,
                    k="-TABLE-")],
 
-        [psg.Push(),
+        [psg.Button("Clear",
+                    border_width=0,
+                    k="-CLEAR-"),
+         psg.Push(),
          psg.Button("Download",
                     border_width=0,
                     k="-DOWNLOAD-")]
@@ -211,6 +218,12 @@ def main():
                 window["-TABLE-"].update(table_list)
             else:
                 print("no format selected.")
+
+        if event == "-CLEAR-":
+            yt_playlist.clear()
+            table_list.clear()
+            window["-TABLE-"].update(table_list)
+            window["-LINKS-"].update("\n".join(yt_playlist))
 
         if event == "-DOWNLOAD-":
             output_format = values["-FORMAT-"]
