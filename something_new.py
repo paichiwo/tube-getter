@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
 
 import os
-import io
 import sys
-import base64
-import requests
 import webbrowser
 import PySimpleGUI as psg
 import data
-from PIL import Image
 from pytube import YouTube
+from pytube import Playlist
 from pytube.exceptions import VideoUnavailable
 
 # sort font problem
+
+# https://www.youtube.com/playlist?list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq
 
 
 def resource_path(relative_path):
@@ -24,12 +23,14 @@ def resource_path(relative_path):
 
 version = "1.1"
 themes = ["LightGrey", "DarkGrey4"]
-colors = ["white", "#52524E"]
+colors = ["#FBFBFB", "#52524E"]
 font_path = resource_path("./fonts/Manrope-Regular.ttf")
 font = (font_path, 10)
+yt_playlist = []
 
 
 def settings_popup():
+    """Creates a new window with app information / settings."""
     layout = [[psg.Image(filename=resource_path("./images/youtube.png"))],
               [psg.Text(f"YOUTUBE GETTER v{version}\nby Paichiwo\n2023\n\n{data.popup_message}",
                         justification='c')],
@@ -51,6 +52,26 @@ def settings_popup():
     window.close()
 
 
+def download_video(playlist, output_path):
+    """Download video stream - highest resolution."""
+    for url in playlist:
+        yt = YouTube(url)
+        stream = yt.streams.get_highest_resolution()
+        stream.download(output_path=output_path, filename=stream.default_filename)
+
+
+def download_audio(playlist, output_path):
+    """Download audio stream."""
+    for url in playlist:
+        yt = YouTube(url)
+        stream = yt.streams.get_audio_only()
+        if stream.mime_type == "audio/mp4":
+            filename = stream.default_filename.rsplit(".", 1)[0] + ".mp3"
+        else:
+            filename = stream.default_filename
+        stream.download(output_path=output_path, filename=filename)
+
+
 def create_window(theme):
     """Application layout for PySimpleGUI."""
     psg.theme(theme)
@@ -58,7 +79,7 @@ def create_window(theme):
     layout = [
         [psg.Push(),
          psg.Button(image_filename=resource_path("./images/close.png"),
-                    button_color="white",
+                    button_color=colors[0],
                     border_width=0,
                     k="-CLOSE-")],
 
@@ -71,14 +92,16 @@ def create_window(theme):
                    border_width=0,
                    pad=5,
                    k="-URL-"),
+         psg.Button("OK",
+                    k="-OK-"),
          psg.Push(),
-         psg.Button(image_filename=resource_path("./images/dark.png"),
-                    button_color="white",
+         psg.Button(image_filename=resource_path("./images/icons_black/sun.png"),
+                    button_color=colors[0],
                     border_width=0,
                     pad=5,
                     k="-THEME-"),
-         psg.Button(image_filename=resource_path("./images/settings.png"),
-                    button_color="white",
+         psg.Button(image_filename=resource_path("./images/icons_black/setting.png"),
+                    button_color=colors[0],
                     border_width=0,
                     pad=5,
                     k="-SETTINGS-")],
@@ -90,7 +113,33 @@ def create_window(theme):
                        expand_x=True,
                        border_width=0,
                        pad=5,
-                       k="-LINKS-")]
+                       k="-LINKS-")],
+
+        [psg.Image(filename=resource_path("./images/icons_black/folder.png")),
+         psg.Input(background_color="light grey",
+                   text_color="black",
+                   k="-DOWNLOAD-FOLDER-"),
+         psg.FolderBrowse("•••",
+                          button_color=("black", colors[0])),
+         psg.Push(),
+         psg.Text("Format"),
+         psg.Combo(values=["Video mp4", "Audio mp3"],
+                   k="-FORMAT-"),
+         psg.Push(),
+         psg.Button("Download",
+                    k="-DOWNLOAD-")
+         ],
+
+        [psg.Table(values=[],
+                   headings=["Title", "Ext", "Size", "Complete", "Speed", "Status"],
+                   col_widths=[33, 7, 8, 6, 8, 12],
+                   auto_size_columns=False,
+                   background_color="light grey",
+                   text_color="black",
+                   size=(10, 10),
+                   expand_x=True,
+                   border_width=0,
+                   pad=5)]
     ]
     return psg.Window(f"YouTube Getter v{version}",
                       layout=layout,
@@ -122,6 +171,26 @@ def main():
 
         if event == "-SETTINGS-":
             settings_popup()
+
+        if event == "-OK-":
+            if "playlist" in values["-URL-"]:
+                p = Playlist(values["-URL-"])
+                for video in p.videos:
+                    print(video)
+                for url in p.video_urls:
+                    yt_playlist.append(url)
+                window["-LINKS-"].update("\n".join(yt_playlist))
+            else:
+                yt_playlist.append(values["-URL-"])
+                window["-LINKS-"].update("\n".join(yt_playlist))
+
+        if event == "-DOWNLOAD-":
+            output_format = values["-FORMAT-"]
+            output_path = values["-DOWNLOAD-FOLDER-"]
+            if output_format == "Video mp4":
+                download_video(yt_playlist, output_path)
+            else:
+                download_audio(yt_playlist, output_path)
 
     window.close()
 
