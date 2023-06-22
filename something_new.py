@@ -24,8 +24,6 @@ def resource_path(relative_path):
 version = "1.1"
 themes = ["LightGrey", "DarkGrey4"]
 colors = ["#FBFBFB", "#52524E"]
-font_path = resource_path("./fonts/Manrope-Regular.ttf")
-font = (font_path, 10)
 yt_playlist = []
 table_list = []
 
@@ -37,7 +35,7 @@ def settings_popup():
                         justification='c')],
               [psg.Image(filename=resource_path("./images/github.png")),
                psg.Text("GitHub",
-                        font=(font, 10, "underline"),
+                        font=("Arial", 10, "underline"),
                         enable_events=True)],
               [psg.Button('OK')]]
     window = psg.Window("Information",
@@ -91,7 +89,7 @@ def create_window(theme):
                     border_width=0,
                     k="-CLOSE-")],
 
-        [psg.Text("Enter URLs:", font=font),
+        [psg.Text("Enter URLs:"),
          psg.Push()],
 
         [psg.Input("",
