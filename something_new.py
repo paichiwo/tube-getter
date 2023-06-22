@@ -149,7 +149,12 @@ def create_window(theme):
                    expand_x=True,
                    border_width=0,
                    pad=5,
-                   k="-TABLE-")]
+                   k="-TABLE-")],
+
+        [psg.Push(),
+         psg.Button("Download",
+                    border_width=0,
+                    k="-DOWNLOAD-")]
     ]
     return psg.Window(f"YouTube Getter v{version}",
                       layout=layout,
