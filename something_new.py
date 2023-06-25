@@ -2,16 +2,14 @@
 
 import os
 import sys
-import webbrowser
-from datetime import datetime
-
-import PySimpleGUI as psg
 import data
+import webbrowser
+import PySimpleGUI as psg
+from datetime import datetime
 from pytube import YouTube
 from pytube import Playlist
 from pytube.exceptions import VideoUnavailable
 
-# sort font problem
 
 # https://www.youtube.com/playlist?list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq
 
@@ -62,7 +60,7 @@ def count_file_size(size_bytes):
 
 
 def count_progress(stream, chunk, bytes_remaining, window):
-    """Count progress of downloading file."""
+    """Count the progress of downloading file."""
     total_size = stream.filesize
     bytes_downloaded = total_size - bytes_remaining
     percentage_completion = round(bytes_downloaded / total_size * 100, 2)
@@ -71,24 +69,54 @@ def count_progress(stream, chunk, bytes_remaining, window):
     window["-TABLE-"].update(table_list)
 
 
+def get_playlist_links(url):
+    """Create a list with user links."""
+    if "playlist" in url:
+        p = Playlist(url)
+        for link in p.video_urls:
+            yt_playlist.append(link)
+    else:
+        yt_playlist.append(url)
+
+
+def update_table(i_tag, output_format,  window):
+    """Update the table with user links information."""
+    for url in yt_playlist:
+        yt = YouTube(url)
+        table_list.append(
+            [yt.streams.get_by_itag(i_tag).title,
+             output_format,
+             f"{count_file_size(yt.streams.get_by_itag(i_tag).filesize)} MB",
+             "0%",
+             "0 Mb/s",
+             "testing"])
+    window["-TABLE-"].update(table_list)
+
+
 def download_video(playlist, output_path, window):
     """Download video stream - highest resolution."""
     for url in playlist:
-        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream, chunk, bytes_remaining, window))
-        stream = yt.streams.get_highest_resolution()
-        stream.download(output_path=output_path, filename=stream.default_filename)
+        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
+                                                                                                     chunk,
+                                                                                                     bytes_remaining,
+                                                                                                     window))
+        yt_stream = yt.streams.get_highest_resolution()
+        yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
 
 
 def download_audio(playlist, output_path, window):
     """Download audio stream."""
     for url in playlist:
-        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream, chunk, bytes_remaining, window))
-        stream = yt.streams.get_audio_only()
-        if stream.mime_type == "audio/mp4":
-            filename = stream.default_filename.rsplit(".", 1)[0] + ".mp3"
+        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
+                                                                                                     chunk,
+                                                                                                     bytes_remaining,
+                                                                                                     window))
+        yt_stream = yt.streams.get_audio_only()
+        if yt_stream.mime_type == "audio/mp4":
+            filename = yt_stream.default_filename.rsplit(".", 1)[0] + ".mp3"
         else:
-            filename = stream.default_filename
-        stream.download(output_path=output_path, filename=filename)
+            filename = yt_stream.default_filename
+        yt_stream.download(output_path=output_path, filename=filename)
 
 
 def create_window(theme):
@@ -116,8 +144,8 @@ def create_window(theme):
 
                    k="-URL-"),
          psg.Button('Submit', visible=False, bind_return_key=True),
-         psg.Button("OK",
-                    k="-OK-"),
+         psg.Button("Add",
+                    k="-ADD-"),
          psg.Push(),
          psg.Button(image_filename=resource_path("./images/icons_black/sun.png"),
                     button_color=colors[0],
@@ -129,15 +157,6 @@ def create_window(theme):
                     border_width=0,
                     pad=5,
                     k="-SETTINGS-")],
-
-        [psg.Multiline(autoscroll=True,
-                       background_color="light grey",
-                       text_color="black",
-                       size=(10, 10),
-                       expand_x=True,
-                       border_width=0,
-                       pad=5,
-                       k="-LINKS-")],
 
         [psg.Image(filename=resource_path("./images/icons_black/folder.png")),
          psg.Input(background_color="light grey",
@@ -151,9 +170,6 @@ def create_window(theme):
          psg.Combo(values=["mp4", "mp3"],
                    default_value="mp3",
                    k="-FORMAT-"),
-         psg.Push(),
-         psg.Button("Add",
-                    k="-ADD-")
          ],
 
         [psg.Table(values=[],
@@ -164,7 +180,7 @@ def create_window(theme):
                    background_color="light grey",
                    alternating_row_color="grey",
                    text_color="black",
-                   size=(10, 10),
+                   size=(10, 20),
                    expand_x=True,
                    border_width=0,
                    pad=5,
@@ -212,38 +228,17 @@ def main():
         elif event == "-SETTINGS-":
             settings_popup()
 
-        elif event == "-OK-" or event == "Submit":
-            if "playlist" in values["-URL-"]:
-                p = Playlist(values["-URL-"])
-                for url in p.video_urls:
-                    yt_playlist.append(url)
-                window["-LINKS-"].update("\n".join(yt_playlist))
+        elif event == "-ADD-" or event == "Submit":
+            get_playlist_links(values["-URL-"])
+            if values["-FORMAT-"] == "mp4":
+                update_table(22, "mp4", window)
             else:
-                yt_playlist.append(values["-URL-"])
-                window["-LINKS-"].update("\n".join(yt_playlist))
-
-        elif event == "-ADD-":
-            if values["-FORMAT-"]:
-                for url in yt_playlist:
-                    yt = YouTube(url)
-                    table_list.append(
-                        [yt.streams.get_by_itag(22).title,
-                         values["-FORMAT-"],
-                         f"{count_file_size(yt.streams.get_by_itag(22).filesize)} MB",
-                         "0%",
-                         f"{count_progress}",
-                         "0 Mb/s",
-                         "testing"])
-                window["-TABLE-"].update(table_list)
-                print(values["-TABLE-"])
-            else:
-                print("no format selected.")
+                update_table(140, "mp3", window)
 
         elif event == "-CLEAR-":
             yt_playlist.clear()
             table_list.clear()
             window["-TABLE-"].update(table_list)
-            window["-LINKS-"].update("\n".join(yt_playlist))
 
         elif event == "-DOWNLOAD-":
             output_format = values["-FORMAT-"]
