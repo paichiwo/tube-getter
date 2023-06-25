@@ -12,9 +12,6 @@ from pytube import Playlist
 from pytube.exceptions import VideoUnavailable
 
 
-# https://www.youtube.com/playlist?list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq
-
-
 def resource_path(relative_path):
     """PyInstaller requirement,
     Get an absolute path to resource, works for dev and for PyInstaller."""
@@ -39,6 +36,7 @@ def settings_popup():
                psg.Text("GitHub",
                         font=("Arial", 10, "underline"),
                         enable_events=True)],
+              [psg.Text("")],
               [psg.Button('OK')]]
     window = psg.Window("Information",
                         layout,
@@ -125,30 +123,16 @@ def create_window(theme):
     psg.theme(theme)
 
     layout = [
-        [psg.Push(),
-         psg.Button(image_filename=resource_path("./images/close.png"),
-                    button_color=colors[0],
-                    border_width=0,
-                    k="-CLOSE-")],
 
         [psg.Text("Enter URLs:"),
-         psg.Push()],
-
-        [psg.Input("",
-                   focus=True,
+         psg.Push(),
+         psg.Text("Ext:"),
+         psg.Combo(values=["mp4", "mp3"],
+                   default_value="mp3",
                    background_color="light grey",
                    text_color="black",
-                   expand_x=True,
-                   border_width=0,
                    pad=5,
-                   right_click_menu=["%Right", ["Paste"]],
-
-                   k="-URL-"),
-         psg.Button('Submit', visible=False, bind_return_key=True),
-         psg.Button("Add",
-                    border_width=0,
-                    k="-ADD-"),
-         psg.Push(),
+                   k="-FORMAT-"),
          psg.Button(image_filename=resource_path("./images/icons_black/sun.png"),
                     button_color=colors[0],
                     border_width=0,
@@ -160,22 +144,30 @@ def create_window(theme):
                     pad=5,
                     k="-SETTINGS-")],
 
+        [psg.Input(focus=True,
+                   background_color="light grey",
+                   text_color="black",
+                   expand_x=True,
+                   border_width=0,
+                   pad=5,
+                   right_click_menu=["%Right", ["Paste"]],
+                   k="-URL-"),
+         psg.Button('Submit', visible=False, bind_return_key=True),
+         psg.Button("Add",
+                    border_width=0,
+                    pad=5,
+                    k="-ADD-")],
+
         [psg.Image(filename=resource_path("./images/icons_black/folder.png")),
          psg.Input("C:/Users/",
                    background_color="light grey",
                    text_color="black",
+                   expand_x=True,
                    border_width=0,
                    k="-DOWNLOAD-FOLDER-"),
-         psg.FolderBrowse("•••",
-                          button_color=("black", colors[0]),
+         psg.FolderBrowse("Browse",
                           initial_folder="C:/Users/",
-                          k="-DOTS-"),
-         psg.Push(),
-         psg.Text("Format"),
-         psg.Combo(values=["mp4", "mp3"],
-                   default_value="mp3",
-                   k="-FORMAT-"),
-         ],
+                          k="-DOTS-")],
 
         [psg.Table(values=[],
                    headings=["Title", "Ext", "Size", "Progress", "Speed", "Status"],
@@ -193,18 +185,20 @@ def create_window(theme):
 
         [psg.Button("Clear",
                     border_width=0,
+                    pad=5,
                     k="-CLEAR-"),
          psg.Push(),
          psg.Button("Download",
                     border_width=0,
+                    pad=5,
                     k="-DOWNLOAD-")]
     ]
     return psg.Window(f"YouTube Getter v{version}",
                       layout=layout,
-                      size=(800, 550),
+                      size=(800, 500),
                       element_justification="c",
-                      no_titlebar=False,
-                      grab_anywhere=True,
+                      resizable=True,
+                      icon=resource_path("./images/youtube.png"),
                       finalize=True)
 
 
@@ -214,7 +208,7 @@ def main():
     themes_counter = 1
     while True:
         event, values = window.read()
-        if event == psg.WIN_CLOSED or event == "-CLOSE-":
+        if event == psg.WIN_CLOSED:
             break
 
         elif event == "Paste":
@@ -227,7 +221,6 @@ def main():
             window = create_window(theme)
             window["-SETTINGS-"].update(button_color=color)
             window["-THEME-"].update(button_color=color)
-            window["-CLOSE-"].update(button_color=color)
             window["-DOTS-"].update(button_color=color)
             themes_counter += 1
 
