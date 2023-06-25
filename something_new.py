@@ -2,7 +2,6 @@
 
 import os
 import sys
-import threading
 import webbrowser
 from datetime import datetime
 
@@ -63,7 +62,7 @@ def count_file_size(size_bytes):
 
 
 def count_progress(stream, chunk, bytes_remaining, window):
-    """Count the progress of downloading file."""
+    """Count progress of downloading file."""
     total_size = stream.filesize
     bytes_downloaded = total_size - bytes_remaining
     percentage_completion = round(bytes_downloaded / total_size * 100, 2)
@@ -74,82 +73,22 @@ def count_progress(stream, chunk, bytes_remaining, window):
 
 def download_video(playlist, output_path, window):
     """Download video stream - highest resolution."""
-    def download_single_video(url):
-        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
-                                                                                                     chunk,
-                                                                                                     bytes_remaining,
-                                                                                                     window))
+    for url in playlist:
+        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream, chunk, bytes_remaining, window))
         stream = yt.streams.get_highest_resolution()
         stream.download(output_path=output_path, filename=stream.default_filename)
 
-    threads = []
-    for url in playlist:
-        thread = threading.Thread(target=download_single_video, args=(url,))
-        threads.append(thread)
-        thread.start()
-
-    # Wait for all threads to complete
-    for thread in threads:
-        thread.join()
-
 
 def download_audio(playlist, output_path, window):
-    """Download audio stream at 128kbs."""
-    def download_single_audio(url):
-        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
-                                                                                                     chunk,
-                                                                                                     bytes_remaining,
-                                                                                                     window))
+    """Download audio stream."""
+    for url in playlist:
+        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream, chunk, bytes_remaining, window))
         stream = yt.streams.get_audio_only()
         if stream.mime_type == "audio/mp4":
             filename = stream.default_filename.rsplit(".", 1)[0] + ".mp3"
         else:
             filename = stream.default_filename
         stream.download(output_path=output_path, filename=filename)
-
-    threads = []
-    for url in playlist:
-        thread = threading.Thread(target=download_single_audio, args=(url,))
-        threads.append(thread)
-        thread.start()
-
-    # Wait for all threads to complete
-    for thread in threads:
-        thread.join()
-
-
-def process_url(url, playlist, window):
-    if "playlist" in url:
-        p = Playlist(url)
-        for video_url in p.video_urls:
-            playlist.append(video_url)
-    else:
-        playlist.append(url)
-    window["-LINKS-"].update("\n".join(playlist))
-
-
-def process_urls(urls, playlist, window):
-    for url in urls:
-        process_url(url, playlist, window)
-
-
-def process_add_event(values, playlist, window):
-    format_selected = values["-FORMAT-"]
-    if format_selected:
-        for url in playlist:
-            yt = YouTube(url)
-            table_list.append(
-                [yt.streams.get_by_itag(22).title,
-                 format_selected,
-                 f"{count_file_size(yt.streams.get_by_itag(22).filesize)} MB",
-                 "0%",
-                 f"{count_progress}",
-                 "0 Mb/s",
-                 "testing"])
-        window["-TABLE-"].update(table_list)
-        print(values["-TABLE-"])
-    else:
-        print("no format selected.")
 
 
 def create_window(theme):
@@ -274,11 +213,31 @@ def main():
             settings_popup()
 
         elif event == "-OK-" or event == "Submit":
-            urls = values["-URL-"].split("\n")
-            threading.Thread(target=process_urls, args=(urls, yt_playlist, window)).start()
+            if "playlist" in values["-URL-"]:
+                p = Playlist(values["-URL-"])
+                for url in p.video_urls:
+                    yt_playlist.append(url)
+                window["-LINKS-"].update("\n".join(yt_playlist))
+            else:
+                yt_playlist.append(values["-URL-"])
+                window["-LINKS-"].update("\n".join(yt_playlist))
 
         elif event == "-ADD-":
-            threading.Thread(target=process_add_event, args=(values, yt_playlist, window)).start()
+            if values["-FORMAT-"]:
+                for url in yt_playlist:
+                    yt = YouTube(url)
+                    table_list.append(
+                        [yt.streams.get_by_itag(22).title,
+                         values["-FORMAT-"],
+                         f"{count_file_size(yt.streams.get_by_itag(22).filesize)} MB",
+                         "0%",
+                         f"{count_progress}",
+                         "0 Mb/s",
+                         "testing"])
+                window["-TABLE-"].update(table_list)
+                print(values["-TABLE-"])
+            else:
+                print("no format selected.")
 
         elif event == "-CLEAR-":
             yt_playlist.clear()
