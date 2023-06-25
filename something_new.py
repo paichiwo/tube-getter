@@ -2,6 +2,9 @@
 
 import os
 import sys
+
+import pytube.exceptions
+
 import data
 import webbrowser
 import PySimpleGUI as psg
@@ -145,6 +148,7 @@ def create_window(theme):
                    k="-URL-"),
          psg.Button('Submit', visible=False, bind_return_key=True),
          psg.Button("Add",
+                    border_width=0,
                     k="-ADD-"),
          psg.Push(),
          psg.Button(image_filename=resource_path("./images/icons_black/sun.png"),
@@ -159,12 +163,15 @@ def create_window(theme):
                     k="-SETTINGS-")],
 
         [psg.Image(filename=resource_path("./images/icons_black/folder.png")),
-         psg.Input(background_color="light grey",
+         psg.Input("C:/Users/",
+                   background_color="light grey",
                    text_color="black",
+                   border_width=0,
                    k="-DOWNLOAD-FOLDER-"),
          psg.FolderBrowse("•••",
                           button_color=("black", colors[0]),
-                          initial_folder="C:/Users/lzeru/Desktop/Nowy folder"),
+                          initial_folder="C:/Users/",
+                          k="-DOTS-"),
          psg.Push(),
          psg.Text("Format"),
          psg.Combo(values=["mp4", "mp3"],
@@ -223,17 +230,27 @@ def main():
             window["-SETTINGS-"].update(button_color=color)
             window["-THEME-"].update(button_color=color)
             window["-CLOSE-"].update(button_color=color)
+            window["-DOTS-"].update(button_color=color)
             themes_counter += 1
 
         elif event == "-SETTINGS-":
             settings_popup()
 
         elif event == "-ADD-" or event == "Submit":
-            get_playlist_links(values["-URL-"])
-            if values["-FORMAT-"] == "mp4":
-                update_table(22, "mp4", window)
+            if values["-URL-"]:
+                try:
+                    get_playlist_links(values["-URL-"])
+                    if values["-FORMAT-"] == "mp4":
+                        update_table(22, "mp4", window)
+                    else:
+                        update_table(140, "mp3", window)
+
+                except VideoUnavailable:
+                    psg.popup("ERROR: Video is age restricted")
+                except pytube.exceptions.RegexMatchError:
+                    psg.popup("ERROR: Wrong URL",)
             else:
-                update_table(140, "mp3", window)
+                psg.Popup("ERROR: No url detected.")
 
         elif event == "-CLEAR-":
             yt_playlist.clear()
