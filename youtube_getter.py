@@ -2,6 +2,8 @@
 
 import os
 import sys
+import threading
+
 import pytube.exceptions
 import data
 import webbrowser
@@ -94,7 +96,7 @@ def update_table(i_tag, output_format,  window):
 
 def download_video(playlist, output_path, window):
     """Download video stream - highest resolution."""
-    for url in playlist:
+    def download_single_video(url):
         yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
                                                                                                      chunk,
                                                                                                      bytes_remaining,
@@ -102,10 +104,20 @@ def download_video(playlist, output_path, window):
         yt_stream = yt.streams.get_highest_resolution()
         yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
 
+    threads = []
+    for link in playlist:
+        t = threading.Thread(target=download_single_video, args=(link,))
+        threads.append(t)
+        t.start()
+
+    # Wait for all threads to finish
+    for t in threads:
+        t.join()
+
 
 def download_audio(playlist, output_path, window):
     """Download audio stream."""
-    for url in playlist:
+    def download_single_audio(url):
         yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
                                                                                                      chunk,
                                                                                                      bytes_remaining,
@@ -116,6 +128,16 @@ def download_audio(playlist, output_path, window):
         else:
             filename = yt_stream.default_filename
         yt_stream.download(output_path=output_path, filename=filename)
+
+    threads = []
+    for link in playlist:
+        t = threading.Thread(target=download_single_audio, args=(link,))
+        threads.append(t)
+        t.start()
+
+    # Wait for all threads to finish
+    for t in threads:
+        t.join()
 
 
 def create_window(theme):
@@ -155,6 +177,7 @@ def create_window(theme):
          psg.Button('Submit', visible=False, bind_return_key=True),
          psg.Button("Add",
                     border_width=0,
+                    size=8,
                     pad=5,
                     k="-ADD-")],
 
@@ -167,6 +190,7 @@ def create_window(theme):
                    k="-DOWNLOAD-FOLDER-"),
          psg.FolderBrowse("Browse",
                           initial_folder="C:/Users/",
+                          size=(8, 1),
                           k="-DOTS-")],
 
         [psg.Table(values=[],
@@ -185,11 +209,13 @@ def create_window(theme):
 
         [psg.Button("Clear",
                     border_width=0,
+                    size=8,
                     pad=5,
                     k="-CLEAR-"),
          psg.Push(),
          psg.Button("Download",
                     border_width=0,
+                    size=8,
                     pad=5,
                     k="-DOWNLOAD-")]
     ]
@@ -221,7 +247,6 @@ def main():
             window = create_window(theme)
             window["-SETTINGS-"].update(button_color=color)
             window["-THEME-"].update(button_color=color)
-            window["-DOTS-"].update(button_color=color)
             themes_counter += 1
 
         elif event == "-SETTINGS-":
@@ -252,9 +277,9 @@ def main():
             output_format = values["-FORMAT-"]
             output_path = values["-DOWNLOAD-FOLDER-"]
             if output_format == "Video mp4":
-                download_video(yt_playlist, output_path, window)
+                threading.Thread(target=download_video, args=(yt_playlist, output_path, window)).start()
             else:
-                download_audio(yt_playlist, output_path, window)
+                threading.Thread(target=download_audio, args=(yt_playlist, output_path, window)).start()
 
     window.close()
 
