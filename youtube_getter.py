@@ -66,6 +66,7 @@ def count_progress(stream, chunk, bytes_remaining, window):
     bytes_downloaded = total_size - bytes_remaining
     percentage_completion = round(bytes_downloaded / total_size * 100, 2)
     for item in table_list:
+        print(item[3])
         item[3] = f"{percentage_completion}%"
     window["-TABLE-"].update(table_list)
 
@@ -82,6 +83,7 @@ def get_playlist_links(url):
 
 def update_table(i_tag, output_format,  window):
     """Update the table with user links information."""
+    table_list.clear()
     for url in yt_playlist:
         yt = YouTube(url)
         table_list.append(
@@ -92,33 +94,31 @@ def update_table(i_tag, output_format,  window):
              "0 Mb/s",
              "testing"])
     window["-TABLE-"].update(table_list)
+    print(len(table_list))
 
 
 def download_video(playlist, output_path, window):
     """Download video stream - highest resolution."""
-    def download_single_video(url):
-        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
+    for link in playlist:
+        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
                                                                                                      chunk,
                                                                                                      bytes_remaining,
                                                                                                      window))
         yt_stream = yt.streams.get_highest_resolution()
-        yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
 
-    threads = []
-    for link in playlist:
-        t = threading.Thread(target=download_single_video, args=(link,))
-        threads.append(t)
-        t.start()
-
-    # Wait for all threads to finish
-    for t in threads:
-        t.join()
+        for item in table_list:
+            item[5] = "downloading"
+        window["-TABLE-"].update(table_list)
+        try:
+            yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
+        except (PermissionError, RuntimeError):
+            psg.popup("ERROR: Permission Error.")
 
 
 def download_audio(playlist, output_path, window):
     """Download audio stream."""
-    def download_single_audio(url):
-        yt = YouTube(url, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
+    for link in playlist:
+        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
                                                                                                      chunk,
                                                                                                      bytes_remaining,
                                                                                                      window))
@@ -127,17 +127,14 @@ def download_audio(playlist, output_path, window):
             filename = yt_stream.default_filename.rsplit(".", 1)[0] + ".mp3"
         else:
             filename = yt_stream.default_filename
-        yt_stream.download(output_path=output_path, filename=filename)
 
-    threads = []
-    for link in playlist:
-        t = threading.Thread(target=download_single_audio, args=(link,))
-        threads.append(t)
-        t.start()
-
-    # Wait for all threads to finish
-    for t in threads:
-        t.join()
+        for item in table_list:
+            item[5] = "downloading"
+        window["-TABLE-"].update(table_list)
+        try:
+            yt_stream.download(output_path=output_path, filename=filename)
+        except (PermissionError, RuntimeError):
+            psg.popup("ERROR: Permission Error.")
 
 
 def create_window(theme):
@@ -262,9 +259,9 @@ def main():
                         update_table(140, "mp3", window)
 
                 except VideoUnavailable:
-                    psg.popup("ERROR: Video is age restricted")
+                    psg.popup("ERROR: Video is age restricted.")
                 except pytube.exceptions.RegexMatchError:
-                    psg.popup("ERROR: Wrong URL",)
+                    psg.popup("ERROR: Wrong URL.",)
             else:
                 psg.Popup("ERROR: No url detected.")
 
@@ -276,10 +273,11 @@ def main():
         elif event == "-DOWNLOAD-":
             output_format = values["-FORMAT-"]
             output_path = values["-DOWNLOAD-FOLDER-"]
-            if output_format == "Video mp4":
-                threading.Thread(target=download_video, args=(yt_playlist, output_path, window)).start()
+            if output_format == "mp4":
+                threading.Thread(target=download_video, args=(yt_playlist.copy(), output_path, window)).start()
+                print(type(window["-TABLE-"]))
             else:
-                threading.Thread(target=download_audio, args=(yt_playlist, output_path, window)).start()
+                threading.Thread(target=download_audio, args=(yt_playlist.copy(), output_path, window)).start()
 
     window.close()
 
