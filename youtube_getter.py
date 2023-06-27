@@ -103,11 +103,14 @@ def download_video(playlist, output_path, window):
                                                                                                       bytes_remaining,
                                                                                                       window))
         yt_stream = yt.streams.get_highest_resolution()
-        table_list[index][5] = "downloading"
+        # Set status to 'downloading'
+        table_list[index][5] = "Downloading"
         window["-TABLE-"].update(table_list)
         try:
             yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
-
+            # Set status to 'complete'
+            table_list[index][5] = "Complete"
+            window["-TABLE"].update(table_list)
         except (PermissionError, RuntimeError):
             psg.popup("ERROR: Permission Error.")
 
@@ -120,16 +123,20 @@ def download_audio(playlist, output_path, window):
                                                                                                       bytes_remaining,
                                                                                                       window))
         yt_stream = yt.streams.get_audio_only()
+        # Set status to 'downloading'
+        table_list[index][5] = "Downloading"
+        window["-TABLE-"].update(table_list)
 
+        # change an extension to mp3 if mp4 audio downloaded.
         if yt_stream.mime_type == "audio/mp4":
             filename = yt_stream.default_filename.rsplit(".", 1)[0] + ".mp3"
         else:
             filename = yt_stream.default_filename
-        table_list[index][5] = "downloading"
-        window["-TABLE-"].update(table_list)
         try:
             yt_stream.download(output_path=output_path, filename=filename)
-
+            # Set status to 'complete'
+            table_list[index][5] = "Complete"
+            window["-TABLE-"].update(table_list)
         except (PermissionError, RuntimeError):
             psg.popup("ERROR: Permission Error.")
 
