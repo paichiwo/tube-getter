@@ -3,6 +3,7 @@
 import os
 import sys
 import threading
+import urllib.error
 
 import pytube.exceptions
 import data
@@ -60,17 +61,6 @@ def count_file_size(size_bytes):
     return round(size_bytes / (1024 * 1024), 1)
 
 
-def count_progress(stream, chunk, bytes_remaining, window):
-    """Count the progress of downloading file."""
-    total_size = stream.filesize
-    bytes_downloaded = total_size - bytes_remaining
-    percentage_completion = round(bytes_downloaded / total_size * 100, 2)
-    for item in table_list:
-        print(item[3])
-        item[3] = f"{percentage_completion}%"
-    window["-TABLE-"].update(table_list)
-
-
 def get_playlist_links(url):
     """Create a list with user links."""
     if "playlist" in url:
@@ -86,55 +76,71 @@ def update_table(i_tag, output_format,  window):
     table_list.clear()
     for url in yt_playlist:
         yt = YouTube(url)
-        table_list.append(
-            [yt.streams.get_by_itag(i_tag).title,
-             output_format,
-             f"{count_file_size(yt.streams.get_by_itag(i_tag).filesize)} MB",
-             "0%",
-             "0 Mb/s",
-             "testing"])
+        try:
+            table_list.append(
+                [yt.streams.get_by_itag(i_tag).title,
+                 output_format,
+                 f"{count_file_size(yt.streams.get_by_itag(i_tag).filesize)} MB",
+                 "0%",
+                 "0 Mb/s",
+                 "Queued"])
+        except AttributeError:
+            table_list.append(
+                [yt.streams.get_highest_resolution().title,
+                 output_format,
+                 f"{count_file_size(yt.streams.get_highest_resolution().filesize)} MB",
+                 "0%",
+                 "0 Mb/s",
+                 "Queued"])
     window["-TABLE-"].update(table_list)
-    print(len(table_list))
 
 
 def download_video(playlist, output_path, window):
     """Download video stream - highest resolution."""
-    for link in playlist:
-        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
-                                                                                                     chunk,
-                                                                                                     bytes_remaining,
-                                                                                                     window))
+    for index, link in enumerate(playlist):
+        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(index, stream,
+                                                                                                      chunk,
+                                                                                                      bytes_remaining,
+                                                                                                      window))
         yt_stream = yt.streams.get_highest_resolution()
-
-        for item in table_list:
-            item[5] = "downloading"
+        table_list[index][5] = "downloading"
         window["-TABLE-"].update(table_list)
         try:
             yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
+
         except (PermissionError, RuntimeError):
             psg.popup("ERROR: Permission Error.")
 
 
 def download_audio(playlist, output_path, window):
     """Download audio stream."""
-    for link in playlist:
-        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(stream,
-                                                                                                     chunk,
-                                                                                                     bytes_remaining,
-                                                                                                     window))
+    for index, link in enumerate(playlist):
+        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(index, stream,
+                                                                                                      chunk,
+                                                                                                      bytes_remaining,
+                                                                                                      window))
         yt_stream = yt.streams.get_audio_only()
+
         if yt_stream.mime_type == "audio/mp4":
             filename = yt_stream.default_filename.rsplit(".", 1)[0] + ".mp3"
         else:
             filename = yt_stream.default_filename
-
-        for item in table_list:
-            item[5] = "downloading"
+        table_list[index][5] = "downloading"
         window["-TABLE-"].update(table_list)
         try:
             yt_stream.download(output_path=output_path, filename=filename)
+
         except (PermissionError, RuntimeError):
             psg.popup("ERROR: Permission Error.")
+
+
+def count_progress(index, stream, chunk, bytes_remaining, window):
+    """Count the progress of downloading file."""
+    total_size = stream.filesize
+    bytes_downloaded = total_size - bytes_remaining
+    percentage_completion = round(bytes_downloaded / total_size * 100, 2)
+    table_list[index][3] = f"{percentage_completion}%"
+    window["-TABLE-"].update(table_list)
 
 
 def create_window(theme):
@@ -186,7 +192,7 @@ def create_window(theme):
                    border_width=0,
                    k="-DOWNLOAD-FOLDER-"),
          psg.FolderBrowse("Browse",
-                          initial_folder="C:/Users/",
+                          initial_folder="C:/Users/lzeru/Desktop/",
                           size=(8, 1),
                           k="-DOTS-")],
 
@@ -261,7 +267,9 @@ def main():
                 except VideoUnavailable:
                     psg.popup("ERROR: Video is age restricted.")
                 except pytube.exceptions.RegexMatchError:
-                    psg.popup("ERROR: Wrong URL.",)
+                    psg.popup("ERROR: Wrong URL.")
+                except (urllib.error.URLError, urllib.error.HTTPError):
+                    psg.popup("ERROR: Internal error.")
             else:
                 psg.Popup("ERROR: No url detected.")
 
