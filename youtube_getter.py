@@ -110,7 +110,7 @@ def download_video(playlist, output_path, window):
             yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
             # Set status to 'complete'
             table_list[index][5] = "Complete"
-            window["-TABLE"].update(table_list)
+            window["-TABLE-"].update(table_list)
         except (PermissionError, RuntimeError):
             psg.popup("ERROR: Permission Error.")
 
@@ -147,6 +147,12 @@ def count_progress(index, stream, chunk, bytes_remaining, window):
     bytes_downloaded = total_size - bytes_remaining
     percentage_completion = round(bytes_downloaded / total_size * 100, 2)
     table_list[index][3] = f"{percentage_completion}%"
+
+    # Calculate and update the download speed
+    elapsed_time = (datetime.now() - download_start_time).total_seconds()
+    download_speed = bytes_downloaded / (1024 * elapsed_time)  # Convert bytes/sec to kilobytes/sec
+    table_list[index][4] = f"{round(download_speed, 2)} KB/s"
+
     window["-TABLE-"].update(table_list)
 
 
