@@ -1,4 +1,2 @@
 PySimpleGUI
-requests
 pytube
-Pillow
