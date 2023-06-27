@@ -4,15 +4,13 @@ import os
 import sys
 import threading
 import urllib.error
-
-import pytube.exceptions
 import data
 import webbrowser
 import PySimpleGUI as psg
 from datetime import datetime
 from pytube import YouTube
 from pytube import Playlist
-from pytube.exceptions import VideoUnavailable
+import pytube.exceptions
 
 
 def resource_path(relative_path):
@@ -152,7 +150,6 @@ def count_progress(index, stream, chunk, bytes_remaining, window):
     elapsed_time = (datetime.now() - download_start_time).total_seconds()
     download_speed = bytes_downloaded / (1024 * elapsed_time)  # Convert bytes/sec to kilobytes/sec
     table_list[index][4] = f"{round(download_speed, 2)} KB/s"
-
     window["-TABLE-"].update(table_list)
 
 
@@ -161,15 +158,14 @@ def create_window(theme):
     psg.theme(theme)
 
     layout = [
-
         [psg.Text("Enter URLs:"),
          psg.Push(),
          psg.Text("Ext:"),
-         psg.Combo(values=["mp4", "mp3"],
-                   default_value="mp3",
+         psg.Combo(values=["Video", "Audio"],
+                   default_value="Audio",
                    background_color="light grey",
                    text_color="black",
-                   pad=5,
+                   pad=(32, 5),
                    k="-FORMAT-"),
          psg.Button(image_filename=resource_path("./images/icons_black/sun.png"),
                     button_color=colors[0],
@@ -211,7 +207,7 @@ def create_window(theme):
 
         [psg.Table(values=[],
                    headings=["Title", "Ext", "Size", "Progress", "Speed", "Status"],
-                   col_widths=[33, 7, 8, 6, 8, 12],
+                   col_widths=[33, 7, 7, 7, 8, 12],
                    auto_size_columns=False,
                    justification="c",
                    background_color="light grey",
@@ -272,12 +268,12 @@ def main():
             if values["-URL-"]:
                 try:
                     get_playlist_links(values["-URL-"])
-                    if values["-FORMAT-"] == "mp4":
+                    if values["-FORMAT-"] == "Video":
                         update_table(22, "mp4", window)
                     else:
                         update_table(140, "mp3", window)
 
-                except VideoUnavailable:
+                except pytube.exceptions.VideoUnavailable:
                     psg.popup("ERROR: Video is age restricted.")
                 except pytube.exceptions.RegexMatchError:
                     psg.popup("ERROR: Wrong URL.")
