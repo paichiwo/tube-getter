@@ -1,63 +1,78 @@
-## **YouTube Downloader**
+## **Tube Getter**
 
-The Python-based YouTube Downloader is a script that enables users to download video or audio files from YouTube with ease. The user interface is built using the PySimpleGUI library, while the PyTube library is employed to implement the video downloading functionality. With a straightforward and user-friendly design, the script offers a hassle-free method for users to obtain their desired YouTube content.
+![](screenshots/screenshot_full_01.png)
+
+YouTube Getter is a Python application that allows you to download videos and audio from YouTube.
+It provides a simple user interface built with PySimpleGUI
+and utilizes the pytube library for downloading YouTube content.
+
+## **Features**
+
+*   Download videos and audio from YouTube.
+*   Support for downloading individual videos or entire playlists.
+*   Choose the output format (mp4 or mp3).
+*   Monitor the download progress, including file size, download speed, and completion status.
+*   Customize the download folder.
 
 ## **Prerequisites**
 
-To run this script, you need to have Python 3.x installed on your system. You can download it from the official website of Python.
-
-Additionally, you need to install the following Python libraries:
-
+*   Python 3.x
 *   PySimpleGUI
-*   requests
-*   PyTube
-*   PIL
+*   pytube
 
-You can install these libraries using pip.
+## **Installation**
 
-`pip install PySimpleGUI requests PyTube Pillow`
+### SOURCE:
 
-Or you can use the requirements file:
+Clone the repository:   
+`git clone` [`https://github.com/paichiwo/tube-getter.git`](https://github.com/paichiwo/tube-getter.git)
 
-`pip install -r requirements.txt`
+Install the required dependencies or run `requirements.txt`:   
+`pip install PySimpleGUI pytube` or `pip install -r requirements.txt`
+
+Run the application:   
+`python tube_getter.py`
+
+
+### WINDOWS:
+
+Download `tube_getter.exe` from …….   
+Run the application. 
+
+Note: Application is portable, no installation required.
 
 ## **Usage**
 
-To use the YouTube Downloader, run the following command in your terminal:
+- Run the  application, the window will appear.
 
-`python youtube_downloader.py`
+- Enter the YouTube video URL or playlist URL in the input field and click "Add" or press Enter.
 
-Or just run the application on your favourite IDE.
+- Choose the output format (Video or Audio) from the dropdown menu.
 
-Once the program starts, you can use the following steps to download a video or audio from YouTube:
+- Select the download folder by clicking the "Browse" button or manually enter the folder path.
 
-* **Note:** When you running application for first time it might ask for authentication:
-  ![](screenshots/screenshot3.png)   
-  Just follow these steps, authenticate and you ready to go 
+- The table will display the list of videos or audio in the playlist, along with their details.
 
-1.  Enter the URL of the video or audio in the "Video URL" field.
-2.  Click on the "Video" or "Audio" button to display a table with available streams.
-3.  Select a stream from the table.
-4.  Click “Yes” on the "Download" pop-up window to download the selected stream.
+- Click the "Download" button to start the download process and monitor the download progress in the table.
 
-    ![](screenshots/screenshot1.png)
-
-The downloaded files will be saved in the "Downloads" folder in the same directory as the script.  
-The supported file formats are MP4 for video files and MP3 (if 128 kbps bitrate is selected) or WebM (if any other bitrate is selected) for audio files.
-
+- Completed downloads will show the status as “Complete”.
 
 ## **Contributing**
 
-_I'm constantly working on this application, so this code might change a lot._
+_I'm constantly working on this application, this code might change a lot._
 
-If you would like to contribute to the YouTube Downloader, feel free to create a pull request on the GitHub repository.
+If you find any issues, feel free to report.
 
-If you are interested in contributing to the development of the YouTube Downloader, you are welcome to create a pull request on the project's GitHub repository.By contributing to the project, you can help improve the functionality, stability, and overall quality of the YouTube Downloader application, which is much appreciated.
+If you are interested in contributing to the development of the YouTube Downloader,
+you are welcome to create a pull request on the project's GitHub repository.By contributing to the project,
+you can help improve the functionality, stability, and overall quality of the Tube Getter application,
+which is much appreciated.
 
 ## **License**
 
-The YouTube Downloader is licensed under the [MIT License](https://github.com/paichiwo/youtube_downloader/LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
-## **Example** 
+## **Acknowledgements**
 
-![](screenshots/screenshot2.png)
+*   [PySimpleGUI](https://pysimplegui.readthedocs.io/) - Python GUI Framework
+*   [pytube](https://pytube.io/) - Python library for downloading YouTube videos
