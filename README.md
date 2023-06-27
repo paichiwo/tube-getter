@@ -2,7 +2,7 @@
 
 ![](screenshots/screenshot_full_01.png)
 
-YouTube Getter is a Python application that allows you to download videos and audio from YouTube.
+Tube Getter is a Python application that allows you to download videos and audio from YouTube.
 It provides a simple user interface built with PySimpleGUI
 and utilizes the pytube library for downloading YouTube content.
 
@@ -25,7 +25,7 @@ and utilizes the pytube library for downloading YouTube content.
 ### SOURCE:
 
 Clone the repository:   
-`git clone` [`https://github.com/paichiwo/tube-getter.git`](https://github.com/paichiwo/tube-getter.git)
+`git clone https://github.com/paichiwo/tube-getter.git`
 
 Install the required dependencies or run `requirements.txt`:   
 `pip install PySimpleGUI pytube` or `pip install -r requirements.txt`
@@ -36,14 +36,14 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from …….   
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v1.1   
 Run the application. 
 
 Note: Application is portable, no installation required.
 
 ## **Usage**
 
-- Run the  application, the window will appear.
+- Run the application, the window will appear.
 
 - Enter the YouTube video URL or playlist URL in the input field and click "Add" or press Enter.
 
@@ -55,7 +55,7 @@ Note: Application is portable, no installation required.
 
 - Click the "Download" button to start the download process and monitor the download progress in the table.
 
-- Completed downloads will show the status as “Complete”.
+- Completed downloads will show the status as “Complete.”
 
 ## **Contributing**
 
@@ -64,7 +64,7 @@ _I'm constantly working on this application, this code might change a lot._
 If you find any issues, feel free to report.
 
 If you are interested in contributing to the development of the YouTube Downloader,
-you are welcome to create a pull request on the project's GitHub repository.By contributing to the project,
+you are welcome to create a pull request on the project's GitHub repository. By contributing to the project,
 you can help improve the functionality, stability, and overall quality of the Tube Getter application,
 which is much appreciated.
 
