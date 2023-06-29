@@ -8,11 +8,11 @@ and utilizes the pytube library for downloading YouTube content.
 
 ## **Features**
 
-*   Download videos and audio from YouTube.
+*   Download video and audio from YouTube.
 *   Support for downloading individual videos or entire playlists.
 *   Choose the output format (mp4 or mp3).
-*   Monitor the download progress, including file size, download speed, and completion status.
-*   Customize the download folder.
+*   Monitor the download progress, including progress, download speed, and completion status.
+*   Choose the download folder.
 
 ## **Prerequisites**
 
@@ -28,7 +28,9 @@ Clone the repository:
 `git clone https://github.com/paichiwo/tube-getter.git`
 
 Install the required dependencies or run `requirements.txt`:   
-`pip install PySimpleGUI pytube` or `pip install -r requirements.txt`
+`pip install PySimpleGUI pytube`   
+or   
+`pip install -r requirements.txt`
 
 Run the application:   
 `python tube_getter.py`
@@ -46,15 +48,10 @@ Note: Application is portable, no installation required.
 - Run the application, the window will appear.
 
 - Enter the YouTube video URL or playlist URL in the input field and click "Add" or press Enter.
-
 - Choose the output format (Video or Audio) from the dropdown menu.
-
 - Select the download folder by clicking the "Browse" button or manually enter the folder path.
-
 - The table will display the list of videos or audio in the playlist, along with their details.
-
 - Click the "Download" button to start the download process and monitor the download progress in the table.
-
 - Completed downloads will show the status as “Complete.”
 
 ## **Contributing**
