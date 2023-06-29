@@ -96,10 +96,9 @@ def update_table(i_tag, output_format,  window):
 def download_video(playlist, output_path, window):
     """Download video stream - highest resolution."""
     for index, link in enumerate(playlist):
-        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(index, stream,
-                                                                                                      chunk,
-                                                                                                      bytes_remaining,
-                                                                                                      window))
+        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(
+            index, stream, chunk, bytes_remaining, window))
+
         yt_stream = yt.streams.get_highest_resolution()
         # Set status to 'downloading'
         table_list[index][5] = "Downloading"
@@ -116,10 +115,9 @@ def download_video(playlist, output_path, window):
 def download_audio(playlist, output_path, window):
     """Download audio stream."""
     for index, link in enumerate(playlist):
-        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(index, stream,
-                                                                                                      chunk,
-                                                                                                      bytes_remaining,
-                                                                                                      window))
+        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(
+            index, stream, chunk, bytes_remaining, window))
+
         yt_stream = yt.streams.get_audio_only()
         # Set status to 'downloading'
         table_list[index][5] = "Downloading"
@@ -202,8 +200,7 @@ def create_window(theme):
                    k="-DOWNLOAD-FOLDER-"),
          psg.FolderBrowse("Browse",
                           initial_folder="C:/Users/lzeru/Desktop/",
-                          size=(8, 1),
-                          k="-DOTS-")],
+                          size=(8, 1))],
 
         [psg.Table(values=[],
                    headings=["Title", "Ext", "Size", "Progress", "Speed", "Status"],
