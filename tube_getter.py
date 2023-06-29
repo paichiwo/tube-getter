@@ -30,7 +30,7 @@ download_start_time = datetime.now()
 
 def settings_popup():
     """Creates a new window with app information / settings."""
-    layout = [[psg.Image(filename=resource_path("./images/youtube.png"))],
+    layout = [[psg.Image(filename=resource_path("./images/yt3d.png"))],
               [psg.Text(f"YOUTUBE GETTER v{version}\nby Paichiwo\n2023\n\n{data.popup_message}",
                         justification='c')],
               [psg.Image(filename=resource_path("./images/github.png")),
@@ -44,7 +44,7 @@ def settings_popup():
                         element_justification='c',
                         grab_anywhere=True,
                         finalize=True,
-                        icon=resource_path("./images/youtube.png"))
+                        icon=resource_path("./images/yt3d.png"))
     while True:
         event, values = window.read()
         if event == psg.WIN_CLOSED:
@@ -236,7 +236,7 @@ def create_window(theme):
                       size=(800, 500),
                       element_justification="c",
                       resizable=True,
-                      icon=resource_path("./images/youtube.png"),
+                      icon=resource_path("./images/yt3d.png"),
                       finalize=True)
 
 
