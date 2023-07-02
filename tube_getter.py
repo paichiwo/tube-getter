@@ -230,7 +230,7 @@ def create_window(theme):
     ]
     return psg.Window(f"YouTube Getter v{version}",
                       layout=layout,
-                      size=(800, 500),
+                      size=(800, 490),
                       element_justification="c",
                       resizable=True,
                       icon=resource_path("./images/yt3d.png"),
