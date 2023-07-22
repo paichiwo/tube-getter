@@ -1,5 +1,6 @@
 import os
 import sys
+from tkinter import ttk
 
 
 def resource_path(relative_path):
@@ -19,3 +20,9 @@ def center_window(window, width, height):
 
     window.geometry(f"{width}x{height}+{x}+{y}")
     window.update_idletasks()
+
+def set_treeview_style():
+    style = ttk.Style()
+    style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Calibri', 11))  # Modify the font of the body
+    style.configure("mystyle.Treeview.Heading", font=('Calibri', 13, 'bold'))  # Modify the font of the headings
+    style.layout("mystyle.Treeview", [('mystyle.Treeview.treearea', {'sticky': 'nswe'})])  # Remove the borders
