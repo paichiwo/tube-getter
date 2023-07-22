@@ -1,11 +1,20 @@
+import tkinter.font
 from src.helpers import resource_path
 
 version = "1.1"
 
 image_paths = {
     'theme': resource_path('../images/icons_black/sun.png'),
-    'settings': resource_path('../images/icons_black/setting.png')
+    'settings': resource_path('../images/icons_black/setting.png'),
+    'entry': resource_path('../images/entry.png'),
+    'add': resource_path('../images/button_add.png'),
+    'clear': resource_path('../images/button_clear.png'),
+    'download': resource_path('../images/button_download.png'),
+    'icon': resource_path('../images/yt3d.ico')
 }
+font_size = 10
+
+colors = ['#CCCCCC']
 
 popup_message = """
 The Python-based Tube Getter enables users to download video or

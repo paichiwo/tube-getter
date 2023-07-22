@@ -18,3 +18,4 @@ def center_window(window, width, height):
     y = (screen_height - height) // 2
 
     window.geometry(f"{width}x{height}+{x}+{y}")
+    window.update_idletasks()
