@@ -115,8 +115,9 @@ def download_video(playlist, output_path, window):
 def download_audio(playlist, output_path, window):
     """Download audio stream."""
     for index, link in enumerate(playlist):
-        yt = YouTube(link, on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(
-            index, stream, chunk, bytes_remaining, window))
+        yt = YouTube(link,
+                     on_progress_callback=lambda stream, chunk, bytes_remaining: count_progress(
+                         index, stream, chunk, bytes_remaining, window))
 
         yt_stream = yt.streams.get_audio_only()
         # Set status to 'downloading'
@@ -192,14 +193,14 @@ def create_window(theme):
                     k="-ADD-")],
 
         [psg.Image(filename=resource_path("./images/icons_black/folder.png")),
-         psg.Input("C:/Users/",
+         psg.Input("C:/Users/lzeru/Desktop/test",
                    background_color="light grey",
                    text_color="black",
                    expand_x=True,
                    border_width=0,
                    k="-DOWNLOAD-FOLDER-"),
          psg.FolderBrowse("Browse",
-                          initial_folder="C:/Users/lzeru/Desktop/",
+                          initial_folder="C:/Users/lzeru/Desktop/test",
                           size=(8, 1))],
 
         [psg.Table(values=[],
@@ -242,7 +243,7 @@ def main():
     window = create_window(themes[0])
     themes_counter = 1
     while True:
-        event, values = window.read()
+        event, values = window.read(timeout=1000)
         if event == psg.WIN_CLOSED:
             break
 
