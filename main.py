@@ -85,7 +85,8 @@ settings_button_image = PhotoImage(file=image_paths['settings'])
 settings_button = Button(
     root,
     image=settings_button_image,
-    border=0,command=settings_window)
+    border=0,
+    command=settings_window)
 settings_button.place(x=765, y=8)
 
 entry_image = PhotoImage(file=image_paths['entry'])

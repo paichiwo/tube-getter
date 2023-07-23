@@ -30,7 +30,7 @@ def count_file_size(size_bytes):
 
 
 def get_playlist_links(url, array):
-    """Create list with individual links from yt playlist"""
+    """Create a list with individual links from yt playlist"""
     if "playlist" in url:
         p = Playlist(url)
         for link in p.video_urls:
@@ -71,7 +71,7 @@ def load_settings():
         with open(resource_path('../data/settings.json'), 'r') as file:
             settings = json.load(file)
             return settings['output_folder']
-    except json.decoder.JSONDecodeError:
+    except (json.decoder.JSONDecodeError, FileNotFoundError):
         return 'C:/Users/Downloads'
 
 
@@ -79,5 +79,3 @@ def save_settings(output_folder):
     """Save settings to .json file"""
     with open(resource_path('../data/settings.json'), 'w') as file:
         json.dump({'output_folder': output_folder}, file)
-
-

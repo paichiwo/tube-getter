@@ -1,7 +1,7 @@
 import webbrowser
 from tkinter import Tk, Label, PhotoImage, Button, Frame, filedialog
 from src.config import image_paths, settings_header, settings_message, colors, github_url
-from src.helpers import center_window, save_settings, load_settings
+from src.helpers import save_settings, load_settings
 
 
 def settings_window():
@@ -11,24 +11,23 @@ def settings_window():
         folder_selected = filedialog.askdirectory()
         if folder_selected:
             output_folder_value.configure(text=folder_selected)
-            return
 
     def close_window():
         """Save settings to .json file and close the settings window"""
-        output_path = output_folder_label.cget('text')
+        output_path = output_folder_value.cget('text')
         save_settings(output_path)
         sett.destroy()
 
     sett = Tk()
     sett.iconbitmap(bitmap=image_paths['icon'])
-    sett.title(f"Settings")
-    center_window(sett, 500, 450)
+    sett.title("Settings")
+    sett.geometry('500x450')
     sett.resizable(False, False)
 
     # Create top frame and bottom frame
-    top_frame = Frame(sett, border=1)
+    top_frame = Frame(sett)
     top_frame.pack()
-    bot_frame = Frame(sett, border=1)
+    bot_frame = Frame(sett)
     bot_frame.pack()
 
     # TOP FRAME
@@ -87,5 +86,5 @@ def settings_window():
         command=close_window)
     close_button_button.pack(padx=10, pady=10)
 
+    sett.attributes('-topmost', True)
     sett.mainloop()
-
