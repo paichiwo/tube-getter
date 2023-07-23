@@ -1,12 +1,10 @@
 import tkinter.font
 import pytube.exceptions
 import urllib.error
-from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, VERTICAL, NO, CENTER
-
-from pytube import YouTube
-
+from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, CENTER
+from src.settings_window import settings_window
 from src.config import version, image_paths, colors, font_size
-from src.helpers import center_window, get_playlist_links, count_file_size, get_data_for_treeview
+from src.helpers import center_window, get_playlist_links, get_data_for_treeview
 
 yt_playlist = []
 
@@ -46,16 +44,6 @@ def add():
             print("ERROR: Internal error.")
     else:
         print("ERROR: No url detected.")
-
-    # data = [
-    #     ["This is the longest video title I could think of", ".mp4", "100 MB", "50%", "2 MB/s", "Downloading"],
-    #     ["Video 2", ".avi", "200 MB", "75%", "4 MB/s", "Downloading"],
-    #     ["Video 3", ".mkv", "150 MB", "30%", "1 MB/s", "Paused"],
-    #     ["Video 4", ".mp4", "300 MB", "10%", "500 KB/s", "Completed"],
-    #     ["Video 5", ".mov", "50 MB", "90%", "3 MB/s", "Downloading"],
-    # ]
-    # for item in data:
-    #     tree.insert("", "end", values=item)
 
 
 root = Tk()
@@ -97,7 +85,7 @@ settings_button_image = PhotoImage(file=image_paths['settings'])
 settings_button = Button(
     root,
     image=settings_button_image,
-    border=0)
+    border=0,command=settings_window)
 settings_button.place(x=765, y=8)
 
 entry_image = PhotoImage(file=image_paths['entry'])
