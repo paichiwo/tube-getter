@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -62,3 +63,21 @@ def get_data_for_treeview(i_tag, output_format, yt_list):
                 "Queued"
             ])
     return treeview_list
+
+
+def load_settings():
+    """Load settings from .json file"""
+    try:
+        with open(resource_path('../data/settings.json'), 'r') as file:
+            settings = json.load(file)
+            return settings['output_folder']
+    except json.decoder.JSONDecodeError:
+        return 'C:/Users/Downloads'
+
+
+def save_settings(output_folder):
+    """Save settings to .json file"""
+    with open(resource_path('../data/settings.json'), 'w') as file:
+        json.dump({'output_folder': output_folder}, file)
+
+
