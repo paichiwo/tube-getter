@@ -1,6 +1,7 @@
 import os
 import sys
-from tkinter import ttk
+
+from pytube import Playlist, YouTube
 
 
 def resource_path(relative_path):
@@ -21,8 +22,43 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
     window.update_idletasks()
 
-def set_treeview_style():
-    style = ttk.Style()
-    style.configure("mystyle.Treeview", highlightthickness=0, bd=0, font=('Calibri', 11))  # Modify the font of the body
-    style.configure("mystyle.Treeview.Heading", font=('Calibri', 13, 'bold'))  # Modify the font of the headings
-    style.layout("mystyle.Treeview", [('mystyle.Treeview.treearea', {'sticky': 'nswe'})])  # Remove the borders
+
+def count_file_size(size_bytes):
+    """Count the stream file sizes in MB"""
+    return round(size_bytes / (1024 * 1024), 1)
+
+
+def get_playlist_links(url, array):
+    """Create list with individual links from yt playlist"""
+    if "playlist" in url:
+        p = Playlist(url)
+        for link in p.video_urls:
+            array.append(link)
+    else:
+        array.append(url)
+
+
+def get_data_for_treeview(i_tag, output_format, yt_list):
+    """Return a list with data to display in the treeview"""
+    treeview_list = []
+    for url in yt_list:
+        yt = YouTube(url)
+        try:
+            treeview_list.append([
+                yt.streams.get_by_itag(i_tag).title,
+                output_format,
+                f"{count_file_size(yt.streams.get_by_itag(i_tag).filesize)} MB",
+                "0 %",
+                "0 Mb/s",
+                "Queued"
+            ])
+        except AttributeError:
+            treeview_list.append([
+                yt.streams.get_highest_resolution().title,
+                output_format,
+                f"{count_file_size(yt.streams.get_highest_resolution().filesize)} MB",
+                "0 %",
+                "0 Mb/s",
+                "Queued"
+            ])
+    return treeview_list
