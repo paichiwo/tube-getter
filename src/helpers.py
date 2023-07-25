@@ -12,6 +12,13 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+def get_downloads_folder_path():
+    """Get the path to the Downloads folder on Windows"""
+    user_profile = os.environ['USERPROFILE']
+    downloads_folder = os.path.join(user_profile, 'Downloads')
+    return downloads_folder
+
+
 def center_window(window, width, height):
     """Create a window in the center of the screen, using desired dimensions"""
     screen_width = window.winfo_screenwidth()
@@ -72,7 +79,8 @@ def load_settings():
             settings = json.load(file)
             return settings['output_folder']
     except (json.decoder.JSONDecodeError, FileNotFoundError):
-        return 'C:/Users/Downloads'
+        output_folder = get_downloads_folder_path()
+        return output_folder
 
 
 def save_settings(output_folder):
