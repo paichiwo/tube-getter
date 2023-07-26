@@ -1,7 +1,6 @@
 import json
 import os
 import sys
-
 from pytube import Playlist, YouTube
 
 
@@ -46,32 +45,6 @@ def get_playlist_links(url, array):
         array.append(url)
 
 
-def get_data_for_treeview(i_tag, output_format, yt_list):
-    """Return a list with data to display in the treeview"""
-    treeview_list = []
-    for url in yt_list:
-        yt = YouTube(url)
-        try:
-            treeview_list.append([
-                yt.streams.get_by_itag(i_tag).title,
-                output_format,
-                f"{count_file_size(yt.streams.get_by_itag(i_tag).filesize)} MB",
-                "0 %",
-                "0 Mb/s",
-                "Queued"
-            ])
-        except AttributeError:
-            treeview_list.append([
-                yt.streams.get_highest_resolution().title,
-                output_format,
-                f"{count_file_size(yt.streams.get_highest_resolution().filesize)} MB",
-                "0 %",
-                "0 Mb/s",
-                "Queued"
-            ])
-    return treeview_list
-
-
 def load_settings():
     """Load settings from .json file"""
     try:
@@ -87,6 +60,3 @@ def save_settings(output_folder):
     """Save settings to .json file"""
     with open(resource_path('../data/settings.json'), 'w') as file:
         json.dump({'output_folder': output_folder}, file)
-
-
-
