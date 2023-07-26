@@ -2,18 +2,62 @@ import tkinter.font
 import pytube.exceptions
 import urllib.error
 from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, CENTER
+from pytube import YouTube
 from src.settings_window import settings_window
 from src.config import version, image_paths, colors, font_size
-from src.helpers import center_window, get_playlist_links, get_data_for_treeview
+from src.helpers import center_window, get_playlist_links, get_data_for_treeview, load_settings
 
 yt_playlist = []
 
 
 def main_window():
-    """Create UI elements for main window and provide functionality"""
+    """Create UI elements for the main window and provide functionality"""
+
+    def download_video(playlist, output_path):
+        """Download video stream - highest resolution."""
+        for index, link in enumerate(playlist):
+            yt = YouTube(link)
+            yt_stream = yt.streams.get_highest_resolution()
+            # Set status to 'downloading'
+            yt_playlist[index][5] = "Downloading"
+            tree.insert("", "end", values=yt_playlist)
+            try:
+                yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
+                # Set status to 'complete'
+                yt_playlist[index][5] = "Complete"
+                tree.insert("", "end", values=yt_playlist)
+            except (PermissionError, RuntimeError):
+                print("ERROR: Permission Error.")
+
+    def download_audio(playlist, output_path):
+        """Download audio stream."""
+        for index, link in enumerate(playlist):
+            yt = YouTube(link)
+            yt_stream = yt.streams.get_audio_only()
+            # Set status to 'downloading'
+            yt_playlist[index][5] = "Downloading"
+            tree.insert("", "end", values=yt_playlist)
+
+            # change an extension to mp3 if mp4 audio downloaded.
+            if yt_stream.mime_type == "audio/mp4":
+                filename = yt_stream.default_filename.rsplit(".", 1)[0] + ".mp3"
+            else:
+                filename = yt_stream.default_filename
+            try:
+                yt_stream.download(output_path=output_path, filename=filename)
+                # Set status to 'complete'
+                yt_playlist[index][5] = "Complete"
+                tree.insert("", "end", values=yt_playlist)
+            except (PermissionError, RuntimeError):
+                print("ERROR: Permission Error.")
 
     def download():
-        pass
+        output_path = load_settings()
+        file_type = combobox.get()
+        if file_type == "Audio":
+            download_audio(yt_playlist, output_path)
+        else:
+            download_video(yt_playlist, output_path)
 
     def clear():
         """Clear all data from the list and the treeview"""

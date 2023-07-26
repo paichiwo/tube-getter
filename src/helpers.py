@@ -87,3 +87,6 @@ def save_settings(output_folder):
     """Save settings to .json file"""
     with open(resource_path('../data/settings.json'), 'w') as file:
         json.dump({'output_folder': output_folder}, file)
+
+
+
