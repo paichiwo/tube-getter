@@ -1,11 +1,10 @@
 import threading
-import tkinter.font
 import pytube.exceptions
 import urllib.error
 from pytube import YouTube
 from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, CENTER
 from src.settings_window import settings_window
-from src.config import version, image_paths, colors, font_size
+from src.config import version, image_paths, colors
 from src.helpers import center_window, get_playlist_links, load_settings, count_file_size
 
 yt_playlist = []
@@ -40,6 +39,11 @@ def main_window():
                 ])
         return treeview_list
 
+    def update_treeview(array):
+        """Update treeview with values from a given list"""
+        for item in array:
+            tree.insert("", "end", values=item)
+
     def download_video(playlist, output_path):
         """Download video stream - highest resolution"""
         treeview_list.clear()
@@ -53,10 +57,12 @@ def main_window():
 
     def download_audio(playlist, output_path):
         """Download audio stream"""
-
         for index, link in enumerate(playlist):
             yt = YouTube(link, on_progress_callback=progress_callback)
             yt_stream = yt.streams.get_audio_only()
+            treeview_list[index][5] = "Downloading"
+            for item in treeview_list:
+                tree.insert("", "end", values=item)
             # change an extension to mp3 if mp4 audio downloaded.
             if yt_stream.mime_type == "audio/mp4":
                 filename = yt_stream.default_filename.rsplit(".", 1)[0] + ".mp3"
@@ -79,15 +85,12 @@ def main_window():
                 item[3] = f"{percentage:.2f} %"
                 item[4] = f"{speed / (1024 * 1024):.2f} Mb/s"
                 break
-        for item in tree.get_children():
-            tree.delete(item)
-
-        # Update the Treeview with the updated data
-        for item in treeview_list:
-            tree.insert("", "end", values=item)
+        for entry in tree.get_children():
+            tree.delete(entry)
+        update_treeview(treeview_list)
 
     def download():
-        """Download video or audio action when download button is pressed"""
+        """Download video or audio action when the download button is pressed"""
         def download_task():
             output_path = load_settings()
             file_type = combobox.get()
@@ -97,32 +100,29 @@ def main_window():
                 download_video(yt_playlist, output_path)
             print("Download complete.")
 
-        # Create a new thread for the download_task function
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
 
     def clear():
         """Clear all data from the list and the treeview"""
         yt_playlist.clear()
-        for item in tree.get_children():
-            tree.delete(item)
+        for entry in tree.get_children():
+            tree.delete(entry)
 
     def add():
         """Add youtube link or youtube playlist to queue"""
         url = url_entry.get()
         file_type = combobox.get()
+        treeview_list.clear()
         if url:
             try:
                 get_playlist_links(url, yt_playlist)
                 if file_type == "Audio":
                     data = get_data_for_treeview(140, 'mp3', yt_playlist)
-                    for item in data:
-                        tree.insert("", "end", values=item)
+                    update_treeview(data)
                 else:
                     data = get_data_for_treeview(22, 'mp4', yt_playlist)
-                    for item in data:
-                        tree.insert("", "end", values=item)
-
+                    update_treeview(data)
             except pytube.exceptions.VideoUnavailable:
                 print("ERROR: Video is age restricted.")
             except pytube.exceptions.RegexMatchError:
@@ -140,12 +140,9 @@ def main_window():
 
     # UI Elements
 
-    custom_font = tkinter.font.Font(size=font_size)
-
     # Enter Urls label:
     enter_urls_label = Label(
         root,
-        font=custom_font,
         text="Enter URLs:")
     enter_urls_label.place(x=25, y=8)
 
