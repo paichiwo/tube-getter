@@ -1,4 +1,5 @@
 import threading
+from datetime import datetime
 import pytube.exceptions
 import urllib.error
 from pytube import YouTube
@@ -9,6 +10,7 @@ from src.helpers import center_window, get_playlist_links, load_settings, count_
 
 yt_playlist = []
 treeview_list = []
+download_start_time = datetime.now()
 
 
 def main_window():
@@ -25,7 +27,7 @@ def main_window():
                     output_format,
                     f"{count_file_size(yt.streams.get_by_itag(i_tag).filesize)} MB",
                     "0 %",
-                    "0 Mb/s",
+                    "0 KiB/s",
                     "Queued"
                 ])
             except AttributeError:
@@ -34,19 +36,21 @@ def main_window():
                     output_format,
                     f"{count_file_size(yt.streams.get_highest_resolution().filesize)} MB",
                     "0 %",
-                    "0 Mb/s",
+                    "0 KiB/s",
                     "Queued"
                 ])
         return treeview_list
 
     def update_treeview(array):
-        """Update treeview with values from a given list"""
         for item in array:
             tree.insert("", "end", values=item)
 
+    def update_treeview_row(index, data):
+        """Update an individual row in the treeview with new data."""
+        tree.item(tree.get_children()[index], values=data)
+
     def download_video(playlist, output_path):
         """Download video stream - highest resolution"""
-        treeview_list.clear()
         for index, link in enumerate(playlist):
             yt = YouTube(link, on_progress_callback=progress_callback)
             yt_stream = yt.streams.get_highest_resolution()
@@ -61,8 +65,7 @@ def main_window():
             yt = YouTube(link, on_progress_callback=progress_callback)
             yt_stream = yt.streams.get_audio_only()
             treeview_list[index][5] = "Downloading"
-            for item in treeview_list:
-                tree.insert("", "end", values=item)
+            update_treeview_row(index, treeview_list[index])
             # change an extension to mp3 if mp4 audio downloaded.
             if yt_stream.mime_type == "audio/mp4":
                 filename = yt_stream.default_filename.rsplit(".", 1)[0] + ".mp3"
@@ -70,6 +73,9 @@ def main_window():
                 filename = yt_stream.default_filename
             try:
                 yt_stream.download(output_path=output_path, filename=filename)
+                treeview_list[index][5] = "Downloaded"
+                treeview_list[index][4] = "0 KiB/s"
+                update_treeview_row(index, treeview_list[index])
             except (PermissionError, RuntimeError):
                 print("ERROR: Permission Error.")
 
@@ -78,16 +84,23 @@ def main_window():
         total_size = stream.filesize
         bytes_downloaded = total_size - bytes_remaining
         percentage = (bytes_downloaded / total_size) * 100
-        speed = stream.filesize - bytes_remaining
+
+        elapsed_time = (datetime.now() - download_start_time).total_seconds()
+        download_speed = bytes_downloaded / (1024 * elapsed_time)
 
         for item in treeview_list:
             if item[0] == stream.title:
                 item[3] = f"{percentage:.2f} %"
-                item[4] = f"{speed / (1024 * 1024):.2f} Mb/s"
+                if download_speed < 1000:
+                    item[4] = f"{download_speed:.2f} KiB/s"
+                else:
+                    item[4] = f"{download_speed / 1024:.2f} MiB/s"
                 break
-        for entry in tree.get_children():
-            tree.delete(entry)
-        update_treeview(treeview_list)
+
+        # Update the specific row directly
+        index = [i for i, item in enumerate(treeview_list) if item[0] == stream.title]
+        if index:
+            update_treeview_row(index[0], treeview_list[index[0]])
 
     def download():
         """Download video or audio action when the download button is pressed"""
