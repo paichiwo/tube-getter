@@ -40,10 +40,10 @@ def main_window():
         return treeview_list
 
     def download_video(playlist, output_path):
-        """Download video stream - highest resolution."""
+        """Download video stream - highest resolution"""
         treeview_list.clear()
         for index, link in enumerate(playlist):
-            yt = YouTube(link)
+            yt = YouTube(link, on_progress_callback=progress_callback)
             yt_stream = yt.streams.get_highest_resolution()
             try:
                 yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
@@ -51,10 +51,10 @@ def main_window():
                 print("ERROR: Permission Error.")
 
     def download_audio(playlist, output_path):
-        """Download audio stream."""
+        """Download audio stream"""
 
         for index, link in enumerate(playlist):
-            yt = YouTube(link)
+            yt = YouTube(link, on_progress_callback=progress_callback)
             yt_stream = yt.streams.get_audio_only()
             # change an extension to mp3 if mp4 audio downloaded.
             if yt_stream.mime_type == "audio/mp4":
@@ -65,6 +65,22 @@ def main_window():
                 yt_stream.download(output_path=output_path, filename=filename)
             except (PermissionError, RuntimeError):
                 print("ERROR: Permission Error.")
+
+    def progress_callback(stream, chunk, bytes_remaining):
+        """Update the progress and speed values in the treeview list"""
+        total_size = stream.filesize
+        bytes_downloaded = total_size - bytes_remaining
+        percentage = (bytes_downloaded / total_size) * 100
+        speed = stream.filesize - bytes_remaining
+
+        for item in treeview_list:
+            if item[0] == stream.title:
+                item[3] = f"{percentage:.2f} %"
+                item[4] = f"{speed / (1024 * 1024):.2f} Mb/s"
+
+        # Update the Treeview with the updated data
+        for item in treeview_list:
+            tree.insert("", "end", values=item)
 
     def download():
         output_path = load_settings()
