@@ -16,10 +16,10 @@ download_start_time = datetime.now()
 def main_window():
     """Create UI elements for the main window and provide functionality"""
 
-    def get_data_for_treeview(i_tag, output_format, yt_list):
+    def get_data_for_treeview(i_tag, output_format):
         """Return a list with data to display in the treeview"""
         treeview_list.clear()
-        for url in yt_list:
+        for url in yt_playlist:
             yt = YouTube(url)
             try:
                 treeview_list.append([
@@ -116,26 +116,34 @@ def main_window():
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
 
+    def clear_treeview():
+        """Clear all rows in the treeview"""
+        for entry in tree.get_children():
+            tree.delete(entry)
+
     def clear():
         """Clear all data from the list and the treeview"""
         yt_playlist.clear()
-        for entry in tree.get_children():
-            tree.delete(entry)
+        clear_treeview()
 
     def add():
         """Add youtube link or youtube playlist to queue"""
         url = url_entry.get()
         file_type = combobox.get()
         treeview_list.clear()
+        clear_treeview()
         if url:
             try:
-                get_playlist_links(url, yt_playlist)
+
                 if file_type == "Audio":
-                    data = get_data_for_treeview(140, 'mp3', yt_playlist)
+                    get_playlist_links(url, yt_playlist)
+                    data = get_data_for_treeview(140, 'mp3')
                     update_treeview(data)
                 else:
-                    data = get_data_for_treeview(22, 'mp4', yt_playlist)
+                    get_playlist_links(url, yt_playlist)
+                    data = get_data_for_treeview(22, 'mp4')
                     update_treeview(data)
+                print(yt_playlist)
             except pytube.exceptions.VideoUnavailable:
                 print("ERROR: Video is age restricted.")
             except pytube.exceptions.RegexMatchError:
