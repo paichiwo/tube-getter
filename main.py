@@ -1,8 +1,9 @@
+import threading
 import tkinter.font
 import pytube.exceptions
 import urllib.error
-from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, CENTER
 from pytube import YouTube
+from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, CENTER
 from src.settings_window import settings_window
 from src.config import version, image_paths, colors, font_size
 from src.helpers import center_window, get_playlist_links, load_settings, count_file_size
@@ -86,12 +87,19 @@ def main_window():
             tree.insert("", "end", values=item)
 
     def download():
-        output_path = load_settings()
-        file_type = combobox.get()
-        if file_type == "Audio":
-            download_audio(yt_playlist, output_path)
-        else:
-            download_video(yt_playlist, output_path)
+        """Download video or audio action when download button is pressed"""
+        def download_task():
+            output_path = load_settings()
+            file_type = combobox.get()
+            if file_type == "Audio":
+                download_audio(yt_playlist, output_path)
+            else:
+                download_video(yt_playlist, output_path)
+            print("Download complete.")
+
+        # Create a new thread for the download_task function
+        download_thread = threading.Thread(target=download_task)
+        download_thread.start()
 
     def clear():
         """Clear all data from the list and the treeview"""
