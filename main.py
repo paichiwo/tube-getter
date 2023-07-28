@@ -77,6 +77,9 @@ def main_window():
             if item[0] == stream.title:
                 item[3] = f"{percentage:.2f} %"
                 item[4] = f"{speed / (1024 * 1024):.2f} Mb/s"
+                break
+        for item in tree.get_children():
+            tree.delete(item)
 
         # Update the Treeview with the updated data
         for item in treeview_list:
