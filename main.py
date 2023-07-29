@@ -8,15 +8,19 @@ from src.settings_window import settings_window
 from src.config import version, image_paths, colors
 from src.helpers import center_window, get_playlist_links, load_settings, count_file_size
 
-# change combobox for switch and update window when the switch is pressed
+# change combobox for switch and update window when the switch is pressed **
 # create message label to communicate with user
 # add option to delete single item
 # implement changing themes
+# make right click menu with paste and delete
+# bind enter button
 
 yt_playlist = []
 treeview_list = []
 download_start_time = datetime.now()
 is_on = True
+file_type = 'mp3'
+
 
 def main_window():
     """Create UI elements for the main window and provide functionality"""
@@ -109,14 +113,17 @@ def main_window():
 
     def download():
         """Download video or audio action when the download button is pressed"""
+
         def download_task():
             output_path = load_settings()
-            file_type = combobox.get()
-            if is_on:
-            # if file_type == "Audio":
+
+            # Use is_on and file_type to determine the download type
+            if file_type=='mp3':
+
                 download_audio(yt_playlist, output_path)
             else:
-                download_video(yt_playlist, output_path)
+                download_video(yt_playlist, output_path)  # Always download video if switch is off
+
             print("Download complete.")
 
         download_thread = threading.Thread(target=download_task)
@@ -134,32 +141,33 @@ def main_window():
 
     def switch():
         global is_on
+        global file_type
 
         if is_on:
             on_button.config(image=switch_right)
             is_on = False
-            clear_treeview()
-            treeview_list.clear()
-            data = get_data_for_treeview(140, 'mp3')
-            update_treeview(data)
-        else:
-            on_button.config(image=switch_left)
-            is_on = True
+            file_type = 'mp4'
             clear_treeview()
             treeview_list.clear()
             data = get_data_for_treeview(22, 'mp4')
-            update_treeview(data)
+        else:
+            on_button.config(image=switch_left)
+            is_on = True
+            file_type = 'mp3'
+            clear_treeview()
+            treeview_list.clear()
+            data = get_data_for_treeview(140, 'mp3')
+        update_treeview(data)
+        print(file_type)
 
     def add():
         """Add youtube link or youtube playlist to queue"""
         url = url_entry.get()
-        file_type = combobox.get()
         treeview_list.clear()
         clear_treeview()
         if url:
             try:
                 if is_on:
-                # if file_type == "Audio":
                     get_playlist_links(url, yt_playlist)
                     data = get_data_for_treeview(140, 'mp3')
                 else:
@@ -193,15 +201,15 @@ def main_window():
         text="Enter URLs:")
     enter_urls_label.place(x=25, y=8)
 
-    # Combobox
-
-    combobox = ttk.Combobox(
-        root,
-        values=["Audio", "Video"],
-        state="readonly",
-        width=10)
-    combobox.set("Audio")  # Default selection
-    combobox.place(x=570, y=8)
+    # # Combobox
+    #
+    # combobox = ttk.Combobox(
+    #     root,
+    #     values=["Audio", "Video"],
+    #     state="readonly",
+    #     width=10)
+    # combobox.set("Audio")  # Default selection
+    # combobox.place(x=570, y=8)
 
     switch_left = PhotoImage(file='images/switch_left.png')
     switch_right = PhotoImage(file='images/switch_right.png')
