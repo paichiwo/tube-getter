@@ -10,16 +10,16 @@ from src.helpers import center_window, get_playlist_links, load_settings, count_
 
 # change combobox for switch and update window when the switch is pressed **
 # create message label to communicate with user
-# add option to delete single item
+# add option to delete single item, (button, right click menu in the treeview)
 # implement changing themes
-# make right click menu with paste and delete
+# make right-click options (menu) for URL entry with paste and delete
 # bind enter button
 
 yt_playlist = []
 treeview_list = []
 download_start_time = datetime.now()
 is_on = True
-file_type = 'mp3'
+file_type = 'audio'
 
 
 def main_window():
@@ -118,7 +118,7 @@ def main_window():
             output_path = load_settings()
 
             # Use is_on and file_type to determine the download type
-            if file_type=='mp3':
+            if file_type == 'audio':
 
                 download_audio(yt_playlist, output_path)
             else:
@@ -140,25 +140,25 @@ def main_window():
         clear_treeview()
 
     def switch():
+        """Switches the file type between 'audio' and 'video' and updates the treeview accordingly"""
         global is_on
         global file_type
 
         if is_on:
             on_button.config(image=switch_right)
             is_on = False
-            file_type = 'mp4'
+            file_type = 'video'
             clear_treeview()
             treeview_list.clear()
             data = get_data_for_treeview(22, 'mp4')
         else:
             on_button.config(image=switch_left)
             is_on = True
-            file_type = 'mp3'
+            file_type = 'audio'
             clear_treeview()
             treeview_list.clear()
             data = get_data_for_treeview(140, 'mp3')
         update_treeview(data)
-        print(file_type)
 
     def add():
         """Add youtube link or youtube playlist to queue"""
@@ -174,7 +174,6 @@ def main_window():
                     get_playlist_links(url, yt_playlist)
                     data = get_data_for_treeview(22, 'mp4')
                 update_treeview(data)
-                print(yt_playlist)
             except pytube.exceptions.VideoUnavailable:
                 print("ERROR: Video is age restricted.")
             except pytube.exceptions.RegexMatchError:
@@ -190,9 +189,6 @@ def main_window():
     center_window(root, 800, 500)
     root.resizable(False, False)
 
-    # global audio video switch
-    is_on = True
-
     # UI Elements
 
     # Enter Urls label:
@@ -201,21 +197,13 @@ def main_window():
         text="Enter URLs:")
     enter_urls_label.place(x=25, y=8)
 
-    # # Combobox
-    #
-    # combobox = ttk.Combobox(
-    #     root,
-    #     values=["Audio", "Video"],
-    #     state="readonly",
-    #     width=10)
-    # combobox.set("Audio")  # Default selection
-    # combobox.place(x=570, y=8)
-
+    # Switch for 'audio' / 'video'
     switch_left = PhotoImage(file='images/switch_left.png')
     switch_right = PhotoImage(file='images/switch_right.png')
     on_button = Button(root, image=switch_left, bd=0, command=switch)
     on_button.place(x=200, y=10)
 
+    # Theme button
     theme_button_image = PhotoImage(file=image_paths['theme'])
     theme_button = Button(
         root,
@@ -223,6 +211,7 @@ def main_window():
         border=0)
     theme_button.place(x=740, y=8)
 
+    # Settings button
     settings_button_image = PhotoImage(file=image_paths['settings'])
     settings_button = Button(
         root,
@@ -231,6 +220,7 @@ def main_window():
         command=settings_window)
     settings_button.place(x=765, y=8)
 
+    # URL entry
     entry_image = PhotoImage(file=image_paths['entry'])
     entry_label = Label(root, image=entry_image)
     entry_label.place(x=12, y=35)
@@ -240,6 +230,7 @@ def main_window():
         border=0)
     url_entry.place(x=35, y=45, width=600)
 
+    # Add button
     add_button_image = PhotoImage(file=image_paths['add'])
     add_button = Button(
         root,
@@ -253,7 +244,6 @@ def main_window():
     style.configure("mystyle.Treeview", highlightthickness=0, bd=0, background="#CCCCCC")
     style.layout("mystyle.Treeview", [('mystyle.Treeview.treearea', {'sticky': 'nswe'})])  # Remove the borders
 
-    # Set the colors for the treeview rows
     style.configure("mystyle.Treeview.Heading", background="#CCCCCC", foreground="#000000")  # Heading row
     style.map("mystyle.Treeview", background=[('selected', '#0C8AFF')])  # Selected row
 
@@ -278,7 +268,7 @@ def main_window():
 
     tree.place(x=15, y=100, width=750)
 
-    # Scrollbars
+    # Treeview Scrollbars
     vsb = ttk.Scrollbar(root, orient="vertical", command=tree.yview)
     vsb.place(x=765, y=100, height=300)
     tree.configure(yscrollcommand=vsb.set)
@@ -287,7 +277,7 @@ def main_window():
     hsb.place(x=15, y=410, width=750)
     tree.configure(xscrollcommand=hsb.set)
 
-    # Bottom row of buttons
+    # Clear button
     clear_button_image = PhotoImage(file=image_paths['clear'])
     clear_button = Button(
         root,
@@ -296,6 +286,7 @@ def main_window():
         command=clear)
     clear_button.place(x=12, y=450)
 
+    # Download button
     download_button_image = PhotoImage(file=image_paths['download'])
     download_button = Button(
         root,
