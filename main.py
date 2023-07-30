@@ -64,6 +64,9 @@ def main_window():
             yt_stream = yt.streams.get_highest_resolution()
             try:
                 yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
+                treeview_list[index][5] = "Downloaded"
+                treeview_list[index][4] = "0 KiB/s"
+                update_treeview_row(index, treeview_list[index])
             except (PermissionError, RuntimeError):
                 print("ERROR: Permission Error.")
 
@@ -115,14 +118,10 @@ def main_window():
 
         def download_task():
             output_path = load_settings()
-
-            # Use is_on and file_type to determine the download type
             if file_type == 'audio':
-
                 download_audio(yt_playlist, output_path)
             else:
                 download_video(yt_playlist, output_path)  # Always download video if switch is off
-
             print("Download complete.")
 
         download_thread = threading.Thread(target=download_task)
@@ -142,20 +141,17 @@ def main_window():
         """Switches the file type between 'audio' and 'video' and updates the treeview accordingly"""
         global is_on
         global file_type
-
+        clear_treeview()
+        treeview_list.clear()
         if is_on:
             on_button.config(image=switch_right)
             is_on = False
             file_type = 'video'
-            clear_treeview()
-            treeview_list.clear()
             data = get_data_for_treeview(22, 'mp4')
         else:
             on_button.config(image=switch_left)
             is_on = True
             file_type = 'audio'
-            clear_treeview()
-            treeview_list.clear()
             data = get_data_for_treeview(140, 'mp3')
         update_treeview(data)
 
@@ -273,12 +269,8 @@ def main_window():
 
     # Treeview Scrollbars
     vsb = ttk.Scrollbar(root, orient="vertical", command=tree.yview)
-    vsb.place(x=765, y=100, height=300)
+    vsb.place(x=765, y=100, height=325)
     tree.configure(yscrollcommand=vsb.set)
-
-    hsb = ttk.Scrollbar(root, orient="horizontal", command=tree.xview)
-    hsb.place(x=15, y=410, width=750)
-    tree.configure(xscrollcommand=hsb.set)
 
     # Clear button
     clear_button_image = PhotoImage(file=image_paths['clear'])
