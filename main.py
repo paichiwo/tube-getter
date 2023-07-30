@@ -8,9 +8,8 @@ from src.settings_window import settings_window
 from src.config import version, image_paths, colors
 from src.helpers import center_window, get_playlist_links, load_settings, count_file_size
 
-# change combobox for switch and update window when the switch is pressed **
 # create message label to communicate with user
-# add option to delete single item, (button, right click menu in the treeview)
+# add an option to delete single item, (button, right click menu in the treeview)
 # implement changing themes
 # make right-click options (menu) for URL entry with paste and delete
 # bind enter button
@@ -198,14 +197,14 @@ def main_window():
     enter_urls_label.place(x=25, y=8)
 
     # Switch for 'audio' / 'video'
-    switch_left = PhotoImage(image_paths['switch_left'])
-    switch_right = PhotoImage(image_paths['switch_right'])
+    switch_left = PhotoImage(file=image_paths['switch_left'])
+    switch_right = PhotoImage(file=image_paths['switch_right'])
     on_button = Button(
         root,
         image=switch_left,
         bd=0,
         command=switch)
-    on_button.place(x=600, y=10)
+    on_button.place(x=670, y=8)
 
     # Theme button
     theme_button_image = PhotoImage(file=image_paths['theme'])
@@ -232,7 +231,7 @@ def main_window():
         root,
         bg=colors[0],
         bd=0)
-    url_entry.place(x=35, y=45, width=600)
+    url_entry.place(x=25, y=45, width=615)
 
     # Add button
     add_button_image = PhotoImage(file=image_paths['add'])
