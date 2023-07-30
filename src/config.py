@@ -14,7 +14,9 @@ image_paths = {
     'close': resource_path('../images/button_close.png'),
     'icon': resource_path('../images/yt3d.ico'),
     'icon_png': resource_path('../images/yt3d.png'),
-    'github': resource_path('../images/github.png')
+    'github': resource_path('../images/github.png'),
+    'switch_left': resource_path('../images/switch_left.png'),
+    'switch_right': resource_path('../images/switch_right.png')
 }
 font_size = 10
 

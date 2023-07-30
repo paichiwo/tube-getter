@@ -198,17 +198,21 @@ def main_window():
     enter_urls_label.place(x=25, y=8)
 
     # Switch for 'audio' / 'video'
-    switch_left = PhotoImage(file='images/switch_left.png')
-    switch_right = PhotoImage(file='images/switch_right.png')
-    on_button = Button(root, image=switch_left, bd=0, command=switch)
-    on_button.place(x=200, y=10)
+    switch_left = PhotoImage(image_paths['switch_left'])
+    switch_right = PhotoImage(image_paths['switch_right'])
+    on_button = Button(
+        root,
+        image=switch_left,
+        bd=0,
+        command=switch)
+    on_button.place(x=600, y=10)
 
     # Theme button
     theme_button_image = PhotoImage(file=image_paths['theme'])
     theme_button = Button(
         root,
         image=theme_button_image,
-        border=0)
+        bd=0)
     theme_button.place(x=740, y=8)
 
     # Settings button
@@ -216,7 +220,7 @@ def main_window():
     settings_button = Button(
         root,
         image=settings_button_image,
-        border=0,
+        bd=0,
         command=settings_window)
     settings_button.place(x=765, y=8)
 
@@ -227,7 +231,7 @@ def main_window():
     url_entry = Entry(
         root,
         bg=colors[0],
-        border=0)
+        bd=0)
     url_entry.place(x=35, y=45, width=600)
 
     # Add button
@@ -235,7 +239,7 @@ def main_window():
     add_button = Button(
         root,
         image=add_button_image,
-        border=0,
+        bd=0,
         command=add)
     add_button.place(x=670, y=35)
 
@@ -282,7 +286,7 @@ def main_window():
     clear_button = Button(
         root,
         image=clear_button_image,
-        border=0,
+        bd=0,
         command=clear)
     clear_button.place(x=12, y=450)
 
@@ -291,7 +295,7 @@ def main_window():
     download_button = Button(
         root,
         image=download_button_image,
-        border=0,
+        bd=0,
         command=download)
     download_button.place(x=670, y=450)
 
