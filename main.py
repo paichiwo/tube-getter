@@ -246,7 +246,8 @@ def main_window():
     url_entry_right_click_menu = Menu(root, tearoff=0)
     url_entry_right_click_menu.add_command(label="Paste", command=paste_url)
     url_entry.bind('<Button-3>', on_url_entry_right_click)
-
+    # Bind the Enter key
+    url_entry.bind('<Return>', lambda event: add())
 
     # Add button
     add_button_image = PhotoImage(file=image_paths['add'])
