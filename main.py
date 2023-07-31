@@ -3,12 +3,11 @@ from datetime import datetime
 import pytube.exceptions
 import urllib.error
 from pytube import YouTube
-from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, CENTER
+from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, Menu, CENTER
 from src.settings_window import settings_window
 from src.config import version, image_paths, colors
 from src.helpers import center_window, get_playlist_links, load_settings, count_file_size
 
-# create message label to communicate with user
 # add an option to delete single item, (button, right click menu in the treeview)
 # implement changing themes
 # make right-click options (menu) for URL entry with paste and delete
@@ -177,6 +176,22 @@ def main_window():
         else:
             message_label.configure(text="No url detected.")
 
+    # Menu functions
+    def on_url_entry_right_click(event):
+        try:
+            url_entry_right_click_menu.post(event.x_root, event.y_root)
+        finally:
+            url_entry_right_click_menu.grab_release()
+
+    def paste_url():
+        """Handle the 'Paste' option for the url_entry"""
+        clipboard_text = root.clipboard_get()
+        url_entry.insert('end', clipboard_text)
+
+    def delete_url():
+        """Handle the 'Delete' option for the url_entry"""
+        pass
+
     root = Tk()
     root.iconbitmap(bitmap=image_paths['icon'])
     root.title(f"YouTube Getter v{version}")
@@ -227,6 +242,11 @@ def main_window():
         bg=colors[0],
         bd=0)
     url_entry.place(x=25, y=45, width=615)
+    # Right click menu
+    url_entry_right_click_menu = Menu(root, tearoff=0)
+    url_entry_right_click_menu.add_command(label="Paste", command=paste_url)
+    url_entry.bind('<Button-3>', on_url_entry_right_click)
+
 
     # Add button
     add_button_image = PhotoImage(file=image_paths['add'])
