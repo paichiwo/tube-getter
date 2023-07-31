@@ -10,8 +10,6 @@ from src.helpers import center_window, get_playlist_links, load_settings, count_
 
 # add an option to delete single item, (button, right click menu in the treeview)
 # implement changing themes
-# make right-click options (menu) for URL entry with paste and delete
-# bind enter button
 
 yt_playlist = []
 treeview_list = []
@@ -190,7 +188,7 @@ def main_window():
 
     def delete_url():
         """Handle the 'Delete' option for the url_entry"""
-        pass
+        url_entry.delete(0, "end")
 
     root = Tk()
     root.iconbitmap(bitmap=image_paths['icon'])
@@ -206,7 +204,7 @@ def main_window():
         text="Enter URLs:")
     enter_urls_label.place(x=25, y=12)
 
-    # Switch for 'audio' / 'video'
+    # SWITCH for 'audio' / 'video'
     switch_left = PhotoImage(file=image_paths['switch_left'])
     switch_right = PhotoImage(file=image_paths['switch_right'])
     on_button = Button(
@@ -216,7 +214,7 @@ def main_window():
         command=switch)
     on_button.place(x=670, y=8)
 
-    # Theme button
+    # THEME button
     theme_button_image = PhotoImage(file=image_paths['theme'])
     theme_button = Button(
         root,
@@ -224,7 +222,7 @@ def main_window():
         bd=0)
     theme_button.place(x=740, y=8)
 
-    # Settings button
+    # SETTINGS button
     settings_button_image = PhotoImage(file=image_paths['settings'])
     settings_button = Button(
         root,
@@ -245,11 +243,15 @@ def main_window():
     # Right click menu
     url_entry_right_click_menu = Menu(root, tearoff=0)
     url_entry_right_click_menu.add_command(label="Paste", command=paste_url)
+    url_entry_right_click_menu.add_command(label="Clear", command=delete_url)
+    # Bind right mouse button
     url_entry.bind('<Button-3>', on_url_entry_right_click)
     # Bind the Enter key
     url_entry.bind('<Return>', lambda event: add())
+    # Bind CTRL+Z
+    url_entry.bind('<Control-z>', lambda event: delete_url())
 
-    # Add button
+    # ADD button
     add_button_image = PhotoImage(file=image_paths['add'])
     add_button = Button(
         root,
@@ -292,7 +294,7 @@ def main_window():
     vsb.place(x=765, y=100, height=325)
     tree.configure(yscrollcommand=vsb.set)
 
-    # Clear button
+    # CLEAR button
     clear_button_image = PhotoImage(file=image_paths['clear'])
     clear_button = Button(
         root,
@@ -301,7 +303,7 @@ def main_window():
         command=clear)
     clear_button.place(x=12, y=440)
 
-    # Download button
+    # DOWNLOAD button
     download_button_image = PhotoImage(file=image_paths['download'])
     download_button = Button(
         root,
@@ -310,7 +312,7 @@ def main_window():
         command=download)
     download_button.place(x=670, y=440)
 
-    # Message label
+    # MESSAGE label
     message_label = Label(text="")
     message_label.place(x=12, y=478)
 
