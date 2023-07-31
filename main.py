@@ -68,7 +68,7 @@ def main_window():
                 treeview_list[index][4] = "0 KiB/s"
                 update_treeview_row(index, treeview_list[index])
             except (PermissionError, RuntimeError):
-                print("ERROR: Permission Error.")
+                message_label.configure(text="ERROR: Permission Error.")
 
     def download_audio(playlist, output_path):
         """Download audio stream"""
@@ -88,7 +88,7 @@ def main_window():
                 treeview_list[index][4] = "0 KiB/s"
                 update_treeview_row(index, treeview_list[index])
             except (PermissionError, RuntimeError):
-                print("ERROR: Permission Error.")
+                message_label.configure(text="ERROR: Permission Error.")
 
     def progress_callback(stream, chunk, bytes_remaining):
         """Update the progress and speed values in the treeview list"""
@@ -107,7 +107,6 @@ def main_window():
                 else:
                     item[4] = f"{download_speed / 1024:.2f} MiB/s"
                 break
-
         # Update the specific row directly
         index = [i for i, item in enumerate(treeview_list) if item[0] == stream.title]
         if index:
@@ -122,7 +121,7 @@ def main_window():
                 download_audio(yt_playlist, output_path)
             else:
                 download_video(yt_playlist, output_path)  # Always download video if switch is off
-            print("Download complete.")
+            message_label.configure(text="Download complete.")
 
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
@@ -170,13 +169,13 @@ def main_window():
                     data = get_data_for_treeview(22, 'mp4')
                 update_treeview(data)
             except pytube.exceptions.VideoUnavailable:
-                print("ERROR: Video is age restricted.")
+                message_label.configure(text="ERROR: Video is age restricted.")
             except pytube.exceptions.RegexMatchError:
-                print("ERROR: Wrong URL.")
+                message_label.configure(text="ERROR: Wrong URL.")
             except (urllib.error.URLError, urllib.error.HTTPError):
-                print("ERROR: Internal error.")
+                message_label.configure(text="ERROR: Internal error.")
         else:
-            print("ERROR: No url detected.")
+            message_label.configure(text="No url detected.")
 
     root = Tk()
     root.iconbitmap(bitmap=image_paths['icon'])
@@ -190,7 +189,7 @@ def main_window():
     enter_urls_label = Label(
         root,
         text="Enter URLs:")
-    enter_urls_label.place(x=25, y=8)
+    enter_urls_label.place(x=25, y=12)
 
     # Switch for 'audio' / 'video'
     switch_left = PhotoImage(file=image_paths['switch_left'])
@@ -247,7 +246,7 @@ def main_window():
     style.map("mystyle.Treeview", background=[('selected', '#0C8AFF')])  # Selected row
 
     columns = ('title', 'ext', 'size', 'progress', 'speed', 'status')
-    tree = ttk.Treeview(root, columns=columns, show='headings', height=15, style='mystyle.Treeview')
+    tree = ttk.Treeview(root, columns=columns, show='headings', height=16, style='mystyle.Treeview')
 
     # define headings
     tree.heading('title', text='Title')
@@ -258,14 +257,14 @@ def main_window():
     tree.heading('status', text='Status')
 
     # Set the width of columns
-    tree.column('title', anchor=CENTER, minwidth=100, width=300)
-    tree.column('ext', anchor=CENTER, minwidth=50, width=50)
-    tree.column('size', anchor=CENTER, minwidth=50, width=50)
-    tree.column('progress', anchor=CENTER, minwidth=70, width=70)
-    tree.column('speed', anchor=CENTER, minwidth=70, width=70)
-    tree.column('status', anchor=CENTER, minwidth=70, width=70)
+    tree.column('title', anchor=CENTER, minwidth=150, width=300)
+    tree.column('ext', anchor=CENTER, minwidth=30, width=30)
+    tree.column('size', anchor=CENTER, minwidth=30, width=30)
+    tree.column('progress', anchor=CENTER, minwidth=30, width=30)
+    tree.column('speed', anchor=CENTER, minwidth=30, width=30)
+    tree.column('status', anchor=CENTER, minwidth=50, width=50)
 
-    tree.place(x=15, y=100, width=750)
+    tree.place(x=15, y=85, width=750)
 
     # Treeview Scrollbars
     vsb = ttk.Scrollbar(root, orient="vertical", command=tree.yview)
@@ -279,7 +278,7 @@ def main_window():
         image=clear_button_image,
         bd=0,
         command=clear)
-    clear_button.place(x=12, y=450)
+    clear_button.place(x=12, y=440)
 
     # Download button
     download_button_image = PhotoImage(file=image_paths['download'])
@@ -288,7 +287,11 @@ def main_window():
         image=download_button_image,
         bd=0,
         command=download)
-    download_button.place(x=670, y=450)
+    download_button.place(x=670, y=440)
+
+    # Message label
+    message_label = Label(text="")
+    message_label.place(x=12, y=478)
 
     root.mainloop()
 
