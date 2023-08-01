@@ -194,7 +194,7 @@ def main_window():
 
     root = Tk()
     root.iconbitmap(bitmap=image_paths['icon'])
-    root.title(f"YouTube Getter v{version}")
+    root.title(f"Tube Getter v{version}")
     center_window(root, 800, 500)
     root.resizable(False, False)
 
