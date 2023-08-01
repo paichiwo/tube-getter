@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import sys
 import threading
 import pytube.exceptions
 import urllib.error
@@ -18,6 +19,9 @@ treeview_list = []
 download_start_time = datetime.now()
 is_on = True
 file_type = 'audio'
+
+if getattr(sys, 'frozen', False):
+    import pyi_splash
 
 
 def main_window():
@@ -317,6 +321,9 @@ def main_window():
     # MESSAGE label
     message_label = Label(text="")
     message_label.place(x=12, y=478)
+
+    if getattr(sys, 'frozen', False):
+        pyi_splash.close()
 
     root.mainloop()
 
