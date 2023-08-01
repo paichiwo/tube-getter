@@ -2,11 +2,8 @@
 /venv/
 /.idea/
 /__pycache__/
-/test/
 # Application Output
 /.mp4
 /.mp3
-/Downloads/
 /output
 
-/theme/
