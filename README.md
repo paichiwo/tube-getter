@@ -1,19 +1,20 @@
 ## **Tube Getter**
 
-![](screenshots/TG_screenshot_1.png)
+<p align="center">![](images/tube_getter_logo.png)</p>
+---
 
+<p align="center">![](screenshots/TG_screenshot_1.png)</p>
+---
 Tube Getter is a Python application that allows you to download videos and audio from YouTube.
 It provides a simple user interface built with Tkinter
 and utilizes the pytube library for downloading the YouTube content.
-
+---
 ## **Features**
 
 *   Download video and audio from YouTube.
 *   Support for downloading individual videos or entire playlists.
 *   Choose the output format (video or audio).
 *   Monitor the download progress, including progress, download speed, and completion status.
-
-
 * Choose the download folder in the settings window
 
 ## **Prerequisites**
