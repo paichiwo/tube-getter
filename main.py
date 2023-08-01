@@ -1,7 +1,9 @@
+#!/usr/bin/python3
+
 import threading
-from datetime import datetime
 import pytube.exceptions
 import urllib.error
+from datetime import datetime
 from pytube import YouTube
 from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, Menu, CENTER
 from src.settings_window import settings_window

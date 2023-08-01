@@ -1,22 +1,22 @@
 from src.helpers import resource_path
 
-version = "1.2"
+version = "1.2.1"
 
 image_paths = {
-    'theme': resource_path('../images/icons_black/sun.png'),
-    'settings': resource_path('../images/icons_black/setting.png'),
-    'entry': resource_path('../images/entry.png'),
-    'entry_small': resource_path('../images/entry_small.png'),
-    'folder': resource_path('../images/folder.png'),
-    'add': resource_path('../images/button_add.png'),
-    'clear': resource_path('../images/button_clear.png'),
-    'download': resource_path('../images/button_download.png'),
-    'close': resource_path('../images/button_close.png'),
-    'icon': resource_path('../images/yt3d.ico'),
-    'icon_png': resource_path('../images/yt3d.png'),
-    'github': resource_path('../images/github.png'),
-    'switch_left': resource_path('../images/switch_left.png'),
-    'switch_right': resource_path('../images/switch_right.png')
+    'theme': resource_path('images/icons_black/sun.png'),
+    'settings': resource_path('images/icons_black/setting.png'),
+    'entry': resource_path('images/entry.png'),
+    'entry_small': resource_path('images/entry_small.png'),
+    'folder': resource_path('images/folder.png'),
+    'add': resource_path('images/button_add.png'),
+    'clear': resource_path('images/button_clear.png'),
+    'download': resource_path('images/button_download.png'),
+    'close': resource_path('images/button_close.png'),
+    'icon': resource_path('images/yt3d.ico'),
+    'icon_png': resource_path('images/yt3d.png'),
+    'github': resource_path('images/github.png'),
+    'switch_left': resource_path('images/switch_left.png'),
+    'switch_right': resource_path('images/switch_right.png')
 }
 font_size = 10
 

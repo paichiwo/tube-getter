@@ -1,14 +1,15 @@
 import json
 import os
 import sys
-from pytube import Playlist, YouTube
+from pytube import Playlist
 
 
 def resource_path(relative_path):
-    """PyInstaller requirement,
-    Get an absolute path to resource, works for dev and for PyInstaller."""
-    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
-    return os.path.join(base_path, relative_path)
+    """Get an absolute path to resource, works for dev and for PyInstaller"""
+    if hasattr(sys, '_MEIPASS'):
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+        return os.path.join(base_path, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
 
 
 def get_downloads_folder_path():
