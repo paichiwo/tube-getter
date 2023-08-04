@@ -48,10 +48,11 @@ def get_playlist_links(url, array):
 
 def load_settings():
     """Load settings from .json file"""
+    path = os.path.join(os.environ['APPDATA'], 'Tube-Getter', 'settings.json')
     try:
-        with open(resource_path('data/settings.json'), 'r') as file:
+        with open(path, 'r') as file:
             settings = json.load(file)
-            return settings['output_folder']
+            return settings.get('output_folder')
     except (json.decoder.JSONDecodeError, FileNotFoundError):
         output_folder = get_downloads_folder_path()
         return output_folder
@@ -59,5 +60,14 @@ def load_settings():
 
 def save_settings(output_folder):
     """Save settings to .json file"""
-    with open(resource_path('data/settings.json'), 'w') as file:
-        json.dump({'output_folder': output_folder}, file)
+    settings_file = 'settings.json'
+    path = os.path.join(os.environ['APPDATA'], 'Tube-Getter')
+    settings_path = os.path.join(path, settings_file)
+    data = {'output_folder': output_folder}
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    with open(settings_path, 'w') as file:
+        json.dump(data, file)
+
