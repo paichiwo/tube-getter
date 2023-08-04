@@ -48,7 +48,7 @@ def get_playlist_links(url, array):
 
 def load_settings():
     """Load settings from .json file"""
-    path = os.path.join(os.environ['APPDATA'], 'Tube-Getter', 'settings.json')
+    path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', 'settings.json')
     try:
         with open(path, 'r') as file:
             settings = json.load(file)
@@ -61,7 +61,7 @@ def load_settings():
 def save_settings(output_folder):
     """Save settings to .json file"""
     settings_file = 'settings.json'
-    path = os.path.join(os.environ['APPDATA'], 'Tube-Getter')
+    path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter')
     settings_path = os.path.join(path, settings_file)
     data = {'output_folder': output_folder}
 
@@ -70,4 +70,3 @@ def save_settings(output_folder):
 
     with open(settings_path, 'w') as file:
         json.dump(data, file)
-
