@@ -65,6 +65,8 @@ def main_window():
         for index, link in enumerate(playlist):
             yt = YouTube(link, on_progress_callback=progress_callback)
             yt_stream = yt.streams.get_highest_resolution()
+            treeview_list[index][5] = "Downloading"
+            update_treeview_row(index, treeview_list[index])
             try:
                 yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
                 treeview_list[index][5] = "Downloaded"
