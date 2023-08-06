@@ -21,7 +21,7 @@ def settings_window():
     sett = Tk()
     sett.iconbitmap(bitmap=image_paths['icon'])
     sett.title("Settings")
-    sett.geometry('500x450')
+    sett.geometry('500x450+400+200')
     sett.resizable(False, False)
 
     # Create top frame and bottom frame
@@ -86,5 +86,4 @@ def settings_window():
         command=close_window)
     close_button_button.pack(padx=10, pady=10)
 
-    sett.attributes('-topmost', True)
     sett.mainloop()
