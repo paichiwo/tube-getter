@@ -1,6 +1,6 @@
 from src.helpers import resource_path
 
-version = "1.2.2"
+version = "1.2.3"
 
 image_paths = {
     'theme': resource_path('images/icons_black/sun.png'),
