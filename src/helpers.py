@@ -38,7 +38,7 @@ def count_file_size(size_bytes):
 
 def get_playlist_links(url, array):
     """Create a list with individual links from yt playlist"""
-    if "playlist" in url:
+    if "list=" in url:
         p = Playlist(url)
         for link in p.video_urls:
             array.append(link)
