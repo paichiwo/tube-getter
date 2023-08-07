@@ -11,7 +11,6 @@ from src.settings_window import settings_window
 from src.config import version, image_paths, colors
 from src.helpers import center_window, get_playlist_links, load_settings, count_file_size
 
-# add an option to delete single item, (button, right click menu in the treeview)
 # implement changing themes
 
 yt_playlist = []
