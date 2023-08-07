@@ -60,6 +60,22 @@ def main_window():
         """Update an individual row in the treeview with new data."""
         tree.item(tree.get_children()[index], values=data)
 
+    def delete_item_treeview():
+        """Delete single item from the treeview and corresponding item from yt_playlist"""
+        selection = tree.selection()
+        if selection:
+            tree.delete(selection[0])
+            # Delete item from yt_playlist
+            index = tree.index(selection[0])
+            yt_playlist.pop(index)
+        else:
+            message_label.configure(text="No item selected")
+
+    def clear_treeview():
+        """Clear all rows in the treeview"""
+        for entry in tree.get_children():
+            tree.delete(entry)
+
     def download_video(playlist, output_path):
         """Download video stream - highest resolution"""
         for index, link in enumerate(playlist):
@@ -130,11 +146,6 @@ def main_window():
 
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
-
-    def clear_treeview():
-        """Clear all rows in the treeview"""
-        for entry in tree.get_children():
-            tree.delete(entry)
 
     def clear():
         """Clear all data from the list and the treeview"""
@@ -301,6 +312,10 @@ def main_window():
     vsb = ttk.Scrollbar(root, orient="vertical", command=tree.yview)
     vsb.place(x=765, y=100, height=325)
     tree.configure(yscrollcommand=vsb.set)
+
+    treeview_right_click_menu = Menu(root, tearoff=0)
+    treeview_right_click_menu.add_command(label="Delete item", command=delete_item_treeview)
+    tree.bind('<Button-3>', lambda event: treeview_right_click_menu.post(event.x_root, event.y_root))
 
     # CLEAR button
     clear_button_image = PhotoImage(file=image_paths['clear'])
