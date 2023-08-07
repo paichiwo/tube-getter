@@ -259,6 +259,7 @@ def main_window():
         bg=colors[0],
         bd=0)
     url_entry.place(x=25, y=45, width=615)
+    url_entry.focus()
     # Right click menu
     url_entry_right_click_menu = Menu(root, tearoff=0)
     url_entry_right_click_menu.add_command(label="Paste", command=paste_url)
