@@ -24,8 +24,14 @@ if getattr(sys, 'frozen', False):
 
 
 def main_window():
-    """Create UI elements for the main window and provide functionality"""
+    """
+    Create the main user interface with UI elements and associated functionality.
 
+    This function sets up the main graphical user interface of the application, including
+    buttons, labels, entry fields, and a Treeview to display information. It defines various
+    functions to handle adding URLs, switching between audio and video, downloading media,
+    updating progress, and managing UI elements.
+    """
     def get_data_for_treeview(i_tag, output_format):
         """Return a list with data to display in the treeview"""
         treeview_list.clear()
