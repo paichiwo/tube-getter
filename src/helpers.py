@@ -5,7 +5,7 @@ from pytube import Playlist
 
 
 def resource_path(relative_path):
-    """Get an absolute path to resource, works for dev and for PyInstaller"""
+    """Get the absolute path to a resource, accommodating both development and PyInstaller builds"""
     if hasattr(sys, '_MEIPASS'):
         base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
         return os.path.join(base_path, relative_path)
@@ -20,7 +20,7 @@ def get_downloads_folder_path():
 
 
 def center_window(window, width, height):
-    """Create a window in the center of the screen, using desired dimensions"""
+    """Center a window on the screen using the provided dimensions"""
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
 
@@ -32,12 +32,12 @@ def center_window(window, width, height):
 
 
 def count_file_size(size_bytes):
-    """Count the stream file sizes in MB"""
+    """Convert bytes to megabytes (MB) for representing file sizes"""
     return round(size_bytes / (1024 * 1024), 1)
 
 
 def get_playlist_links(url, array):
-    """Create a list with individual links from yt playlist"""
+    """    Retrieve individual video links from a YouTube playlist and add them to a list"""
     if "list=" in url:
         p = Playlist(url)
         for link in p.video_urls:
@@ -47,7 +47,7 @@ def get_playlist_links(url, array):
 
 
 def load_settings():
-    """Load settings from .json file"""
+    """Load settings from a JSON file"""
     path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', 'settings.json')
     try:
         with open(path, 'r') as file:
@@ -59,7 +59,7 @@ def load_settings():
 
 
 def save_settings(output_folder):
-    """Save settings to .json file"""
+    """Save settings to a JSON file"""
     settings_file = 'settings.json'
     path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter')
     settings_path = os.path.join(path, settings_file)
