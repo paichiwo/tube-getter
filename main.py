@@ -36,7 +36,7 @@ def main_window():
         """Return a list with data to display in the treeview"""
         treeview_list.clear()
         for url in yt_playlist:
-            yt = YouTube(url)
+            yt = YouTube(url, use_oauth=True, allow_oauth_cache=True)
             try:
                 treeview_list.append([
                     yt.streams.get_by_itag(i_tag).title,
@@ -46,7 +46,7 @@ def main_window():
                     "0 KiB/s",
                     "Queued"
                 ])
-            except AttributeError:
+            except (AttributeError, KeyError):
                 treeview_list.append([
                     yt.streams.get_highest_resolution().title,
                     output_format,
@@ -58,6 +58,7 @@ def main_window():
         return treeview_list
 
     def update_treeview(array):
+        """Update treeview with items from the array"""
         for item in array:
             tree.insert("", "end", values=item)
 
@@ -99,7 +100,7 @@ def main_window():
     def download_audio(playlist, output_path):
         """Download audio stream"""
         for index, link in enumerate(playlist):
-            yt = YouTube(link, on_progress_callback=progress_callback)
+            yt = YouTube(link, on_progress_callback=progress_callback, use_oauth=True, allow_oauth_cache=True)
             yt_stream = yt.streams.get_audio_only()
             treeview_list[index][5] = "Downloading"
             update_treeview_row(index, treeview_list[index])
