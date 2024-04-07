@@ -5,7 +5,7 @@ import threading
 import pytube.exceptions
 import urllib.error
 from datetime import datetime
-from pytube import YouTube
+from pytubefix import YouTube
 from tkinter import Tk, ttk, Button, Entry, Label, PhotoImage, Menu, CENTER
 from src.settings_window import settings_window
 from src.config import version, image_paths, colors
