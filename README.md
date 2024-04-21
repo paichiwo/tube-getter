@@ -5,8 +5,8 @@
 
 ---
 Tube Getter is a Python application that allows you to download videos and audio from YouTube.
-It provides a simple user interface built with Tkinter
-and utilizes the pytube library for downloading the YouTube content.
+It provides a simple user interface built with customtkinter
+and utilizes the pytubefix library for downloading the YouTube content.
 ---
 ## **Features**
 
@@ -14,12 +14,16 @@ and utilizes the pytube library for downloading the YouTube content.
 *   Support for downloading individual videos or entire playlists.
 *   Choose the output format (video or audio).
 *   Monitor the download progress, including progress, download speed, and completion status.
-* Choose the download folder in the settings window
+*   Choose the download folder in the settings window
 
 ## **Prerequisites**
 
 *   Python 3.x
-*   pytube
+*   pytubefix
+*   customtkinter
+*   pillow
+*   darkdetect
+*   sv-ttk
 
 ## **Installation**
 
@@ -28,9 +32,7 @@ and utilizes the pytube library for downloading the YouTube content.
 Clone the repository:   
 `git clone https://github.com/paichiwo/tube-getter.git`
 
-Install the required dependencies or run `requirements.txt`:   
-`pip install pytube`   
-or   
+Install the required dependencies:
 `pip install -r requirements.txt`
 
 Run the application:   
@@ -39,11 +41,11 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v1.2.1
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v1.2.7
 
 Run the application. 
 
-_Note: Application is portable, no installation required._
+Note: Application is portable, no installation required.
 
 ## **Usage**
 
@@ -68,20 +70,17 @@ you can also add URLs one by one.
 ## **Contributing**
 
 _I'm constantly working on this application, this code might change a lot._
-
-If you find any issues, feel free to report.
-
-CONTRIBUTIONS ARE WELCOME
+_If you find any issues, feel free to open an issue._
 
 If you are interested in contributing to the development of the YouTube Downloader,
 you are welcome to create a pull request on the project's GitHub repository. By contributing to the project,
 you can help improve the functionality, stability, and overall quality of the Tube Getter application,
 which is much appreciated.
-
+![TG_screenshot_1.png](..%2Ftube_getter_2%2Fscreenshots%2FTG_screenshot_1.png)
 ## **License**
 
 This project is licensed under the [MIT License](LICENSE).
 
 ## **Acknowledgements**
 
-*   [pytube](https://pytube.io/) - Python library for downloading YouTube videos
+*   [pytubefix](https://pytubefix.readthedocs.io/en/latest/) - Python library for downloading YouTube videos
