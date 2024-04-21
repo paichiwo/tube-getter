@@ -76,7 +76,6 @@ If you are interested in contributing to the development of the YouTube Download
 you are welcome to create a pull request on the project's GitHub repository. By contributing to the project,
 you can help improve the functionality, stability, and overall quality of the Tube Getter application,
 which is much appreciated.
-![TG_screenshot_1.png](..%2Ftube_getter_2%2Fscreenshots%2FTG_screenshot_1.png)
 ## **License**
 
 This project is licensed under the [MIT License](LICENSE).
