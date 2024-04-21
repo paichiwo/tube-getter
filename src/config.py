@@ -1,35 +1,27 @@
 from src.helpers import resource_path
 
-version = "1.2.5"
 
-image_paths = {
-    'theme': resource_path('images/icons_black/sun.png'),
-    'settings': resource_path('images/icons_black/setting.png'),
-    'entry': resource_path('images/entry.png'),
-    'entry_small': resource_path('images/entry_small.png'),
-    'folder': resource_path('images/folder.png'),
-    'add': resource_path('images/button_add.png'),
-    'clear': resource_path('images/button_clear.png'),
-    'download': resource_path('images/button_download.png'),
-    'close': resource_path('images/button_close.png'),
+VERSION = '1.2.7'
+
+IMG_PATHS = {
+    'settings': resource_path('images/setting.png'),
     'icon': resource_path('images/yt3d.ico'),
     'icon_png': resource_path('images/yt3d.png'),
     'github': resource_path('images/github.png'),
     'switch_left': resource_path('images/switch_left.png'),
     'switch_right': resource_path('images/switch_right.png')
 }
-font_size = 10
 
-colors = ['#CCCCCC', '#0C8AFF']
 
-settings_header = f"TUBE GETTER v{version}\nby Paichiwo\n2023"
+# settings window
+SETTINGS_HEADER = f'TUBE GETTER v{VERSION}\nby Paichiwo\n2023'
 
-settings_message = """
-The Python-based Tube Getter enables users to download video or
-audio files from YouTube with ease. The user interface is built using
-the PySimpleGUI library, while the PyTube library is used to
-implement the video/audio downloading functionality. With a user-friendly
-design, it offers a hassle-free method to obtain desired YouTube content.
+SETTINGS_MSG = """
+Welcome to my Python-based Tube Getter. This app makes downloading video 
+or audio files from YouTube an easy and pleasant task. It lets you download 
+individual files or whole playlists to a chosen location on your PC. 
+I'm constantly working on updates, but should you find any issues 
+please visit my github by clicking an icon below and open an 'issue' to let me know.
 """
 
-github_url = "https://github.com/paichiwo"
+GITHUB_URL = "https://github.com/paichiwo/tube-getter"
