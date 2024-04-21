@@ -1,2 +1,6 @@
-pytube
 pytubefix
+customtkinter
+pillow
+darkdetect
+sv_ttk
+pytube
