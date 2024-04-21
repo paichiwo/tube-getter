@@ -47,6 +47,8 @@ Run the application.
 
 Note: Application is portable, no installation required.
 
+Note: Your antivirus software might find this application suspicious. This is due to the nature of pyinstaller behavior.
+It's a common and acknowledged by pyinstaller devs - we're waiting on the fix. Exemption might have to be added in windows defender or other antivirus software that you use.
 ## **Usage**
 
 - Run the application, the window will appear.
