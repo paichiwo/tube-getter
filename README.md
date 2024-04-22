@@ -6,7 +6,7 @@
 ---
 Tube Getter is a Python application that allows you to download videos and audio from YouTube.
 It provides a simple user interface built with customtkinter
-and utilizes the pytubefix library for downloading the YouTube content.
+and uses the pytubefix library for downloading the YouTube content.
 ---
 ## **Features**
 
@@ -47,8 +47,10 @@ Run the application.
 
 Note: Application is portable, no installation required.
 
-Note: Your antivirus software might find this application suspicious. This is due to the nature of pyinstaller behavior.
-It's a common and acknowledged by pyinstaller devs - we're waiting on the fix. Exemption might have to be added in windows defender or other antivirus software that you use.
+Note: Your antivirus software might find this application suspicious. 
+This is due to the nature of pyinstaller behavior.
+It's a common problem and well acknowledged. 
+Exemption might have to be added in windows defender or other antivirus software that you use.
 ## **Usage**
 
 - Run the application, the window will appear.
@@ -72,12 +74,13 @@ you can also add URLs one by one.
 ## **Contributing**
 
 _I'm constantly working on this application, this code might change a lot._
-_If you find any issues, feel free to open an issue._
+_If you find any bugs, please feel free to open an issue._
 
 If you are interested in contributing to the development of the YouTube Downloader,
-you are welcome to create a pull request on the project's GitHub repository. By contributing to the project,
-you can help improve the functionality, stability, and overall quality of the Tube Getter application,
-which is much appreciated.
+you are welcome to create a pull request on the project's GitHub repository. 
+By contributing to the project, you can help improve the functionality, 
+stability, and overall quality of the Tube Getter application, which is much appreciated.
+
 ## **License**
 
 This project is licensed under the [MIT License](LICENSE).
@@ -85,3 +88,9 @@ This project is licensed under the [MIT License](LICENSE).
 ## **Acknowledgements**
 
 *   [pytubefix](https://pytubefix.readthedocs.io/en/latest/) - Python library for downloading YouTube videos
+
+## TODO:
+
+- bind enter key with url entry
+- bind control-z with url entry
+- bind right mouse click on a treeview / implement menu with 'delete' and 'open folder' options
