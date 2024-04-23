@@ -169,7 +169,7 @@ class TubeGetter(ctk.CTk):
     def get_data_for_treeview(self, i_tag, dl_format):
         self.treeview_list.clear()
         for url in self.yt_playlist:
-            yt = YouTube(url)
+            yt = YouTube(url, client='WEB')
             try:
                 self.treeview_list.append([
                     yt.streams.get_by_itag(i_tag).title,
