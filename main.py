@@ -13,7 +13,7 @@ from PIL import Image
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch, CTkImage
 from tkinter import ttk, Menu, CENTER
 from src.config import VERSION, IMG_PATHS
-from src.helpers import center_window, get_links, load_settings, count_file_size
+from src.helpers import center_window, get_links, load_settings, count_file_size, open_downloads_folder
 from src.settings_win import SettingsWindow
 
 if getattr(sys, 'frozen', False):
@@ -47,8 +47,8 @@ class TubeGetter(ctk.CTk):
                                          text='', width=40, command=self.settings_action)
 
         self.url_entry = CTkEntry(self.main_frame, width=620, border_width=1)
-        self.url_entry.bind('<Return>', lambda event: self.add_action)
-        self.url_entry.bind('<Control-Z>', lambda event: self.delete_url_action())
+        self.url_entry.bind('<Return>', self.add_action)
+        self.url_entry.bind('<Control-z>', self.delete_url_action)
 
         self.add_button = CTkButton(self.main_frame, text='Add', width=130, command=self.add_action)
         self.clear_button = CTkButton(self.main_frame, text='Clear', width=130, command=self.clear_action)
@@ -66,10 +66,10 @@ class TubeGetter(ctk.CTk):
         self.tree.heading('status', text='Status')
 
         self.tree.column('title', anchor=CENTER, minwidth=150, width=300)
-        self.tree.column('ext', anchor=CENTER, minwidth=30, width=30)
+        self.tree.column('ext', anchor=CENTER, minwidth=25, width=25)
         self.tree.column('size', anchor=CENTER, minwidth=30, width=30)
         self.tree.column('progress', anchor=CENTER, minwidth=30, width=30)
-        self.tree.column('speed', anchor=CENTER, minwidth=30, width=30)
+        self.tree.column('speed', anchor=CENTER, minwidth=30, width=35)
         self.tree.column('status', anchor=CENTER, minwidth=50, width=50)
 
         # Treeview Scrollbars
@@ -77,7 +77,10 @@ class TubeGetter(ctk.CTk):
         self.tree.configure(yscrollcommand=self.vsb.set)
 
         treeview_right_click_menu = Menu(self.main_frame, tearoff=0, foreground='white')
+        treeview_right_click_menu.configure(bg='black')
         treeview_right_click_menu.add_command(label='Delete item', command=self.delete_item_treeview_action)
+        treeview_right_click_menu.add_command(label='Open downloads folder', command=open_downloads_folder)
+
         self.tree.bind('<Button-3>', lambda event: treeview_right_click_menu.post(event.x_root, event.y_root))
 
         # info for user
@@ -115,10 +118,11 @@ class TubeGetter(ctk.CTk):
         self.switch.configure(text=self.dl_format)
         self.update_treeview(data)
 
-    def add_action(self):
-        url = self.url_entry.get()
+    def add_action(self, event=None):
         self.treeview_list.clear()
         self.clear_treeview()
+
+        url = self.url_entry.get()
         if url:
             try:
                 if self.dl_format == 'audio':
@@ -137,7 +141,7 @@ class TubeGetter(ctk.CTk):
         else:
             self.info_for_user_label.configure(text="No url detected.")
 
-    def delete_url_action(self):
+    def delete_url_action(self, event=None):
         self.url_entry.delete(0, 'end')
 
     def clear_action(self):
@@ -200,12 +204,13 @@ class TubeGetter(ctk.CTk):
     def delete_item_treeview_action(self):
         selection = self.tree.selection()
         if selection:
-            self.tree.delete(selection[0])
             # Delete item from yt_playlist
             index = self.tree.index(selection[0])
             self.yt_playlist.pop(index)
+            # Delete item from treeview
+            self.tree.delete(selection[0])
         else:
-            self.info_for_user_label.configure(text="No item selected")
+            self.info_for_user_label.configure(text="No item selected.")
 
     def download_video(self, playlist, output_path):
         for index, link in enumerate(playlist):

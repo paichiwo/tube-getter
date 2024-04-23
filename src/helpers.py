@@ -66,3 +66,7 @@ def save_settings(output_folder):
     with open(settings_path, 'w') as file:
         json.dump(data, file)
 
+
+def open_downloads_folder():
+    os.startfile(load_settings())
+
