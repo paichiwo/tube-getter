@@ -56,7 +56,7 @@ class TubeGetter(ctk.CTk):
 
         # treeview
         columns = ('title', 'ext', 'size', 'progress', 'speed', 'status')
-        self.tree = ttk.Treeview(self.main_frame, columns=columns, show='headings', height=16)
+        self.tree = ttk.Treeview(self.main_frame, columns=columns, show='headings')
 
         self.tree.heading('title', text='Title')
         self.tree.heading('ext', text='Ext')
@@ -65,12 +65,12 @@ class TubeGetter(ctk.CTk):
         self.tree.heading('speed', text='Speed')
         self.tree.heading('status', text='Status')
 
-        self.tree.column('title', anchor=CENTER, minwidth=150, width=300)
-        self.tree.column('ext', anchor=CENTER, minwidth=25, width=25)
-        self.tree.column('size', anchor=CENTER, minwidth=30, width=30)
-        self.tree.column('progress', anchor=CENTER, minwidth=30, width=30)
-        self.tree.column('speed', anchor=CENTER, minwidth=30, width=35)
-        self.tree.column('status', anchor=CENTER, minwidth=50, width=50)
+        self.tree.column('title', anchor=CENTER, minwidth=150, width=300, stretch=False)
+        self.tree.column('ext', anchor=CENTER, minwidth=50, width=70, stretch=False)
+        self.tree.column('size', anchor=CENTER, minwidth=70, width=90, stretch=False)
+        self.tree.column('progress', anchor=CENTER, minwidth=60, width=80, stretch=False)
+        self.tree.column('speed', anchor=CENTER, minwidth=70, width=90, stretch=False)
+        self.tree.column('status', anchor=CENTER, minwidth=75, width=95, stretch=False)
 
         # Treeview Scrollbars
         self.vsb = ttk.Scrollbar(self.main_frame, orient='vertical', command=self.tree.yview)
@@ -169,7 +169,7 @@ class TubeGetter(ctk.CTk):
     def get_data_for_treeview(self, i_tag, dl_format):
         self.treeview_list.clear()
         for url in self.yt_playlist:
-            yt = YouTube(url, client='WEB')
+            yt = YouTube(url)
             try:
                 self.treeview_list.append([
                     yt.streams.get_by_itag(i_tag).title,
