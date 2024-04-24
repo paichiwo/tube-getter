@@ -5,7 +5,7 @@ from pytubefix import Playlist
 
 
 def resource_path(relative_path):
-    """Get the absolute path for auto-to-py"""
+    """Get the absolute path for auto-py-to-exe"""
     if hasattr(sys, '_MEIPASS'):
         base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
         return os.path.join(base_path, relative_path)
@@ -56,11 +56,10 @@ def load_settings():
         return get_downloads_folder_path()
 
 
-def save_settings(output_folder):
+def save_settings(data, file_name):
     """Save settings to JSON file"""
     path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter')
-    settings_path = os.path.join(path, 'settings.json')
-    data = {'output_folder': output_folder}
+    settings_path = os.path.join(path, file_name)
     if not os.path.exists(path):
         os.makedirs(path)
     with open(settings_path, 'w') as file:
@@ -69,4 +68,23 @@ def save_settings(output_folder):
 
 def open_downloads_folder():
     os.startfile(load_settings())
+
+
+def save_heading_widths(treeview):
+    widths = {}
+    for column in treeview['columns']:
+        width = treeview.column(column, 'width')
+        widths[column] = width
+    save_settings(widths, 'headings.json')
+
+
+def load_heading_widths(treeview):
+    path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', 'headings.json')
+    try:
+        with open(path, 'r') as file:
+            widths = json.load(file)
+            for column, width in widths.items():
+                treeview.column(column, width=width)
+    except FileNotFoundError:
+        pass
 

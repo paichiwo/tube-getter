@@ -2,7 +2,6 @@
 
 import darkdetect
 import sv_ttk
-import sys
 import threading
 import pytubefix.exceptions
 import urllib.error
@@ -13,7 +12,7 @@ from PIL import Image
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch, CTkImage
 from tkinter import ttk, Menu, CENTER
 from src.config import VERSION, IMG_PATHS
-from src.helpers import center_window, get_links, load_settings, count_file_size, open_downloads_folder
+from src.helpers import *
 from src.settings_win import SettingsWindow
 
 if getattr(sys, 'frozen', False):
@@ -72,6 +71,8 @@ class TubeGetter(ctk.CTk):
         self.tree.column('speed', anchor=CENTER, minwidth=70, width=90, stretch=False)
         self.tree.column('status', anchor=CENTER, minwidth=75, width=95, stretch=False)
 
+        self.tree.bind('<Configure>', self.on_heading_width_change)
+
         # Treeview Scrollbars
         self.vsb = ttk.Scrollbar(self.main_frame, orient='vertical', command=self.tree.yview)
         self.tree.configure(yscrollcommand=self.vsb.set)
@@ -86,6 +87,7 @@ class TubeGetter(ctk.CTk):
         self.info_for_user_frame = CTkFrame(self.main_frame, width=810, height=24)
         self.info_for_user_label = CTkLabel(self.info_for_user_frame, text='')
 
+        load_heading_widths(self.tree)
         self.draw_gui()
 
     def draw_gui(self):
@@ -271,6 +273,10 @@ class TubeGetter(ctk.CTk):
         else:
             sv_ttk.use_light_theme()
         self.after(5000, self.check_theme_change)
+
+    def on_heading_width_change(self, event):
+        print(event)
+        save_heading_widths(self.tree)
 
     if getattr(sys, 'frozen', False):
         pyi_splash.close()

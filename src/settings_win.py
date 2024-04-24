@@ -58,5 +58,5 @@ class SettingsWindow(CTkToplevel):
         folder_selected = filedialog.askdirectory()
         if folder_selected:
             self.output_destination_label.configure(text=folder_selected)
-            save_settings(folder_selected)
+            save_settings({'output_folder': folder_selected}, 'settings.json')
             self.focus()
