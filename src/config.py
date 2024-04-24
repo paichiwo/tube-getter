@@ -1,7 +1,7 @@
 from src.helpers import resource_path
 
 
-VERSION = '1.2.8'
+VERSION = '1.2.9'
 
 IMG_PATHS = {
     'settings': resource_path('images/setting.png'),
