@@ -88,9 +88,3 @@ This project is licensed under the [MIT License](LICENSE).
 ## **Acknowledgements**
 
 *   [pytubefix](https://pytubefix.readthedocs.io/en/latest/) - Python library for downloading YouTube videos
-
-## TODO:
-
-- bind enter key with url entry
-- bind control-z with url entry
-- bind right mouse click on a treeview / implement menu with 'delete' and 'open folder' options
