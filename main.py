@@ -77,7 +77,6 @@ class TubeGetter(ctk.CTk):
         self.tree.configure(yscrollcommand=self.vsb.set)
 
         treeview_right_click_menu = Menu(self.main_frame, tearoff=0, foreground='white')
-        treeview_right_click_menu.configure(bg='black')
         treeview_right_click_menu.add_command(label='Delete item', command=self.delete_item_treeview_action)
         treeview_right_click_menu.add_command(label='Open downloads folder', command=open_downloads_folder)
 

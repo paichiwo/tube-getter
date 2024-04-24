@@ -1,7 +1,7 @@
 from src.helpers import resource_path
 
 
-VERSION = '1.2.7'
+VERSION = '1.2.8'
 
 IMG_PATHS = {
     'settings': resource_path('images/setting.png'),
@@ -20,7 +20,7 @@ SETTINGS_MSG = """
 Welcome to my Python-based Tube Getter. This app makes downloading video 
 or audio files from YouTube an easy and pleasant task. It lets you download 
 individual files or whole playlists to a chosen location on your PC. 
-I'm constantly working on updates, but should you find any issues 
+I'm constantly working on updates, but should you find any bugs 
 please visit my github by clicking an icon below and open an 'issue' to let me know.
 """
 
