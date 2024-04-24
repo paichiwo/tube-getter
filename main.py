@@ -87,8 +87,9 @@ class TubeGetter(ctk.CTk):
         self.info_for_user_frame = CTkFrame(self.main_frame, width=810, height=24)
         self.info_for_user_label = CTkLabel(self.info_for_user_frame, text='')
 
-        load_heading_widths(self.tree)
+        # draw GUI
         self.draw_gui()
+        load_heading_widths(self.tree)
 
     def draw_gui(self):
         self.main_frame.pack()
@@ -275,7 +276,6 @@ class TubeGetter(ctk.CTk):
         self.after(5000, self.check_theme_change)
 
     def on_heading_width_change(self, event):
-        print(event)
         save_heading_widths(self.tree)
 
     if getattr(sys, 'frozen', False):
