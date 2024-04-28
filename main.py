@@ -57,12 +57,8 @@ class TubeGetter(ctk.CTk):
         columns = ('title', 'ext', 'size', 'progress', 'speed', 'status')
         self.tree = ttk.Treeview(self.main_frame, columns=columns, show='headings')
 
-        self.tree.heading('title', text='Title')
-        self.tree.heading('ext', text='Ext')
-        self.tree.heading('size', text='Size')
-        self.tree.heading('progress', text='Progress')
-        self.tree.heading('speed', text='Speed')
-        self.tree.heading('status', text='Status')
+        for column_name in columns:
+            self.tree.heading(column_name, text=column_name.capitalize())
 
         self.tree.column('title', anchor=CENTER, minwidth=150, width=300, stretch=False)
         self.tree.column('ext', anchor=CENTER, minwidth=50, width=70, stretch=False)

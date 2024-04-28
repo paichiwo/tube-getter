@@ -1,6 +1,10 @@
 
 ![](images/tube_getter_logo.png)
 
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/t/paichiwo/tube-getter/main)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/paichiwo/tube-getter/total)
+
+
 ![](screenshots/TG_screenshot_1.png)
 
 ---
