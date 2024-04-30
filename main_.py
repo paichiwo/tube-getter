@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 import datetime
-import darkdetect
-import sv_ttk
 import threading
 import pytubefix.exceptions
 import urllib.error
@@ -10,7 +8,6 @@ from datetime import datetime
 from pytubefix import YouTube, Channel
 from PIL import Image
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch, CTkImage
-from tkinter import ttk, Menu, CENTER
 from src.config import VERSION, IMG_PATHS
 from src.helpers import *
 from src.settings_win import SettingsWindow
@@ -18,6 +15,7 @@ from src.info_frame import Table
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
+
 
 class TubeGetter(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -29,10 +27,12 @@ class TubeGetter(ctk.CTk):
 
         self.settings_window = None
 
-        self.yt_playlist = []
-        self.treeview_list = []
+        self.yt_list = []
+        self.table_list = []
         self.download_start_time = datetime.now()
         self.dl_format = 'audio'
+
+        self.get_test_data()
 
         """GUI Elements"""
 
@@ -58,8 +58,7 @@ class TubeGetter(ctk.CTk):
         self.add_button = CTkButton(self.top_frame_2, text='Add', width=130, command=self.simulate_progress) # change to add action
 
         # # MIDDLE
-        self.get_test_data()
-        self.table = Table(self.middle_frame, table_data=self.treeview_list, fg_color='grey10')
+        self.table = Table(self.middle_frame, yt_links=self.yt_list, table_data=self.table_list, fg_color=('grey80', 'grey10'))
 
         # BOTTOM
         self.clear_button = CTkButton(self.bottom_frame_1, text='Clear', width=130, command=self.clear_action)
@@ -143,7 +142,8 @@ class TubeGetter(ctk.CTk):
 
     def clear_action(self):
         self.yt_playlist.clear()
-        self.clear_treeview()
+        self.treeview_list.clear()
+        self.table.delete_all_data_frames()
 
     def download_action(self):
         def download_task():
@@ -167,12 +167,11 @@ class TubeGetter(ctk.CTk):
         single_link = 'https://www.youtube.com/watch?v=afB4DlkebO8'
         playlist_link = 'https://www.youtube.com/watch?v=gKDuHIRNJSY&list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq&pp=gAQBiAQB'
 
-        url_list = []
-        get_links(playlist_link, url_list)
+        get_links(playlist_link, self.yt_list)
 
-        for link in url_list:
+        for link in self.yt_list:
             yt = YouTube(link)
-            self.treeview_list.append([
+            self.table_list.append([
                 yt.thumbnail_url,
                 yt.title,
                 Channel(yt.channel_url).channel_name,
