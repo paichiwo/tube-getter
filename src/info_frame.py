@@ -44,11 +44,10 @@ class DataFrame(CTkFrame):
 
         self.master = master
         self.data = data
-        self.configure(height=50)
 
         self.thumbnail = CTkLabel(self,
                                   text='',
-                                  image=CTkImage(self.display_image(data[0]), size=(64, 36)))
+                                  image=CTkImage(self.create_thumbnail(data[0]), size=(64, 36)))
 
         self.title = CTkLabel(self,
                               text=self.data[1],
@@ -93,15 +92,15 @@ class DataFrame(CTkFrame):
                                     fg_color='transparent',
                                     hover_color='grey25')
 
-        self.bar_frame = CTkFrame(self)
-        self.progress_bar = CTkProgressBar(self.bar_frame, height=2)
+        self.progress_bar_frame = CTkFrame(self)
+        self.progress_bar = CTkProgressBar(self.progress_bar_frame, height=2)
         self.progress_bar.set(0)
 
         # draw elements
         self.draw_elements()
 
     def draw_elements(self):
-        self.bar_frame.pack(anchor='n', side='bottom', fill='x', padx=7)
+        self.progress_bar_frame.pack(anchor='n', side='bottom', fill='x', padx=7)
         self.progress_bar.pack(anchor='n', side='bottom', fill='x')
 
         self.thumbnail.place(x=7, y=7)
@@ -117,7 +116,7 @@ class DataFrame(CTkFrame):
         self.delete_btn.place(relx=.96, rely=.5, anchor='center')
 
     @staticmethod
-    def display_image(url):
+    def create_thumbnail(url):
         response = get(url)
         image_data = response.content
         image = Image.open(BytesIO(image_data)).resize((64, 36))
