@@ -9,7 +9,12 @@ IMG_PATHS = {
     'icon_png': resource_path('images/yt3d.png'),
     'github': resource_path('images/github.png'),
     'switch_left': resource_path('images/switch_left.png'),
-    'switch_right': resource_path('images/switch_right.png')
+    'switch_right': resource_path('images/switch_right.png'),
+
+    'clock': resource_path('images/test/clock.png'),
+    'eye': resource_path('images/test/webcam.png'),
+    'calendar': resource_path('images/test/calendar.png'),
+    'bin': resource_path('images/test/bin.png'),
 }
 
 
