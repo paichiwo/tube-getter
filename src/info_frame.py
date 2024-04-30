@@ -1,7 +1,5 @@
 from datetime import datetime
-from customtkinter import CTk, CTkScrollableFrame, CTkFrame, CTkImage, CTkLabel, CTkButton, CTkFont, CTkProgressBar
-from pytubefix import YouTube, Channel
-from src.helpers import get_links, center_window
+from customtkinter import CTkScrollableFrame, CTkFrame, CTkImage, CTkLabel, CTkButton, CTkFont, CTkProgressBar
 from src.config import IMG_PATHS
 from requests import get
 from PIL import Image
@@ -12,38 +10,75 @@ class Table(CTkScrollableFrame):
     """ Custom scrollable frame that holds DataFrames"""
 
     def __init__(self, master,
+                 yt_links=None,
                  table_data=None,
-                 width=300, height=300,
-                 entry_padx=5, entry_pady=5,
-                 entry_color='grey20',
+                 width=300,
+                 height=300,
+                 entry_padx=5,
+                 entry_pady=5,
+                 entry_color=('grey90', 'grey20'),
                  *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
+        # arrays with data
+        self.yt_links = yt_links
         self.table_data = table_data
+
+        # entry configuration
+        self.entry_padx = entry_padx
+        self.entry_pady = entry_pady
+        self.entry_color = entry_color
+
+        # table configuration
         self.configure(width=width, height=height)
 
+        # list containing data frames
         self.frames = []
-        self.progress_bar = CTkProgressBar(self, height=2)
 
+        # initial setup
+        self.create_list_with_data_frames()
+        self.draw_data_frames()
+        self.update_frames()
+
+    def create_list_with_data_frames(self):
         for data_entry in self.table_data:
-            self.frames.append(DataFrame(self, data_entry, fg_color=entry_color))
-        for data_frame in self.frames:
-            data_frame.pack(padx=entry_padx, pady=entry_pady, fill='x')
+            self.frames.append(DataFrame(self, data_entry, self.delete_one_data_frame, fg_color=self.entry_color))
 
-    def delete_all_entries(self):
+    def draw_data_frames(self):
+        for data_frame in self.frames:
+            data_frame.pack(padx=self.entry_padx, pady=self.entry_pady, fill='x')
+
+    def update_frames(self):
+        for i, frame in enumerate(self.frames):
+            frame.index = i
+
+    def delete_all_data_frames(self):
         for data_frame in self.frames:
             data_frame.destroy()
         self.frames.clear()
+
+    def delete_one_data_frame(self):
+        for i, frame in enumerate(self.frames):
+            if frame.deleted:
+                self.frames.pop(i)
+                self.table_data.pop(i)
+                self.yt_links.pop(i)
+                frame.destroy()
+
+        self.update_frames()
 
 
 class DataFrame(CTkFrame):
     """ Custom frame widget that holds and displays data about the YouTube video. """
 
-    def __init__(self, master, data, *args, **kwargs):
+    def __init__(self, master, data, destroy_callback, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
 
         self.master = master
         self.data = data
+        self.index = 0
+        self.deleted = False
+        self.destroy_callback = destroy_callback
 
         self.thumbnail = CTkLabel(self,
                                   text='',
@@ -81,16 +116,21 @@ class DataFrame(CTkFrame):
 
         self.extension = CTkLabel(self,
                                   text='test',
-                                  width=20,
-                                  fg_color='grey25',
+                                  fg_color=('grey80', 'grey25'),
                                   corner_radius=5)
+
+        self.download_speed = CTkLabel(self,
+                                       text='0 KiB/s',
+                                       fg_color=('grey80', 'grey25'),
+                                       corner_radius=5)
 
         self.delete_btn = CTkButton(self,
                                     text='',
                                     width=24,
                                     image=CTkImage(Image.open(IMG_PATHS['bin']), size=(24, 24)),
                                     fg_color='transparent',
-                                    hover_color='grey25')
+                                    hover_color=('grey80', 'grey25'),
+                                    command=self.delete_action)
 
         self.progress_bar_frame = CTkFrame(self)
         self.progress_bar = CTkProgressBar(self.progress_bar_frame, height=2)
@@ -98,6 +138,10 @@ class DataFrame(CTkFrame):
 
         # draw elements
         self.draw_elements()
+
+    def delete_action(self):
+        self.deleted = True
+        self.destroy_callback()
 
     def draw_elements(self):
         self.progress_bar_frame.pack(anchor='n', side='bottom', fill='x', padx=7)
@@ -112,7 +156,8 @@ class DataFrame(CTkFrame):
         self.views.pack(anchor='w', side='left', padx=(0, 10), pady=(0, 7))
         self.uploaded_date.pack(anchor='w', side='left', padx=(0, 10), pady=(0, 7))
 
-        self.extension.place(relx=.9, rely=.5, anchor='center')
+        self.extension.place(relx=.84, rely=.5, anchor='center')
+        self.download_speed.place(relx=.9, rely=.5, anchor='center')
         self.delete_btn.place(relx=.96, rely=.5, anchor='center')
 
     @staticmethod
@@ -133,37 +178,3 @@ class DataFrame(CTkFrame):
     @staticmethod
     def convert_date(date):
         return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
-
-
-# if __name__ == '__main__':
-#     single_link = 'https://www.youtube.com/watch?v=afB4DlkebO8'
-#     playlist_link = 'https://www.youtube.com/watch?v=gKDuHIRNJSY&list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq&pp=gAQBiAQB'
-#
-#     url_list = []
-#     table_data_list = []
-#     get_links(playlist_link, url_list)
-#
-#     for link in url_list:
-#         yt = YouTube(link)
-#         table_data_list.append([
-#             yt.thumbnail_url,
-#             yt.title,
-#             Channel(yt.channel_url).channel_name,
-#             yt.length,
-#             yt.views,
-#             yt.publish_date
-#         ])
-#
-#     print(table_data_list)
-#
-#     root = CTk()
-#     center_window(root, 1000, 600)
-#     root.resizable(False, False)
-#
-#     table = Table(root, table_data_list, height=400, fg_color='black')
-#     table.pack(fill='x')
-#
-#     delete = CTkButton(root, text='delete all', command=table.delete_all_entries)
-#     delete.pack()
-#
-#     root.mainloop()
