@@ -38,7 +38,7 @@ class Table(CTkScrollableFrame):
         # initial setup
         self.create_list_with_data_frames()
         self.draw_data_frames()
-        self.update_frames()
+        self.update_frames_indices()
 
     def create_list_with_data_frames(self):
         for data_entry in self.table_data:
@@ -48,9 +48,16 @@ class Table(CTkScrollableFrame):
         for data_frame in self.frames:
             data_frame.pack(padx=self.entry_padx, pady=self.entry_pady, fill='x')
 
-    def update_frames(self):
-        for i, frame in enumerate(self.frames):
-            frame.index = i
+    def insert_data_all_data_frames(self, data):
+        for data_frame in self.frames:
+            data_frame.data = data
+
+    def insert_data_one_data_frame(self, index, data):
+        self.frames[index].data = data
+
+    def update_frames_indices(self):
+        for i, data_frame in enumerate(self.frames):
+            data_frame.index = i
 
     def delete_all_data_frames(self):
         for data_frame in self.frames:
@@ -65,7 +72,7 @@ class Table(CTkScrollableFrame):
                 self.yt_links.pop(i)
                 frame.destroy()
 
-        self.update_frames()
+        self.update_frames_indices()
 
 
 class DataFrame(CTkFrame):
@@ -114,15 +121,18 @@ class DataFrame(CTkFrame):
                                       font=CTkFont(size=11),
                                       height=8)
 
-        self.extension = CTkLabel(self,
-                                  text='test',
+        self.frame_right = CTkFrame(self, fg_color='transparent')
+        self.extension = CTkLabel(self.frame_right,
+                                  width=50,
+                                  text=self.data[6],
                                   fg_color=('grey80', 'grey25'),
                                   corner_radius=5)
 
-        self.download_speed = CTkLabel(self,
-                                       text='0 KiB/s',
-                                       fg_color=('grey80', 'grey25'),
-                                       corner_radius=5)
+        self.size = CTkLabel(self.frame_right,
+                             width=50,
+                             text=self.data[7],
+                             fg_color=('grey80', 'grey25'),
+                             corner_radius=5)
 
         self.delete_btn = CTkButton(self,
                                     text='',
@@ -156,8 +166,10 @@ class DataFrame(CTkFrame):
         self.views.pack(anchor='w', side='left', padx=(0, 10), pady=(0, 7))
         self.uploaded_date.pack(anchor='w', side='left', padx=(0, 10), pady=(0, 7))
 
-        self.extension.place(relx=.84, rely=.5, anchor='center')
-        self.download_speed.place(relx=.9, rely=.5, anchor='center')
+        self.frame_right.place(relx=.85, rely=.5, anchor='center')
+        self.extension.grid(row=0, column=0, padx=5)
+        self.size.grid(row=0, column=1)
+
         self.delete_btn.place(relx=.96, rely=.5, anchor='center')
 
     @staticmethod
