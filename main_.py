@@ -24,6 +24,7 @@ class TubeGetter(ctk.CTk):
         self.iconbitmap(bitmap=IMG_PATHS['icon'])
         self.title(f'Tube Getter v{VERSION}')
         center_window(self, 1000, 600)
+        self.minsize(500, 400)  # adjust later
 
         self.settings_window = None
 
@@ -32,7 +33,7 @@ class TubeGetter(ctk.CTk):
         self.download_start_time = datetime.now()
         self.dl_format = 'audio'
 
-        self.get_test_data()
+        # self.get_test_data()
 
         """GUI Elements"""
 
@@ -55,7 +56,7 @@ class TubeGetter(ctk.CTk):
         self.url_entry.bind('<Return>', self.add_action)
         self.url_entry.bind('<Control-z>', self.delete_url_action)
 
-        self.add_button = CTkButton(self.top_frame_2, text='Add', width=130, command=self.simulate_progress) # change to add action
+        self.add_button = CTkButton(self.top_frame_2, text='Add', width=130, command=self.add_action) # change to add action
 
         # # MIDDLE
         self.table = Table(self.middle_frame, yt_links=self.yt_list, table_data=self.table_list, fg_color=('grey80', 'grey10'))
@@ -67,6 +68,7 @@ class TubeGetter(ctk.CTk):
         # info for user
         self.info_for_user_frame = CTkFrame(self.bottom_frame_2, height=24, corner_radius=0)
         self.info_for_user_label = CTkLabel(self.info_for_user_frame, text='test message')
+        self.dl_speed = CTkLabel(self.info_for_user_frame, text='100 kib/s')
 
         # draw GUI
         self.draw_gui()
@@ -96,6 +98,7 @@ class TubeGetter(ctk.CTk):
         self.bottom_frame_2.pack(fill='x', side='bottom')
         self.info_for_user_frame.pack(fill='x')
         self.info_for_user_label.pack(side='left', fill='x', padx=10)
+        self.dl_speed.pack(side='right', fill='x', padx=10)
 
     def simulate_progress(self):
         self.a += 0.01
@@ -103,31 +106,31 @@ class TubeGetter(ctk.CTk):
         self.table.frames[0].progress_bar.set(self.a)
 
     def switch_action(self):
-        self.clear_treeview()
-        self.treeview_list.clear()
+        self.table.delete_all_data_frames()
+        self.table_list.clear()
         if self.dl_format == 'audio':
             self.dl_format = 'video'
-            data = self.get_data_for_treeview(22, 'mp4')
+            data = self.get_data_for_table(22, 'mp4')
         else:
             self.dl_format = 'audio'
-            data = self.get_data_for_treeview(140, 'mp3')
+            data = self.get_data_for_table(140, 'mp3')
         self.switch.configure(text=self.dl_format)
-        self.update_treeview(data)
+        self.update_table(data)
 
     def add_action(self, event=None):
-        self.treeview_list.clear()
-        self.clear_treeview()
+        self.table_list.clear()
+        self.table.delete_all_data_frames()
 
         url = self.url_entry.get()
         if url:
             try:
                 if self.dl_format == 'audio':
-                    get_links(url, self.yt_playlist)
-                    data = self.get_data_for_treeview(140, 'mp3')
+                    get_links(url, self.yt_list)
+                    data = self.get_data_for_table(140, 'mp3')
                 else:
-                    get_links(url, self.yt_playlist)
-                    data = self.get_data_for_treeview(22, 'mp4')
-                self.update_treeview(data)
+                    get_links(url, self.yt_list)
+                    data = self.get_data_for_table(22, 'mp4')
+                self.update_table(data)
             except pytubefix.exceptions.VideoUnavailable:
                 self.info_for_user_label.configure(text="ERROR: Video is age restricted.")
             except pytubefix.exceptions.RegexMatchError:
@@ -141,8 +144,8 @@ class TubeGetter(ctk.CTk):
         self.url_entry.delete(0, 'end')
 
     def clear_action(self):
-        self.yt_playlist.clear()
-        self.treeview_list.clear()
+        self.yt_list.clear()
+        self.table_list.clear()
         self.table.delete_all_data_frames()
 
     def download_action(self):
@@ -163,22 +166,37 @@ class TubeGetter(ctk.CTk):
         else:
             self.settings_window.focus()
 
-    def get_test_data(self):
-        single_link = 'https://www.youtube.com/watch?v=afB4DlkebO8'
-        playlist_link = 'https://www.youtube.com/watch?v=gKDuHIRNJSY&list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq&pp=gAQBiAQB'
+    def get_data_for_table(self, i_tag, dl_format):
+        self.table_list.clear()
 
-        get_links(playlist_link, self.yt_list)
+        for url in self.yt_list:
+            yt = YouTube(url)
+            try:
+                stream = yt.streams.get_by_itag(i_tag)
+            except (AttributeError, KeyError):
+                stream = yt.streams.get_highest_resolution()
 
-        for link in self.yt_list:
-            yt = YouTube(link)
             self.table_list.append([
                 yt.thumbnail_url,
                 yt.title,
                 Channel(yt.channel_url).channel_name,
                 yt.length,
                 yt.views,
-                yt.publish_date
+                yt.publish_date,
+                dl_format,
+                f'{count_file_size(stream.filesize)} MB'
             ])
+        return self.table_list
+
+    def update_table(self, array):
+        self.table.table_data = array
+        self.table.create_list_with_data_frames()
+        self.table.draw_data_frames()
+        print(array)
+        print(len(self.table.frames))
+
+    # https://www.youtube.com/watch?v=afB4DlkebO8
+    # https://www.youtube.com/watch?v=gKDuHIRNJSY&list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq&pp=gAQBiAQB
 
     if getattr(sys, 'frozen', False):
         pyi_splash.close()
