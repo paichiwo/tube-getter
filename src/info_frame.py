@@ -1,6 +1,8 @@
+import os.path
 from datetime import datetime
 from customtkinter import CTkScrollableFrame, CTkFrame, CTkImage, CTkLabel, CTkButton, CTkFont, CTkProgressBar
 from src.config import IMG_PATHS
+from src.helpers import open_downloads_folder, imager
 from requests import get
 from PIL import Image
 from io import BytesIO
@@ -47,13 +49,6 @@ class Table(CTkScrollableFrame):
     def draw_data_frames(self):
         for data_frame in self.frames:
             data_frame.pack(padx=self.entry_padx, pady=self.entry_pady, fill='x')
-
-    def insert_data_all_data_frames(self, data):
-        for data_frame in self.frames:
-            data_frame.data = data
-
-    def insert_data_one_data_frame(self, index, data):
-        self.frames[index].data = data
 
     def update_frames_indices(self):
         for i, data_frame in enumerate(self.frames):
@@ -102,26 +97,27 @@ class DataFrame(CTkFrame):
 
         self.duration = CTkLabel(self,
                                  text=f' {self.convert_time(self.data[3])}',
-                                 image=CTkImage(Image.open(IMG_PATHS['clock']), size=(12, 12)),
+                                 image=imager(IMG_PATHS['clock'], 12, 12),
                                  compound='left',
                                  font=CTkFont(size=11),
                                  height=8)
 
         self.views = CTkLabel(self,
                               text=f' {self.data[4]}',
-                              image=CTkImage(Image.open(IMG_PATHS['eye']), size=(12, 12)),
+                              image=imager(IMG_PATHS['eye'], 12, 12),
                               compound='left',
                               font=CTkFont(size=11),
                               height=8)
 
         self.uploaded_date = CTkLabel(self,
                                       text=f' {self.convert_date(self.data[5])}',
-                                      image=CTkImage(Image.open(IMG_PATHS['calendar']), size=(12, 12)),
+                                      image=imager(IMG_PATHS['calendar'], 12, 12),
                                       compound='left',
                                       font=CTkFont(size=11),
                                       height=8)
 
         self.frame_right = CTkFrame(self, fg_color='transparent')
+
         self.extension = CTkLabel(self.frame_right,
                                   width=50,
                                   text=self.data[6],
@@ -129,7 +125,7 @@ class DataFrame(CTkFrame):
                                   corner_radius=5)
 
         self.size = CTkLabel(self.frame_right,
-                             width=50,
+                             width=80,
                              text=self.data[7],
                              fg_color=('grey80', 'grey25'),
                              corner_radius=5)
@@ -137,7 +133,7 @@ class DataFrame(CTkFrame):
         self.delete_btn = CTkButton(self,
                                     text='',
                                     width=24,
-                                    image=CTkImage(Image.open(IMG_PATHS['bin']), size=(24, 24)),
+                                    image=imager(IMG_PATHS['bin'], 24, 24),
                                     fg_color='transparent',
                                     hover_color=('grey80', 'grey25'),
                                     command=self.delete_action)
@@ -152,6 +148,17 @@ class DataFrame(CTkFrame):
     def delete_action(self):
         self.deleted = True
         self.destroy_callback()
+
+    def change_delete_btn(self):
+        if 0 < self.progress_bar.get() < 1.0:
+            self.delete_btn.configure(state='disabled')
+
+        elif self.progress_bar.get() >= 1.0:
+            self.delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                                      command=open_downloads_folder, state='normal')
+        else:
+            self.delete_btn.configure(image=imager(IMG_PATHS['bin'], 24, 24),
+                                      command=self.delete_action, state='normal')
 
     def draw_elements(self):
         self.progress_bar_frame.pack(anchor='n', side='bottom', fill='x', padx=7)
@@ -190,3 +197,4 @@ class DataFrame(CTkFrame):
     @staticmethod
     def convert_date(date):
         return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
+
