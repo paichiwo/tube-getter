@@ -30,9 +30,6 @@ class TestYourModule(unittest.TestCase):
             def winfo_screenheight(self):
                 return self.screen_height
 
-            def update_idletasks(self):
-                pass
-
             def geometry(self, geometry):
                 self.window_geometry = geometry
 
