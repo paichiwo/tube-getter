@@ -8,7 +8,6 @@ class TestYourModule(unittest.TestCase):
 
     def setUp(self):
         os.environ['LOCALAPPDATA'] = '/path/to/local/app/data'
-        pass
 
     def test_get_downloads_folder_path(self):
         # Test if get_downloads_folder_path returns correct path
