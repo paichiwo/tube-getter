@@ -2,6 +2,8 @@ import json
 import os
 import sys
 from pytubefix import Playlist
+from customtkinter import CTkImage
+from PIL import Image
 
 
 def resource_path(relative_path):
@@ -31,9 +33,16 @@ def center_window(window, width, height):
     window.update_idletasks()
 
 
+def imager(path, x, y):
+    return CTkImage(Image.open(path), size=(x, y))
+
+
 def count_file_size(size_bytes):
     """Convert bytes to megabytes (MB) for representing file sizes"""
-    return round(size_bytes / (1024 * 1024), 1)
+    if size_bytes >= 1024 * 1024 * 1024:
+        return round(size_bytes / (1024 * 1024 * 1024), 2), "GB"
+    else:
+        return round(size_bytes / (1024 * 1024), 2), "MB"
 
 
 def get_links(url, array):
@@ -47,7 +56,7 @@ def get_links(url, array):
 
 
 def load_settings():
-    """Load settings from JSON file"""
+    # Load settings from JSON file
     path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', 'settings.json')
     try:
         with open(path, 'r') as file:
@@ -57,7 +66,7 @@ def load_settings():
 
 
 def save_settings(data, file_name):
-    """Save settings to JSON file"""
+    # Save settings to JSON file
     path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter')
     settings_path = os.path.join(path, file_name)
     if not os.path.exists(path):
@@ -70,21 +79,16 @@ def open_downloads_folder():
     os.startfile(load_settings())
 
 
-def save_heading_widths(treeview):
-    widths = {}
-    for column in treeview['columns']:
-        width = treeview.column(column, 'width')
-        widths[column] = width
-    save_settings(widths, 'headings.json')
+def format_download_speed_string(download_speed):
+    if download_speed < 1000:
+        return f'{download_speed:.2f} KiB/s'
+    else:
+        return f'{download_speed / 1024:.2f} MiB/s'
 
 
-def load_heading_widths(treeview):
-    path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', 'headings.json')
-    try:
-        with open(path, 'r') as file:
-            widths = json.load(file)
-            for column, width in widths.items():
-                treeview.column(column, width=width)
-    except FileNotFoundError:
-        pass
+def handle_audio_extension(stream):
+    if stream.mime_type == 'audio/mp4':
+        return stream.default_filename.rsplit('.', 1)[0] + '.mp3'
+    else:
+        return stream.default_filename
 
