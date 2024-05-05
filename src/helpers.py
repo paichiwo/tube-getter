@@ -86,20 +86,9 @@ def format_download_speed_string(download_speed):
         return f'{download_speed / 1024:.2f} MiB/s'
 
 
-def save_heading_widths(treeview):
-    widths = {}
-    for column in treeview['columns']:
-        width = treeview.column(column, 'width')
-        widths[column] = width
-    save_settings(widths, 'headings.json')
+def handle_audio_extension(stream):
+    if stream.mime_type == 'audio/mp4':
+        return stream.default_filename.rsplit('.', 1)[0] + '.mp3'
+    else:
+        return stream.default_filename
 
-
-def load_heading_widths(treeview):
-    path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', 'headings.json')
-    try:
-        with open(path, 'r') as file:
-            widths = json.load(file)
-            for column, width in widths.items():
-                treeview.column(column, width=width)
-    except FileNotFoundError:
-        pass
