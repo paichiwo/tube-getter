@@ -106,7 +106,7 @@ class TubeGetter(ctk.CTk):
         self.switch.configure(text=self.dl_format)
         self.update_table(data)
 
-    def add_action(self):
+    def add_action(self, event=None):
         self.table_list.clear()
         self.table.delete_all_data_frames()
 
@@ -138,11 +138,7 @@ class TubeGetter(ctk.CTk):
             for data_frame in self.table.frames:
                 data_frame.delete_btn.configure(state='disabled')
 
-            output_path = load_settings()
-            if self.dl_format == 'audio':
-                self.download_audio(self.yt_list, output_path)
-            else:
-                self.download_video(self.yt_list, output_path)
+            self.download_media()
             self.info_for_user_label.configure(text='Download complete.')
 
         download_thread = threading.Thread(target=download_task)
@@ -191,24 +187,27 @@ class TubeGetter(ctk.CTk):
         self.table.create_list_with_data_frames()
         self.table.draw_data_frames()
 
-    def download_video(self, yt_list, output_path):
-        for index, link in enumerate(yt_list):
-            yt = YouTube(link, on_progress_callback=self.progress_callback)
-            yt_stream = yt.streams.get_highest_resolution()
-            try:
-                yt_stream.download(output_path=output_path, filename=yt_stream.default_filename)
-                self.dl_speed.configure(text='0 KiB/s')
+    def download_media(self):
+        filename = ''
+        output_path = load_settings()
 
-                if os.path.exists(os.path.join(load_settings(), yt_stream.default_filename)):
+        for index, link in enumerate(self.yt_list):
+            yt = YouTube(link, on_progress_callback=self.progress_callback)
+            if self.dl_format == 'audio':
+                yt_stream = yt.streams.get_audio_only()
+                filename = handle_audio_extension(yt_stream)
+            else:
+                yt_stream = yt.streams.get_highest_resolution()
+
+            try:
+                yt_stream.download(output_path=output_path, filename=filename)
+                self.dl_speed.configure(text='0 KiB/s')
+                if os.path.exists(os.path.join(load_settings(), filename)):
                     self.table.frames[index].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                                   command=open_downloads_folder, state='normal')
                     self.info_for_user_label.configure(text='File already downloaded.')
-
             except (PermissionError, RuntimeError):
                 self.info_for_user_label.configure(text='ERROR: Permission Error.')
-
-    def download_audio(self, yt_list, output_path):
-        pass
 
     def progress_callback(self, stream, chunk, bytes_remaining):
         total_size = stream.filesize
@@ -222,10 +221,6 @@ class TubeGetter(ctk.CTk):
                 self.table.frames[i].progress_bar.set(percentage)
                 self.table.frames[i].change_delete_btn()
                 self.dl_speed.configure(text=format_download_speed_string(download_speed))
-
-    # long video - https://www.youtube.com/watch?v=AsTagX5tG4E
-    # https://www.youtube.com/watch?v=afB4DlkebO8
-    # https://www.youtube.com/watch?v=gKDuHIRNJSY&list=PLRNsV20DA24Gmt9C-X4CVFF4eP76KtkLq&pp=gAQBiAQB
 
     if getattr(sys, 'frozen', False):
         pyi_splash.close()

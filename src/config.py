@@ -25,7 +25,7 @@ SETTINGS_MSG = """
 Welcome to my Python-based Tube Getter. This app makes downloading video 
 or audio files from YouTube an easy and pleasant task. It lets you download 
 individual files or whole playlists to a chosen location on your PC. 
-I'm constantly working on updates, but should you find any bugs 
+I'm constantly working on the updates, but should you find any bugs 
 please visit my github by clicking an icon below and open an 'issue' to let me know.
 """
 
