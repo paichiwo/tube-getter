@@ -5,7 +5,8 @@
 ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/paichiwo/tube-getter/total)
 
 
-![](screenshots/TG_screenshot_1.png)
+![](screenshots/screenshot_1.png)
+![](screenshots/screenshot_2.png)
 
 ---
 Tube Getter is a Python application that allows you to download videos and audio from YouTube.
