@@ -123,7 +123,7 @@ class TubeGetter(ctk.CTk):
                 self.info_for_user_label.configure(text='ERROR: Video is age restricted.')
             except (pytubefix.exceptions.RegexMatchError, KeyError):
                 self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-            except (urllib.error.URLError, urllib.error.HTTPError):
+            except urllib.error.URLError:
                 self.info_for_user_label.configure(text='ERROR: Internal error.')
         else:
             self.info_for_user_label.configure(text='No url detected.')
