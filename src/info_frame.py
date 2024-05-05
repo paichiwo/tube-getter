@@ -197,4 +197,3 @@ class DataFrame(CTkFrame):
     @staticmethod
     def convert_date(date):
         return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
-

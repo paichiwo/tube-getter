@@ -10,8 +10,7 @@
 
 ---
 Tube Getter is a Python application that allows you to download videos and audio from YouTube.
-It provides a simple user interface built with customtkinter
-and uses the pytubefix library for downloading the YouTube content.
+It provides a simple user interface built with customtkinter and the pytubefix library.
 ---
 ## **Features**
 
@@ -27,8 +26,7 @@ and uses the pytubefix library for downloading the YouTube content.
 *   pytubefix
 *   customtkinter
 *   pillow
-*   darkdetect
-*   sv-ttk
+
 
 ## **Installation**
 
@@ -46,7 +44,7 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v1.2.9
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.0_rc1
 
 Run the application. 
 
@@ -56,6 +54,7 @@ Note: Your antivirus software might find this application suspicious.
 This is due to the nature of pyinstaller behavior.
 It's a common problem and well acknowledged. 
 Exemption might have to be added in windows defender or other antivirus software that you use.
+
 ## **Usage**
 
 - Run the application, the window will appear.
@@ -68,13 +67,13 @@ you can also add URLs one by one.
 - Choose Audio or Video to update the relevant information about the YouTube stream.
 
 
-- Select the download folder by clicking the "Settings" button and click "Close" button to save the settings.
+- Select the download folder by clicking the "Settings" button - closing settings window will save your output folder.
 
 
 - The table will display the list of queued video or audio streams.
 
 
-- Click the "Download" button to start the download process and monitor the download progress in the table. Completed downloads will show the status as “Complete.”
+- Click the "Download" button to start the download process and monitor the download progress in the table.
 
 ## **Contributing**
 

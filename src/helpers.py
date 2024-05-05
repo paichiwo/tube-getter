@@ -91,4 +91,3 @@ def handle_audio_extension(stream):
         return stream.default_filename.rsplit('.', 1)[0] + '.mp3'
     else:
         return stream.default_filename
-
