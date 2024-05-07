@@ -37,12 +37,12 @@ def imager(path, x, y):
     return CTkImage(Image.open(path), size=(x, y))
 
 
-def count_file_size(size_bytes):
-    """Convert bytes to megabytes (MB) for representing file sizes"""
-    if size_bytes >= 1024 * 1024 * 1024:
-        return round(size_bytes / (1024 * 1024 * 1024), 2), "GB"
+def format_file_size(size_bytes) -> str:
+    """Convert bytes to MB / GB"""
+    if size_bytes >= 1024 ** 3:
+        return f'{(size_bytes / (1024 ** 3)):.2f} GB'
     else:
-        return round(size_bytes / (1024 * 1024), 2), "MB"
+        return f'{(size_bytes / (1024 ** 2)):.2f} MB'
 
 
 def get_links(url, array):

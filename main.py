@@ -7,9 +7,10 @@ import urllib.error
 import customtkinter as ctk
 from datetime import datetime
 from pytubefix import YouTube, Channel
+from pychute import PyChute
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.config import VERSION, IMG_PATHS
-from src.helpers import (center_window, imager, get_links, count_file_size, load_settings, handle_audio_extension,
+from src.helpers import (center_window, imager, get_links, format_file_size, load_settings, handle_audio_extension,
                          open_downloads_folder, format_download_speed_string)
 from src.settings_win import SettingsWindow
 from src.info_frame import Table
@@ -170,7 +171,7 @@ class TubeGetter(ctk.CTk):
                     yt.views,
                     yt.publish_date,
                     file_format,
-                    count_file_size(stream.filesize)
+                    format_file_size(stream.filesize)
                 ])
             except (AttributeError, KeyError):
                 self.table_list.append([
@@ -181,7 +182,7 @@ class TubeGetter(ctk.CTk):
                     yt.views,
                     yt.publish_date,
                     'mp4',
-                    count_file_size(yt.streams.get_highest_resolution().filesize)
+                    format_file_size(yt.streams.get_highest_resolution().filesize)
                 ])
         return self.table_list
 
