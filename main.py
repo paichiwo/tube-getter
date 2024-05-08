@@ -11,7 +11,7 @@ from pychute import PyChute
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.config import VERSION, IMG_PATHS
 from src.helpers import (center_window, imager, get_links, format_file_size, load_settings, handle_audio_extension,
-                         open_downloads_folder, format_download_speed_string)
+                         open_downloads_folder, format_dl_speed_string, convert_time, convert_date, convert_to_mp3)
 from src.settings_win import SettingsWindow
 from src.info_frame import Table
 
@@ -34,6 +34,7 @@ class TubeGetter(ctk.CTk):
         self.table_list = []
         self.download_start_time = datetime.now()
         self.dl_format = 'audio'
+        self.provider = 'youtube'
 
         # ------------------ GUI WIDGETS -------------------
 
@@ -102,13 +103,19 @@ class TubeGetter(ctk.CTk):
     def switch_action(self):
         self.table.delete_all_data_frames()
         self.table_list.clear()
+
         if self.dl_format == 'audio':
             self.dl_format = 'video'
         else:
             self.dl_format = 'audio'
-        data = self.get_data_for_table()
         self.switch.configure(text=self.dl_format)
-        self.update_table(data)
+
+        if self.provider == 'youtube':
+            data = self.get_yt_data_for_table()
+            self.update_table(data)
+        elif self.provider == 'bitchute':
+            data = self.get_bc_data_for_table()
+            self.update_table(data)
 
     def add_action(self, event=None):
         self.table_list.clear()
@@ -116,20 +123,32 @@ class TubeGetter(ctk.CTk):
 
         url = self.url_entry.get()
         if url:
-            try:
-                get_links(url, self.yt_list)
-                data = self.get_data_for_table()
-                self.update_table(data)
-            except pytubefix.exceptions.VideoUnavailable:
-                self.info_for_user_label.configure(text='ERROR: Video is age restricted.')
-            except (pytubefix.exceptions.RegexMatchError, KeyError):
-                self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-            except urllib.error.URLError:
-                self.info_for_user_label.configure(text='ERROR: Internal error.')
+            if 'youtube' in url:
+                self.provider = 'youtube'
+                try:
+                    get_links(url, self.yt_list)
+                    data = self.get_yt_data_for_table()
+                    self.update_table(data)
+                except pytubefix.exceptions.VideoUnavailable:
+                    self.info_for_user_label.configure(text='ERROR: Video is age restricted.')
+                except (pytubefix.exceptions.RegexMatchError, KeyError):
+                    self.info_for_user_label.configure(text='ERROR: Wrong URL.')
+                except urllib.error.URLError:
+                    self.info_for_user_label.configure(text='ERROR: Internal error.')
+            elif 'bitchute' in url:
+                self.provider = 'bitchute'
+                try:
+                    get_links(url, self.yt_list)
+                    data = self.get_bc_data_for_table()
+                    self.update_table(data)
+                except KeyError:
+                    self.info_for_user_label.configure(text='ERROR: Wrong URL.')
+                except urllib.error.URLError:
+                    self.info_for_user_label.configure(text='ERROR: Internal error.')
         else:
             self.info_for_user_label.configure(text='No url detected.')
 
-    def delete_url_action(self):
+    def delete_url_action(self, event=None):
         self.url_entry.delete(0, 'end')
 
     def clear_action(self):
@@ -142,7 +161,11 @@ class TubeGetter(ctk.CTk):
             for data_frame in self.table.frames:
                 data_frame.delete_btn.configure(state='disabled')
 
-            self.download_media()
+            if self.provider == 'youtube':
+                self.download_yt()
+            elif self.provider == 'bitchute':
+                self.download_bc()
+
             self.info_for_user_label.configure(text='Download complete.')
 
         download_thread = threading.Thread(target=download_task)
@@ -154,7 +177,7 @@ class TubeGetter(ctk.CTk):
         else:
             self.settings_window.focus()
 
-    def get_data_for_table(self):
+    def get_yt_data_for_table(self):
         self.table_list.clear()
 
         for url in self.yt_list:
@@ -167,9 +190,9 @@ class TubeGetter(ctk.CTk):
                     yt.thumbnail_url,
                     yt.title,
                     Channel(yt.channel_url).channel_name,
-                    yt.length,
+                    convert_time(yt.length),
                     yt.views,
-                    yt.publish_date,
+                    convert_date(yt.publish_date),
                     file_format,
                     format_file_size(stream.filesize)
                 ])
@@ -178,12 +201,29 @@ class TubeGetter(ctk.CTk):
                     yt.thumbnail_url,
                     yt.title,
                     Channel(yt.channel_url).channel_name,
-                    yt.length,
+                    convert_time(yt.length),
                     yt.views,
-                    yt.publish_date,
+                    convert_date(yt.publish_date),
                     'mp4',
                     format_file_size(yt.streams.get_highest_resolution().filesize)
                 ])
+        return self.table_list
+
+    def get_bc_data_for_table(self):
+        self.table_list.clear()
+
+        pc = PyChute(self.yt_list[0])
+        file_format = 'mp3' if self.dl_format == 'audio' else 'mp4'
+        self.table_list.append([
+            pc.thumbnail(),
+            pc.title(),
+            pc.channel(),
+            str(pc.duration()),
+            pc.views(),
+            pc.publish_date().split(' ')[0],
+            file_format,
+            format_file_size(pc.filesize())
+        ])
         return self.table_list
 
     def update_table(self, array):
@@ -191,12 +231,12 @@ class TubeGetter(ctk.CTk):
         self.table.create_list_with_data_frames()
         self.table.draw_data_frames()
 
-    def download_media(self):
+    def download_yt(self):
         filename = ''
         output_path = load_settings()
 
-        for index, link in enumerate(self.yt_list):
-            yt = YouTube(link, on_progress_callback=self.progress_callback)
+        for i, link in enumerate(self.yt_list):
+            yt = YouTube(link, on_progress_callback=self.yt_progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()
                 filename = handle_audio_extension(yt_stream)
@@ -207,13 +247,41 @@ class TubeGetter(ctk.CTk):
                 yt_stream.download(output_path=output_path, filename=filename)
                 self.dl_speed.configure(text='0 KiB/s')
                 if os.path.exists(os.path.join(load_settings(), filename)):
-                    self.table.frames[index].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                                  command=open_downloads_folder, state='normal')
+                    self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                                                              command=open_downloads_folder, state='normal')
                     self.info_for_user_label.configure(text='File already downloaded.')
             except (PermissionError, RuntimeError):
                 self.info_for_user_label.configure(text='ERROR: Permission Error.')
 
-    def progress_callback(self, stream, chunk, bytes_remaining):
+    def download_bc(self):
+        output_path = load_settings()
+
+        for i, link in enumerate(self.yt_list):
+            pc = PyChute(url=link)
+            filename = os.path.join(output_path, pc.title())
+
+            if self.dl_format == 'audio':
+                pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
+                self.dl_speed.configure(text='0 KiB/s')
+                self.info_for_user_label.configure(text='Converting bitchute video to mp3 file.')
+                convert_to_mp3(f'{os.path.join(out_path, pc.title())}.mp4',
+                               f'{filename[:-4]}.mp3',
+                               self.table.frames[i].progress_bar)
+
+                if os.path.exists(filename+'.mp3'):
+                    self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                                                              command=open_downloads_folder, state='normal')
+                    self.info_for_user_label.configure(text='File already downloaded.')
+            else:
+                pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
+                self.dl_speed.configure(text='0 KiB/s')
+
+                if os.path.exists(filename+'.mp4'):
+                    self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                                                              command=open_downloads_folder, state='normal')
+                    self.info_for_user_label.configure(text='File already downloaded.')
+
+    def yt_progress_callback(self, stream, chunk, bytes_remaining):
         total_size = stream.filesize
         bytes_downloaded = total_size - bytes_remaining
         percentage = bytes_downloaded / total_size
@@ -224,7 +292,18 @@ class TubeGetter(ctk.CTk):
             if item[1] == stream.title:
                 self.table.frames[i].progress_bar.set(percentage)
                 self.table.frames[i].change_delete_btn()
-                self.dl_speed.configure(text=format_download_speed_string(download_speed))
+                self.dl_speed.configure(text=format_dl_speed_string(download_speed))
+
+    def bc_progress_callback(self, count, block_size, total_size):
+        percentage = min(1.0, float(count * block_size) / total_size)
+
+        elapsed_time = (datetime.now() - self.download_start_time).total_seconds()
+        download_speed = (count * block_size) / (1024 * elapsed_time)
+
+        for i, item in enumerate(self.table_list):
+            self.table.frames[i].progress_bar.set(percentage)
+            self.table.frames[i].change_delete_btn()
+            self.dl_speed.configure(text=format_dl_speed_string(download_speed))
 
     if getattr(sys, 'frozen', False):
         pyi_splash.close()
