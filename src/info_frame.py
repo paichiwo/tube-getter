@@ -1,5 +1,3 @@
-import os.path
-from datetime import datetime
 from customtkinter import CTkScrollableFrame, CTkFrame, CTkImage, CTkLabel, CTkButton, CTkFont, CTkProgressBar
 from src.config import IMG_PATHS
 from src.helpers import open_downloads_folder, imager
@@ -132,7 +130,8 @@ class DataFrame(CTkFrame):
 
         self.delete_btn = CTkButton(self,
                                     text='',
-                                    width=24,
+                                    width=25,
+                                    height=25,
                                     image=imager(IMG_PATHS['bin'], 24, 24),
                                     fg_color='transparent',
                                     hover_color=('grey80', 'grey25'),
