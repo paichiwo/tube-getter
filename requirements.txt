@@ -1,3 +1,4 @@
 pytubefix
 customtkinter
 pillow
+moviepy
