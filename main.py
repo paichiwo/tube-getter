@@ -148,8 +148,10 @@ class TubeGetter(ctk.CTk):
                     self.info_for_user_label.configure(text='ERROR: Wrong URL.')
                 except urllib.error.URLError:
                     self.info_for_user_label.configure(text='ERROR: Internal error.')
+            else:
+                self.info_for_user_label.configure(text='ERROR: Wrong URL.')
         else:
-            self.info_for_user_label.configure(text='No url detected.')
+            self.info_for_user_label.configure(text='ERROR: No url detected.')
 
     def delete_url_action(self, event=None):
         self.url_entry.delete(0, 'end')
