@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 from datetime import datetime
 from pytubefix import Playlist
@@ -107,11 +108,17 @@ def convert_date(date):
     return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
 
 
-def convert_to_mp3(mp4_filepath, mp3_filepath, progress_bar):
+def convert_to_mp3(mp4_filepath, mp3_filepath):
     file_to_convert = AudioFileClip(mp4_filepath)
-    duration = file_to_convert.duration
-    for t in range(0, int(duration), 5):
-        progress = (t / duration)
-        progress_bar.set(progress)
-        file_to_convert.write_audiofile(mp3_filepath)
-        file_to_convert.close()
+    file_to_convert.write_audiofile(mp3_filepath)
+    file_to_convert.close()
+
+
+def format_filename(filename):
+    chars_removed_title = re.sub(r'[^\w ]', '', filename)
+    words = chars_removed_title.split()
+    new_words = []
+    for word in words:
+        new_words.append(word.capitalize())
+    return ' '.join(new_words)
+
