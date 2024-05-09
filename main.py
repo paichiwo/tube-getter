@@ -11,7 +11,8 @@ from pychute import PyChute
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.config import VERSION, IMG_PATHS
 from src.helpers import (center_window, imager, get_links, format_file_size, load_settings, handle_audio_extension,
-                         open_downloads_folder, format_dl_speed_string, convert_time, convert_date, convert_to_mp3)
+                         open_downloads_folder, format_dl_speed_string, convert_time, convert_date, convert_to_mp3,
+                         format_filename)
 from src.settings_win import SettingsWindow
 from src.info_frame import Table
 
@@ -118,6 +119,8 @@ class TubeGetter(ctk.CTk):
             self.update_table(data)
 
     def add_action(self, event=None):
+        self.info_for_user_label.configure(text='')
+
         self.table_list.clear()
         self.table.delete_all_data_frames()
 
@@ -155,9 +158,13 @@ class TubeGetter(ctk.CTk):
         self.yt_list.clear()
         self.table_list.clear()
         self.table.delete_all_data_frames()
+        self.info_for_user_label.configure(text='')
 
     def download_action(self):
         def download_task():
+
+            self.info_for_user_label.configure(text='')
+
             for data_frame in self.table.frames:
                 data_frame.delete_btn.configure(state='disabled')
 
@@ -166,7 +173,10 @@ class TubeGetter(ctk.CTk):
             elif self.provider == 'bitchute':
                 self.download_bc()
 
-            self.info_for_user_label.configure(text='Download complete.')
+            if self.provider == 'bitchute' and self.dl_format == 'audio':
+                self.info_for_user_label.configure(text='Conversion complete')
+            else:
+                self.info_for_user_label.configure(text='Download complete.')
 
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
@@ -213,7 +223,6 @@ class TubeGetter(ctk.CTk):
         self.table_list.clear()
 
         pc = PyChute(self.yt_list[0])
-        file_format = 'mp3' if self.dl_format == 'audio' else 'mp4'
         self.table_list.append([
             pc.thumbnail(),
             pc.title(),
@@ -221,7 +230,7 @@ class TubeGetter(ctk.CTk):
             str(pc.duration()),
             pc.views(),
             pc.publish_date().split(' ')[0],
-            file_format,
+            'mp4',
             format_file_size(pc.filesize())
         ])
         return self.table_list
@@ -258,25 +267,29 @@ class TubeGetter(ctk.CTk):
 
         for i, link in enumerate(self.yt_list):
             pc = PyChute(url=link)
-            filename = os.path.join(output_path, pc.title())
+            filename = os.path.join(output_path, format_filename(pc.title()))
 
             if self.dl_format == 'audio':
                 pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
+                self.table.frames[i].delete_btn.configure(state='disabled')
                 self.dl_speed.configure(text='0 KiB/s')
-                self.info_for_user_label.configure(text='Converting bitchute video to mp3 file.')
-                convert_to_mp3(f'{os.path.join(out_path, pc.title())}.mp4',
-                               f'{filename[:-4]}.mp3',
-                               self.table.frames[i].progress_bar)
 
-                if os.path.exists(filename+'.mp3'):
+                self.info_for_user_label.configure(text='Converting bitchute video to mp3 file.')
+                convert_to_mp3(f'{filename}.mp4', f'{filename}.mp3')
+                self.table.frames[i].size.configure(text=f'{format_file_size(os.path.getsize(f'{filename}.mp3'))}')
+                os.remove(f'{filename}.mp4')
+                self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                                                          command=open_downloads_folder, state='normal')
+
+                if os.path.exists(filename + '.mp3'):
                     self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                               command=open_downloads_folder, state='normal')
-                    self.info_for_user_label.configure(text='File already downloaded.')
+                    self.info_for_user_label.configure(text='Conversion complete.')
             else:
                 pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
                 self.dl_speed.configure(text='0 KiB/s')
 
-                if os.path.exists(filename+'.mp4'):
+                if os.path.exists(filename + '.mp4'):
                     self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                               command=open_downloads_folder, state='normal')
                     self.info_for_user_label.configure(text='File already downloaded.')
@@ -302,7 +315,6 @@ class TubeGetter(ctk.CTk):
 
         for i, item in enumerate(self.table_list):
             self.table.frames[i].progress_bar.set(percentage)
-            self.table.frames[i].change_delete_btn()
             self.dl_speed.configure(text=format_dl_speed_string(download_speed))
 
     if getattr(sys, 'frozen', False):
