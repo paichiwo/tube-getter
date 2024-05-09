@@ -165,8 +165,6 @@ class TubeGetter(ctk.CTk):
     def download_action(self):
         def download_task():
 
-            self.info_for_user_label.configure(text='')
-
             for data_frame in self.table.frames:
                 data_frame.delete_btn.configure(state='disabled')
 
@@ -174,11 +172,6 @@ class TubeGetter(ctk.CTk):
                 self.download_yt()
             elif self.provider == 'bitchute':
                 self.download_bc()
-
-            if self.provider == 'bitchute' and self.dl_format == 'audio':
-                self.info_for_user_label.configure(text='Conversion complete')
-            else:
-                self.info_for_user_label.configure(text='Download complete.')
 
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
@@ -246,7 +239,7 @@ class TubeGetter(ctk.CTk):
         filename = ''
         output_path = load_settings()
 
-        for i, link in enumerate(self.yt_list):
+        for index, link in enumerate(self.yt_list):
             yt = YouTube(link, on_progress_callback=self.yt_progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()
@@ -254,12 +247,15 @@ class TubeGetter(ctk.CTk):
             else:
                 yt_stream = yt.streams.get_highest_resolution()
 
+            self.info_for_user_label.configure(text='Downloading...')
+
             try:
                 yt_stream.download(output_path=output_path, filename=filename)
                 self.dl_speed.configure(text='0 KiB/s')
+                self.info_for_user_label.configure(text='Download complete.')
                 if os.path.exists(os.path.join(load_settings(), filename)):
-                    self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                              command=open_downloads_folder, state='normal')
+                    self.table.frames[index].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                                                                  command=open_downloads_folder, state='normal')
                     self.info_for_user_label.configure(text='File already downloaded.')
             except (PermissionError, RuntimeError):
                 self.info_for_user_label.configure(text='ERROR: Permission Error.')
@@ -271,30 +267,39 @@ class TubeGetter(ctk.CTk):
             pc = PyChute(url=link)
             filename = os.path.join(output_path, format_filename(pc.title()))
 
-            if self.dl_format == 'audio':
-                pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
-                self.table.frames[i].delete_btn.configure(state='disabled')
-                self.dl_speed.configure(text='0 KiB/s')
-
-                self.info_for_user_label.configure(text='Converting bitchute video to mp3 file.')
-                convert_to_mp3(f'{filename}.mp4', f'{filename}.mp3')
-                self.table.frames[i].size.configure(text=f'{format_file_size(os.path.getsize(f'{filename}.mp3'))}')
-                os.remove(f'{filename}.mp4')
+            # check if file exists before downloading
+            if os.path.exists(filename + '.mp4'):
                 self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                           command=open_downloads_folder, state='normal')
-
-                if os.path.exists(filename + '.mp3'):
-                    self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                              command=open_downloads_folder, state='normal')
-                    self.info_for_user_label.configure(text='Conversion complete.')
+                self.info_for_user_label.configure(text='File already downloaded.')
             else:
-                pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
-                self.dl_speed.configure(text='0 KiB/s')
 
-                if os.path.exists(filename + '.mp4'):
+                if self.dl_format == 'audio':
+                    # download
+                    self.info_for_user_label.configure(text='Downloading...')
+                    pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
+                    self.table.frames[i].delete_btn.configure(state='disabled')
+
+                    # convert
+                    self.info_for_user_label.configure(text='Converting bitchute video to mp3 file.')
+                    convert_to_mp3(f'{filename}.mp4', f'{filename}.mp3')
+                    os.remove(f'{filename}.mp4')
+                    self.table.frames[i].extension.configure(text='mp3')
+                    self.table.frames[i].size.configure(text=f'{format_file_size(os.path.getsize(f'{filename}.mp3'))}')
                     self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                               command=open_downloads_folder, state='normal')
-                    self.info_for_user_label.configure(text='File already downloaded.')
+                    # check converted file exists
+                    if os.path.exists(filename + '.mp3'):
+                        self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                                                                  command=open_downloads_folder, state='normal')
+                        self.dl_speed.configure(text='0 KiB/s')
+                        self.info_for_user_label.configure(text='Conversion complete.')
+
+                else:
+                    self.info_for_user_label.configure(text='Downloading...')
+                    pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
+                    self.dl_speed.configure(text='0 KiB/s')
+                    self.info_for_user_label.configure(text='Download complete.')
 
     def yt_progress_callback(self, stream, chunk, bytes_remaining):
         total_size = stream.filesize
