@@ -101,6 +101,21 @@ class TubeGetter(ctk.CTk):
         self.info_for_user_label.pack(side='left', fill='x', padx=10)
         self.dl_speed.pack(side='right', fill='x', padx=10)
 
+    def info_msg(self, text):
+        self.info_for_user_label.configure(text=text)
+
+    def disable_buttons(self):
+        self.add_button.configure(state='disabled')
+        self.switch.configure(state='disabled')
+        self.clear_button.configure(state='disabled')
+        self.download_button.configure(state='disabled')
+
+    def enable_buttons(self):
+        self.add_button.configure(state='normal')
+        self.switch.configure(state='normal')
+        self.clear_button.configure(state='normal')
+        self.download_button.configure(state='normal')
+
     def switch_action(self):
         self.table.delete_all_data_frames()
         self.table_list.clear()
@@ -119,63 +134,69 @@ class TubeGetter(ctk.CTk):
             self.update_table(data)
 
     def add_action(self, event=None):
-        self.info_for_user_label.configure(text='')
+        self.info_msg('')
         self.table_list.clear()
-        self.add_button.configure(state='disabled')
+        self.disable_buttons()
 
         def add_threaded():
             url = self.url_entry.get()
             if url:
                 if 'youtube' in url:
-                    self.provider = 'youtube'
-                    try:
-                        get_links(url, self.yt_list)
-                        self.info_for_user_label.configure(text='Please wait, gathering data...')
-                        data = self.get_yt_data_for_table()
-                        if data:
-                            self.table.delete_all_data_frames()
-                            self.update_table(data)
-                            self.add_button.configure(state='normal')
-                            self.info_for_user_label.configure(text='Ready.')
+                    if self.provider == 'bitchute':
+                        self.yt_list.clear()
+                        self.provider = 'youtube'
 
-                    except pytubefix.exceptions.VideoUnavailable:
-                        self.info_for_user_label.configure(text='ERROR: Video is age restricted.')
-                        self.add_button.configure(state='normal')
-                    except (pytubefix.exceptions.RegexMatchError, KeyError):
-                        self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-                        self.add_button.configure(state='normal')
-                    except urllib.error.URLError:
-                        self.info_for_user_label.configure(text='ERROR: Internal error.')
-                        self.add_button.configure(state='normal')
+                    self.provider = 'youtube'
+                    self.add_youtube(url)
 
                 elif 'bitchute' in url:
                     self.provider = 'bitchute'
+                    self.add_bitchute(url)
 
-                    try:
-                        self.yt_list.clear()
-                        get_links(url, self.yt_list)
-                        self.info_for_user_label.configure(text='Please wait, gathering data...')
-                        data = self.get_bc_data_for_table()
-                        if data:
-                            self.table.delete_all_data_frames()
-                            self.update_table(data)
-                            self.add_button.configure(state='normal')
-                            self.info_for_user_label.configure(text='Ready.')
-                    except KeyError:
-                        self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-                        self.add_button.configure(state='normal')
-                    except urllib.error.URLError:
-                        self.info_for_user_label.configure(text='ERROR: Internal error.')
-                        self.add_button.configure(state='normal')
                 else:
-                    self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-                    self.add_button.configure(state='normal')
+                    self.info_msg('ERROR: Wrong URL.')
             else:
-                self.info_for_user_label.configure(text='ERROR: No url detected.')
-                self.add_button.configure(state='normal')
+                self.info_msg('ERROR: No url detected.')
+            self.enable_buttons()
 
         add_thread = threading.Thread(target=add_threaded)
         add_thread.start()
+
+    def add_youtube(self, url):
+        try:
+            get_links(url, self.yt_list)
+            self.info_msg('Gathering data, please wait...')
+            data = self.get_yt_data_for_table()
+            self.add_update_with_new_data(data)
+
+        except pytubefix.exceptions.VideoUnavailable:
+            self.info_msg('ERROR: Video is age restricted or Wrong URL.')
+        except (pytubefix.exceptions.RegexMatchError, KeyError):
+            self.info_msg('ERROR: Wrong URL.')
+        except urllib.error.URLError:
+            self.info_msg('ERROR: Internal error.')
+        self.enable_buttons()
+
+    def add_bitchute(self, url):
+        try:
+            self.yt_list.clear()
+            get_links(url, self.yt_list)
+            self.info_msg('Gathering data, please wait...')
+            data = self.get_bc_data_for_table()
+            self.add_update_with_new_data(data)
+
+        except (KeyError, TypeError):
+            self.info_msg('ERROR: Wrong URL.')
+        except urllib.error.URLError:
+            self.info_msg('ERROR: Internal error.')
+        self.enable_buttons()
+
+    def add_update_with_new_data(self, data):
+        if data:
+            self.table.delete_all_data_frames()
+            self.update_table(data)
+            self.info_msg('Ready.')
+            self.enable_buttons()
 
     def delete_url_action(self, event=None):
         self.url_entry.delete(0, 'end')
@@ -184,7 +205,7 @@ class TubeGetter(ctk.CTk):
         self.yt_list.clear()
         self.table_list.clear()
         self.table.delete_all_data_frames()
-        self.info_for_user_label.configure(text='')
+        self.info_msg('')
 
     def download_action(self):
         def download_task():
@@ -270,20 +291,20 @@ class TubeGetter(ctk.CTk):
             else:
                 yt_stream = yt.streams.get_highest_resolution()
 
-            self.info_for_user_label.configure(text='Downloading...')
+            self.info_msg('Downloading...')
 
             try:
                 if os.path.exists(os.path.join(load_settings(), filename)):
                     self.table.frames[index].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                                   command=open_downloads_folder, state='normal')
-                    self.info_for_user_label.configure(text='File already downloaded.')
+                    self.info_msg('File already downloaded.')
                 else:
                     yt_stream.download(output_path=output_path, filename=filename)
                     self.dl_speed.configure(text='0 KiB/s')
-                    self.info_for_user_label.configure(text='Download complete.')
+                    self.info_msg('Download complete.')
 
             except (PermissionError, RuntimeError):
-                self.info_for_user_label.configure(text='ERROR: Permission Error.')
+                self.info_msg('ERROR: Permission Error.')
 
     def download_bc(self):
         output_path = load_settings()
@@ -296,17 +317,17 @@ class TubeGetter(ctk.CTk):
             if os.path.exists(filename + '.mp4'):
                 self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                           command=open_downloads_folder, state='normal')
-                self.info_for_user_label.configure(text='File already downloaded.')
+                self.info_msg('File already downloaded.')
             else:
 
                 if self.dl_format == 'audio':
                     # download
-                    self.info_for_user_label.configure(text='Downloading...')
+                    self.info_msg('Downloading...')
                     pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
                     self.table.frames[i].delete_btn.configure(state='disabled')
 
                     # convert
-                    self.info_for_user_label.configure(text='Converting bitchute video to mp3 file.')
+                    self.info_msg('Converting bitchute video to mp3 file.')
                     convert_to_mp3(f'{filename}.mp4', f'{filename}.mp3')
                     os.remove(f'{filename}.mp4')
                     self.table.frames[i].extension.configure(text='mp3')
@@ -318,13 +339,13 @@ class TubeGetter(ctk.CTk):
                         self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                                   command=open_downloads_folder, state='normal')
                         self.dl_speed.configure(text='0 KiB/s')
-                        self.info_for_user_label.configure(text='Conversion complete.')
+                        self.info_msg('Conversion complete.')
 
                 else:
-                    self.info_for_user_label.configure(text='Downloading...')
+                    self.info_msg('Downloading...')
                     pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
                     self.dl_speed.configure(text='0 KiB/s')
-                    self.info_for_user_label.configure(text='Download complete.')
+                    self.info_msg('Download complete.')
 
     def yt_progress_callback(self, stream, chunk, bytes_remaining):
         total_size = stream.filesize
