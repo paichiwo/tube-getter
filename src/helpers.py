@@ -6,7 +6,7 @@ from datetime import datetime
 from pytubefix import Playlist
 from customtkinter import CTkImage
 from PIL import Image
-from moviepy.editor import AudioFileClip
+from moviepy.audio.io.AudioFileClip import AudioFileClip
 
 
 def resource_path(relative_path):

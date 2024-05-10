@@ -5,6 +5,7 @@ import threading
 import pytubefix.exceptions
 import urllib.error
 import customtkinter as ctk
+from io import StringIO
 from datetime import datetime
 from pytubefix import YouTube, Channel
 from pychute import PyChute
@@ -18,6 +19,11 @@ from src.info_frame import Table
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
+
+# write console output to a memory buffer
+output_buffer = StringIO()
+sys.stdout = output_buffer
+sys.stderr = output_buffer
 
 
 class TubeGetter(ctk.CTk):
