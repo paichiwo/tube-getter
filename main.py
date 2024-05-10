@@ -120,38 +120,62 @@ class TubeGetter(ctk.CTk):
 
     def add_action(self, event=None):
         self.info_for_user_label.configure(text='')
-
         self.table_list.clear()
-        self.table.delete_all_data_frames()
+        self.add_button.configure(state='disabled')
 
-        url = self.url_entry.get()
-        if url:
-            if 'youtube' in url:
-                self.provider = 'youtube'
-                try:
-                    get_links(url, self.yt_list)
-                    data = self.get_yt_data_for_table()
-                    self.update_table(data)
-                except pytubefix.exceptions.VideoUnavailable:
-                    self.info_for_user_label.configure(text='ERROR: Video is age restricted.')
-                except (pytubefix.exceptions.RegexMatchError, KeyError):
+        def add_threaded():
+            url = self.url_entry.get()
+            if url:
+                if 'youtube' in url:
+                    self.provider = 'youtube'
+                    try:
+                        get_links(url, self.yt_list)
+                        self.info_for_user_label.configure(text='Please wait, gathering data...')
+                        data = self.get_yt_data_for_table()
+                        if data:
+                            self.table.delete_all_data_frames()
+                            self.update_table(data)
+                            self.add_button.configure(state='normal')
+                            self.info_for_user_label.configure(text='Ready.')
+
+                    except pytubefix.exceptions.VideoUnavailable:
+                        self.info_for_user_label.configure(text='ERROR: Video is age restricted.')
+                        self.add_button.configure(state='normal')
+                    except (pytubefix.exceptions.RegexMatchError, KeyError):
+                        self.info_for_user_label.configure(text='ERROR: Wrong URL.')
+                        self.add_button.configure(state='normal')
+                    except urllib.error.URLError:
+                        self.info_for_user_label.configure(text='ERROR: Internal error.')
+                        self.add_button.configure(state='normal')
+
+                elif 'bitchute' in url:
+                    self.provider = 'bitchute'
+
+                    try:
+                        self.yt_list.clear()
+                        get_links(url, self.yt_list)
+                        self.info_for_user_label.configure(text='Please wait, gathering data...')
+                        data = self.get_bc_data_for_table()
+                        if data:
+                            self.table.delete_all_data_frames()
+                            self.update_table(data)
+                            self.add_button.configure(state='normal')
+                            self.info_for_user_label.configure(text='Ready.')
+                    except KeyError:
+                        self.info_for_user_label.configure(text='ERROR: Wrong URL.')
+                        self.add_button.configure(state='normal')
+                    except urllib.error.URLError:
+                        self.info_for_user_label.configure(text='ERROR: Internal error.')
+                        self.add_button.configure(state='normal')
+                else:
                     self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-                except urllib.error.URLError:
-                    self.info_for_user_label.configure(text='ERROR: Internal error.')
-            elif 'bitchute' in url:
-                self.provider = 'bitchute'
-                try:
-                    get_links(url, self.yt_list)
-                    data = self.get_bc_data_for_table()
-                    self.update_table(data)
-                except KeyError:
-                    self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-                except urllib.error.URLError:
-                    self.info_for_user_label.configure(text='ERROR: Internal error.')
+                    self.add_button.configure(state='normal')
             else:
-                self.info_for_user_label.configure(text='ERROR: Wrong URL.')
-        else:
-            self.info_for_user_label.configure(text='ERROR: No url detected.')
+                self.info_for_user_label.configure(text='ERROR: No url detected.')
+                self.add_button.configure(state='normal')
+
+        add_thread = threading.Thread(target=add_threaded)
+        add_thread.start()
 
     def delete_url_action(self, event=None):
         self.url_entry.delete(0, 'end')
@@ -215,7 +239,6 @@ class TubeGetter(ctk.CTk):
         return self.table_list
 
     def get_bc_data_for_table(self):
-        self.table_list.clear()
 
         pc = PyChute(self.yt_list[0])
         self.table_list.append([
@@ -288,7 +311,7 @@ class TubeGetter(ctk.CTk):
                     os.remove(f'{filename}.mp4')
                     self.table.frames[i].extension.configure(text='mp3')
                     self.table.frames[i].size.configure(text=f'{format_file_size(os.path.getsize(f'{filename}.mp3'))}')
-                    self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+                    self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24), width=25, height=25,
                                                               command=open_downloads_folder, state='normal')
                     # check converted file exists
                     if os.path.exists(filename + '.mp3'):
