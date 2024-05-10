@@ -1,7 +1,7 @@
 from src.helpers import resource_path
 
 
-VERSION = '2.0 rc1'
+VERSION = '2.1'
 
 IMG_PATHS = {
     'icon': resource_path('images/yt3d.ico'),
@@ -16,6 +16,26 @@ IMG_PATHS = {
     'bin': resource_path('images/bin.png'),
     'folder': resource_path('images/folder.png')
 }
+
+INFO_MSG = {
+    'wrong_url_err': 'ERROR: Wrong URL',
+    'url_detected_err': 'ERROR: No url detected',
+    'age_restricted_err': 'ERROR: Video is age restricted or Wrong URL',
+    'internal_err': 'ERROR: Internal error',
+    'permission_err': 'ERROR: Permission Error',
+
+    'file_exists': 'File already downloaded',
+    'dl_complete': 'Download complete',
+    'converting': 'Converting bitchute video to mp3 file',
+    'conversion_done': 'Conversion complete',
+
+
+    'gathering_data': 'Gathering data, please wait...',
+    'downloading': 'Downloading...',
+
+
+}
+
 
 
 # settings window
