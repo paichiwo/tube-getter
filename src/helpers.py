@@ -1,9 +1,12 @@
 import json
 import os
+import re
 import sys
+from datetime import datetime
 from pytubefix import Playlist
 from customtkinter import CTkImage
 from PIL import Image
+from moviepy.editor import AudioFileClip
 
 
 def resource_path(relative_path):
@@ -79,7 +82,7 @@ def open_downloads_folder():
     os.startfile(load_settings())
 
 
-def format_download_speed_string(download_speed):
+def format_dl_speed_string(download_speed):
     if download_speed < 1000:
         return f'{download_speed:.2f} KiB/s'
     else:
@@ -91,3 +94,30 @@ def handle_audio_extension(stream):
         return stream.default_filename.rsplit('.', 1)[0] + '.mp3'
     else:
         return stream.default_filename
+
+
+def convert_time(time_in_sec):
+    hours = time_in_sec // 3600
+    time_in_sec %= 3600
+    minutes = time_in_sec // 60
+    time_in_sec %= 60
+    return f'{hours:02d}:{minutes:02d}:{time_in_sec:02d}'
+
+
+def convert_date(date):
+    return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
+
+
+def convert_to_mp3(mp4_filepath, mp3_filepath):
+    file_to_convert = AudioFileClip(mp4_filepath)
+    file_to_convert.write_audiofile(mp3_filepath)
+    file_to_convert.close()
+
+
+def format_filename(filename):
+    chars_removed_title = re.sub(r'[^\w ]', '', filename)
+    words = chars_removed_title.split()
+    new_words = []
+    for word in words:
+        new_words.append(word.capitalize())
+    return ' '.join(new_words)

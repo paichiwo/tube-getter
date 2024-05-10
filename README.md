@@ -9,13 +9,13 @@
 ![](screenshots/screenshot_2.png)
 
 ---
-Tube Getter is a Python application that allows you to download videos and audio from YouTube.
-It provides a simple user interface built with customtkinter and the pytubefix library.
+Tube Getter is a Python application that allows you to download videos and audio from YouTube and BitChute.
+It provides a simple user interface built with customtkinter, pychute and the pytubefix library.
 ---
 ## **Features**
 
-*   Download video and audio from YouTube.
-*   Support for downloading individual videos or entire playlists.
+*   Download video and audio from YouTube or BitChute.
+*   Support for downloading individual videos or entire playlists (only for YouTube).
 *   Choose the output format (video or audio).
 *   Monitor the download progress, including progress, download speed, and completion status.
 *   Choose the download folder in the settings window
@@ -44,7 +44,7 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.0_rc1
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.1
 
 Run the application. 
 
@@ -62,15 +62,14 @@ Exemption might have to be added in windows defender or other antivirus software
 
 - Enter the YouTube video URL or playlist URL in the input field and click "Add" or press Enter, 
 you can also add URLs one by one.
+  You can also enter BitChute URL (BitChute supports only one media at a time).
+
+  
+- Switch to Audio or Video to update the table with relevant information.
 
 
-- Choose Audio or Video to update the relevant information about the YouTube stream.
-
-
-- Select the download folder by clicking the "Settings" button - closing settings window will save your output folder.
-
-
-- The table will display the list of queued video or audio streams.
+- Select the download folder by clicking the "Settings" button. 
+  Closing the settings window will save your output folder automatically.
 
 
 - Click the "Download" button to start the download process and monitor the download progress in the table.
@@ -91,4 +90,5 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## **Acknowledgements**
 
-*   [pytubefix](https://pytubefix.readthedocs.io/en/latest/) - Python library for downloading YouTube videos
+*   [pytubefix](https://pytubefix.readthedocs.io/en/latest/) - library for downloading YouTube videos
+*   [pychute](http://github.com/paichiwo/pychute) - library for downloading BitChute videos

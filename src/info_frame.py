@@ -1,5 +1,3 @@
-import os.path
-from datetime import datetime
 from customtkinter import CTkScrollableFrame, CTkFrame, CTkImage, CTkLabel, CTkButton, CTkFont, CTkProgressBar
 from src.config import IMG_PATHS
 from src.helpers import open_downloads_folder, imager
@@ -96,7 +94,7 @@ class DataFrame(CTkFrame):
                                 height=8)
 
         self.duration = CTkLabel(self,
-                                 text=f' {self.convert_time(self.data[3])}',
+                                 text=f' {self.data[3]}',
                                  image=imager(IMG_PATHS['clock'], 12, 12),
                                  compound='left',
                                  font=CTkFont(size=11),
@@ -110,7 +108,7 @@ class DataFrame(CTkFrame):
                               height=8)
 
         self.uploaded_date = CTkLabel(self,
-                                      text=f' {self.convert_date(self.data[5])}',
+                                      text=f' {self.data[5]}',
                                       image=imager(IMG_PATHS['calendar'], 12, 12),
                                       compound='left',
                                       font=CTkFont(size=11),
@@ -132,7 +130,8 @@ class DataFrame(CTkFrame):
 
         self.delete_btn = CTkButton(self,
                                     text='',
-                                    width=24,
+                                    width=25,
+                                    height=25,
                                     image=imager(IMG_PATHS['bin'], 24, 24),
                                     fg_color='transparent',
                                     hover_color=('grey80', 'grey25'),
@@ -185,15 +184,3 @@ class DataFrame(CTkFrame):
         image_data = response.content
         image = Image.open(BytesIO(image_data)).resize((64, 36))
         return image
-
-    @staticmethod
-    def convert_time(time_in_sec):
-        hours = time_in_sec // 3600
-        time_in_sec %= 3600
-        minutes = time_in_sec // 60
-        time_in_sec %= 60
-        return f'{hours:02d}:{minutes:02d}:{time_in_sec:02d}'
-
-    @staticmethod
-    def convert_date(date):
-        return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
