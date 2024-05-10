@@ -2,3 +2,4 @@ pytubefix
 customtkinter
 pillow
 moviepy
+pychute
