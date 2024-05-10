@@ -121,4 +121,3 @@ def format_filename(filename):
     for word in words:
         new_words.append(word.capitalize())
     return ' '.join(new_words)
-
