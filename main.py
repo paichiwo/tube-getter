@@ -250,13 +250,15 @@ class TubeGetter(ctk.CTk):
             self.info_for_user_label.configure(text='Downloading...')
 
             try:
-                yt_stream.download(output_path=output_path, filename=filename)
-                self.dl_speed.configure(text='0 KiB/s')
-                self.info_for_user_label.configure(text='Download complete.')
                 if os.path.exists(os.path.join(load_settings(), filename)):
                     self.table.frames[index].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
                                                                   command=open_downloads_folder, state='normal')
                     self.info_for_user_label.configure(text='File already downloaded.')
+                else:
+                    yt_stream.download(output_path=output_path, filename=filename)
+                    self.dl_speed.configure(text='0 KiB/s')
+                    self.info_for_user_label.configure(text='Download complete.')
+
             except (PermissionError, RuntimeError):
                 self.info_for_user_label.configure(text='ERROR: Permission Error.')
 
