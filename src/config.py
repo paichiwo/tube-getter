@@ -1,7 +1,7 @@
 from src.helpers import resource_path
 
 
-VERSION = '2.1'
+VERSION = '2.1.1'
 
 IMG_PATHS = {
     'icon': resource_path('images/yt3d.ico'),
