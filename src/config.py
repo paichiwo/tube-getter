@@ -1,4 +1,4 @@
-from src.helpers import resource_path
+from src.resource_path import resource_path
 
 
 VERSION = '2.1.1'
@@ -23,19 +23,13 @@ INFO_MSG = {
     'age_restricted_err': 'ERROR: Video is age restricted or Wrong URL',
     'internal_err': 'ERROR: Internal error',
     'permission_err': 'ERROR: Permission Error',
-
     'file_exists': 'File already downloaded',
     'dl_complete': 'Download complete',
     'converting': 'Converting bitchute video to mp3 file',
     'conversion_done': 'Conversion complete',
-
-
     'gathering_data': 'Gathering data, please wait...',
     'downloading': 'Downloading...',
-
-
 }
-
 
 
 # settings window
@@ -50,3 +44,6 @@ please visit my github by clicking an icon below and open an 'issue' to let me k
 """
 
 GITHUB_URL = 'https://github.com/paichiwo/tube-getter'
+
+# new version window
+NEW_VERSION_MSG = 'New version available.\n\n Would you like to download it ?\n'
