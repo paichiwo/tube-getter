@@ -7,6 +7,7 @@
 
 ![](screenshots/screenshot_1.png)
 ![](screenshots/screenshot_2.png)
+![](screenshots/screenshot_3.png)
 
 ---
 Tube Getter is a Python application that allows you to download videos and audio from YouTube and BitChute.
@@ -22,10 +23,12 @@ It provides a simple user interface built with customtkinter, pychute and the py
 
 ## **Prerequisites**
 
-*   Python 3.x
-*   pytubefix
-*   customtkinter
-*   pillow
+* pytubefix
+* pychute
+* customtkinter
+* pillow
+* moviepy
+* beautifulsoup4
 
 
 ## **Installation**
@@ -44,7 +47,7 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.1.1
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.1.2
 
 Run the application. 
 

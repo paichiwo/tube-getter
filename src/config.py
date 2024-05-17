@@ -1,15 +1,13 @@
 from src.resource_path import resource_path
 
 
-VERSION = '2.1.1'
+VERSION = '2.1.2'
 
 IMG_PATHS = {
     'icon': resource_path('images/yt3d.ico'),
     'icon_png': resource_path('images/yt3d.png'),
     'settings': resource_path('images/setting.png'),
     'github': resource_path('images/github.png'),
-    'switch_left': resource_path('images/switch_left.png'),
-    'switch_right': resource_path('images/switch_right.png'),
     'clock': resource_path('images/clock.png'),
     'eye': resource_path('images/webcam.png'),
     'calendar': resource_path('images/calendar.png'),
