@@ -2,7 +2,7 @@ import webbrowser
 from tkinter import filedialog, CENTER
 from PIL import Image
 from customtkinter import CTkToplevel, CTkFrame, CTkButton, CTkLabel, CTkImage
-from src.config import IMG_PATHS, SETTINGS_HEADER, SETTINGS_MSG, GITHUB_URL
+from src.config import IMG_PATHS, SETTINGS_HEADER, SETTINGS_MSG, GITHUB_URL, NEW_VERSION_MSG
 from src.helpers import save_settings, load_settings, center_window
 
 
@@ -60,3 +60,36 @@ class SettingsWindow(CTkToplevel):
             self.output_destination_label.configure(text=folder_selected)
             save_settings({'output_folder': folder_selected}, 'settings.json')
             self.focus()
+
+
+class NewVersionWindow(CTkToplevel):
+    def __init__(self, version, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.after(250, lambda: self.iconbitmap(bitmap=IMG_PATHS['icon']))
+        self.after(100, lambda: self.focus())
+        self.title('Info')
+        center_window(self, 300, 160)
+        self.resizable(False, False)
+
+        self.version = version
+
+        self.info_label = CTkLabel(self, text=NEW_VERSION_MSG)
+
+        self.yes_button = CTkButton(self, text='Yes', command=self.download)
+        self.no_button = CTkButton(self, text='No', command=self.close)
+
+        self.draw_gui()
+        self.focus()
+
+    def draw_gui(self):
+        self.info_label.pack(padx=10, pady=10)
+
+        self.yes_button.pack()
+        self.no_button.pack(pady=10)
+
+    def download(self):
+        webbrowser.open(GITHUB_URL + f'/releases/tag/v{self.version}')
+
+    def close(self):
+        self.destroy()
