@@ -13,8 +13,8 @@ from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.config import VERSION, IMG_PATHS, INFO_MSG
 from src.helpers import (center_window, imager, get_links, format_file_size, load_settings, handle_audio_extension,
                          open_downloads_folder, format_dl_speed_string, convert_time, convert_date, convert_to_mp3,
-                         format_filename)
-from src.settings_win import SettingsWindow
+                         format_filename, check_for_new_version)
+from src.other_windows import SettingsWindow, NewVersionWindow
 from src.info_frame import Table
 
 if getattr(sys, 'frozen', False):
@@ -82,6 +82,9 @@ class TubeGetter(ctk.CTk):
 
         # draw GUI
         self.draw_gui()
+
+        # check for the newest release
+        self.check_for_new_version()
 
     def draw_gui(self):
         self.top_frame_1.pack(fill='x')
@@ -378,6 +381,12 @@ class TubeGetter(ctk.CTk):
         for i, item in enumerate(self.table_list):
             self.table.frames[i].progress_bar.set(percentage)
             self.dl_speed.configure(text=format_dl_speed_string(download_speed))
+
+    @staticmethod
+    def check_for_new_version():
+        release = check_for_new_version()
+        if release != VERSION:
+            NewVersionWindow(release)
 
     if getattr(sys, 'frozen', False):
         pyi_splash.close()
