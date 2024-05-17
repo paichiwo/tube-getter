@@ -3,3 +3,4 @@ customtkinter
 pillow
 moviepy
 pychute
+beautifulsoup4
