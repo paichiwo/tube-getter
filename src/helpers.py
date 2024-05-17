@@ -1,20 +1,14 @@
 import json
 import os
 import re
-import sys
+import requests
 from datetime import datetime
 from pytubefix import Playlist
 from customtkinter import CTkImage
 from PIL import Image
 from moviepy.audio.io.AudioFileClip import AudioFileClip
-
-
-def resource_path(relative_path):
-    """Get the absolute path for auto-py-to-exe"""
-    if hasattr(sys, '_MEIPASS'):
-        base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
-        return os.path.join(base_path, relative_path)
-    return os.path.join(os.path.abspath('.'), relative_path)
+from bs4 import BeautifulSoup
+from src.config import GITHUB_URL
 
 
 def get_downloads_folder_path():
@@ -121,3 +115,14 @@ def format_filename(filename):
     for word in words:
         new_words.append(word.capitalize())
     return ' '.join(new_words)
+
+
+def check_for_new_version():
+    try:
+        response = requests.get(GITHUB_URL)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.content, 'html.parser')
+        return soup.find(class_='css-truncate css-truncate-target text-bold mr-2').text.split()[2][1:]
+
+    except Exception as e:
+        print(f'Error occurred: {str(e)}')
