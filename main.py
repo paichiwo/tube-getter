@@ -57,7 +57,7 @@ class TubeGetter(ctk.CTk):
         self.enter_url_label = CTkLabel(self.top_frame_1, text='Enter URL:')
         self.switch = CTkSwitch(self.top_frame_1, width=88, text='audio', command=self.switch_action,
                                 fg_color='#2b719e', progress_color='#2b719e')
-        self.settings_button = CTkButton(self.top_frame_1, image=imager(IMG_PATHS['settings'], 20, 20),
+        self.settings_button = CTkButton(self.top_frame_1, image=imager(IMG_PATHS['settings'], 19, 19),
                                          text='', width=40, command=self.settings_action)
 
         # TOP FRAME 2
