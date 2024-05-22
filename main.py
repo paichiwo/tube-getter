@@ -16,6 +16,7 @@ from src.helpers import (center_window, imager, get_links, format_file_size, loa
                          format_filename, check_for_new_version)
 from src.other_windows import SettingsWindow, NewVersionWindow
 from src.info_frame import Table
+from src.popup_menu import CTkPopupMenu
 
 if getattr(sys, 'frozen', False):
     import pyi_splash
@@ -61,6 +62,7 @@ class TubeGetter(ctk.CTk):
                                          text='', width=40, command=self.settings_action)
 
         # TOP FRAME 2
+
         self.url_entry = CTkEntry(self.top_frame_2, border_width=1)
         self.url_entry.bind('<Return>', self.add_action)
         self.url_entry.bind('<Control-z>', self.delete_url_action)
@@ -79,6 +81,14 @@ class TubeGetter(ctk.CTk):
         self.info_for_user_frame = CTkFrame(self.bottom_frame_2, height=24, corner_radius=0)
         self.info_for_user_label = CTkLabel(self.info_for_user_frame, text='')
         self.dl_speed = CTkLabel(self.info_for_user_frame, text=self.initial_speed)
+
+        # RIGHT CLICK MENU FOR URL ENTRY
+        self.url_entry_menu = CTkPopupMenu(master=self, width=80, height=50, corner_radius=8, border_width=1)
+        self.url_entry.bind('<Button-3>', lambda event: self.url_entry_menu.popup(event), add='+')
+        self.paste_button = CTkButton(self.url_entry_menu.frame, text='Paste', command=self.paste_action,
+                                      text_color=('black', 'white'), hover_color=("gray90", "gray25"),
+                                      compound='left', anchor='w', fg_color='transparent', corner_radius=5)
+        self.paste_button.pack(expand=True, fill="x", padx=10, pady=0)
 
         # draw GUI
         self.draw_gui()
@@ -125,6 +135,9 @@ class TubeGetter(ctk.CTk):
         self.switch.configure(state='normal')
         self.clear_button.configure(state='normal')
         self.download_button.configure(state='normal')
+
+    def paste_action(self):
+        self.url_entry.insert('end', self.clipboard_get())
 
     def switch_action(self):
         self.table.delete_all_data_frames()
