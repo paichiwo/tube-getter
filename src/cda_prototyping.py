@@ -5,6 +5,8 @@ import urllib.request
 
 url1 = 'https://www.cda.pl/video/213378f7'
 url2 = 'https://www.cda.pl/video/5044781ea'
+url3 = 'https://www.cda.pl/video/14967539bc'
+
 
 USER_AGENT = 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:48.0) Gecko/20100101 Firefox/48.0'
 
@@ -17,8 +19,8 @@ qualities = ['1080', '720', '480', '360']
 quality_urls = {q: f'/vfilm?wersja={q}p' for q in qualities}
 
 
-def get_video_src(quality):
-    driver.get(url2 + quality_urls[quality])
+def get_video_src(url, quality):
+    driver.get(url + quality_urls[quality])
     page = driver.page_source
     if page:
         soup = BeautifulSoup(page, 'html.parser')
@@ -32,7 +34,7 @@ def get_video_src(quality):
 target = None
 
 for quality in qualities:
-    target = get_video_src(quality)
+    target = get_video_src(url3, quality)
     print(target)
     if target and len(target.split('/')[-1]) > 4:
         break
