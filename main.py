@@ -62,7 +62,6 @@ class TubeGetter(ctk.CTk):
                                          text='', width=40, command=self.settings_action)
 
         # TOP FRAME 2
-
         self.url_entry = CTkEntry(self.top_frame_2, border_width=1)
         self.url_entry.bind('<Return>', self.add_action)
         self.url_entry.bind('<Control-z>', self.delete_url_action)
@@ -84,6 +83,7 @@ class TubeGetter(ctk.CTk):
 
         # RIGHT CLICK MENU FOR URL ENTRY
         self.url_entry_menu = CTkPopupMenu(master=self, width=80, height=50, corner_radius=8, border_width=1)
+        # self.url_entry_menu.attributes('-alpha', .85)
         self.url_entry.bind('<Button-3>', lambda event: self.url_entry_menu.popup(event), add='+')
         self.paste_button = CTkButton(self.url_entry_menu.frame, text='Paste', command=self.paste_action,
                                       text_color=('black', 'white'), hover_color=("gray90", "gray25"),
@@ -164,7 +164,7 @@ class TubeGetter(ctk.CTk):
         def add_threaded():
             url = self.url_entry.get()
             if url:
-                if 'youtube' in url:
+                if 'youtube' or 'youtu.be' in url:
                     if self.provider == 'bitchute':
                         self.yt_list.clear()
                         self.provider = 'youtube'
