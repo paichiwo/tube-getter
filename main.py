@@ -1,19 +1,14 @@
 #!/usr/bin/python3
-import os
 import sys
 import threading
-import pytubefix.exceptions
-import urllib.error
 import customtkinter as ctk
 from io import StringIO
 from datetime import datetime
-from pytubefix import YouTube, Channel
-from pychute import PyChute
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
+from src.youtuber import YouTuber
+from src.bitchuter import Bitchuter
 from src.config import VERSION, IMG_PATHS, INFO_MSG
-from src.helpers import (center_window, imager, get_links, format_file_size, load_settings, handle_audio_extension,
-                         open_downloads_folder, format_dl_speed_string, convert_time, convert_date, convert_to_mp3,
-                         format_filename, check_for_new_version)
+from src.helpers import center_window, imager, check_for_new_version
 from src.other_windows import SettingsWindow, NewVersionWindow
 from src.info_frame import Table
 from src.popup_menu import CTkPopupMenu
@@ -90,6 +85,12 @@ class TubeGetter(ctk.CTk):
                                       compound='left', anchor='w', fg_color='transparent', corner_radius=5)
         self.paste_button.pack(expand=True, fill="x", padx=10, pady=0)
 
+        # create youtuber object
+        self.youtuber = YouTuber(self.dl_format, self.yt_list, self.table_list, self.add_update_with_new_data,
+                                 self.enable_buttons, self.info_msg, self.dl_speed, self.table)
+        # create bitchuter object
+        self.bitchuter = Bitchuter(self.dl_format, self.yt_list, self.table_list, self.add_update_with_new_data,
+                                   self.enable_buttons, self.info_msg, self.dl_speed, self.table)
         # draw GUI
         self.draw_gui()
 
@@ -150,11 +151,27 @@ class TubeGetter(ctk.CTk):
         self.switch.configure(text=self.dl_format)
 
         if self.provider == 'youtube':
-            data = self.get_yt_data_for_table()
+            data = self.youtuber.get_yt_data_for_table()
             self.update_table(data)
         elif self.provider == 'bitchute':
-            data = self.get_bc_data_for_table()
+            data = self.bitchuter.get_bc_data_for_table()
             self.update_table(data)
+
+    def check_urls(self, url):
+        if 'youtube' in url or 'youtu.be' in url:
+            if self.provider == 'bitchute':
+                self.yt_list.clear()
+            self.provider = 'youtube'
+            self.youtuber.add_youtube(url)
+
+        elif 'bitchute' in url:
+            if self.provider == 'youtube':
+                self.yt_list.clear()
+            self.provider = 'bitchute'
+            self.bitchuter.add_bitchute(url)
+
+        else:
+            self.info_msg(INFO_MSG['wrong_url_err'])
 
     def add_action(self, event=None):
         self.info_msg('')
@@ -164,56 +181,13 @@ class TubeGetter(ctk.CTk):
         def add_threaded():
             url = self.url_entry.get()
             if url:
-                if 'youtube' or 'youtu.be' in url:
-                    if self.provider == 'bitchute':
-                        self.yt_list.clear()
-                        self.provider = 'youtube'
-                        self.add_youtube(url)
-                    else:
-                        self.provider = 'youtube'
-                        self.add_youtube(url)
-
-                elif 'bitchute' in url:
-                    self.provider = 'bitchute'
-                    self.add_bitchute(url)
-
-                else:
-                    self.info_msg(INFO_MSG['wrong_url_err'])
+                self.check_urls(url)
             else:
                 self.info_msg(INFO_MSG['url_detected_err'])
             self.enable_buttons()
 
         add_thread = threading.Thread(target=add_threaded)
         add_thread.start()
-
-    def add_youtube(self, url):
-        try:
-            get_links(url, self.yt_list)
-            self.info_msg(INFO_MSG['gathering_data'])
-            data = self.get_yt_data_for_table()
-            self.add_update_with_new_data(data)
-
-        except pytubefix.exceptions.VideoUnavailable:
-            self.info_msg(INFO_MSG['age_restricted_err'])
-        except (pytubefix.exceptions.RegexMatchError, KeyError):
-            self.info_msg(INFO_MSG['gathering_data'])
-        except urllib.error.URLError:
-            self.info_msg(INFO_MSG['internal_err'])
-        self.enable_buttons()
-
-    def add_bitchute(self, url):
-        try:
-            self.yt_list.clear()
-            get_links(url, self.yt_list)
-            self.info_msg(INFO_MSG['gathering_data'])
-            data = self.get_bc_data_for_table()
-            self.add_update_with_new_data(data)
-
-        except (KeyError, TypeError):
-            self.info_msg(INFO_MSG['wrong_url_err'])
-        except urllib.error.URLError:
-            self.info_msg(INFO_MSG['internal_err'])
-        self.enable_buttons()
 
     def add_update_with_new_data(self, data):
         if data:
@@ -239,9 +213,9 @@ class TubeGetter(ctk.CTk):
                 data_frame.delete_btn.configure(state='disabled')
 
             if self.provider == 'youtube':
-                self.yt_download()
+                self.youtuber.yt_download()
             elif self.provider == 'bitchute':
-                self.bc_download()
+                self.bitchuter.bc_download()
 
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
@@ -252,148 +226,10 @@ class TubeGetter(ctk.CTk):
         else:
             self.settings_window.focus()
 
-    def get_yt_data_for_table(self):
-        self.table_list.clear()
-
-        for url in self.yt_list:
-            yt = YouTube(url)
-            try:
-                stream = yt.streams.get_by_itag(
-                    140) if self.dl_format == 'audio' else yt.streams.get_highest_resolution()
-                file_format = 'mp3' if self.dl_format == 'audio' else 'mp4'
-                self.table_list.append([
-                    yt.thumbnail_url,
-                    yt.title,
-                    Channel(yt.channel_url).channel_name,
-                    convert_time(yt.length),
-                    yt.views,
-                    convert_date(yt.publish_date),
-                    file_format,
-                    format_file_size(stream.filesize)
-                ])
-            except (AttributeError, KeyError):
-                self.table_list.append([
-                    yt.thumbnail_url,
-                    yt.title,
-                    Channel(yt.channel_url).channel_name,
-                    convert_time(yt.length),
-                    yt.views,
-                    convert_date(yt.publish_date),
-                    'mp4',
-                    format_file_size(yt.streams.get_highest_resolution().filesize)
-                ])
-        return self.table_list
-
-    def get_bc_data_for_table(self):
-
-        pc = PyChute(self.yt_list[0])
-        self.table_list.append([
-            pc.thumbnail(),
-            pc.title(),
-            pc.channel(),
-            str(pc.duration()),
-            pc.views(),
-            pc.publish_date().split(' ')[0],
-            'mp4',
-            format_file_size(pc.filesize())
-        ])
-        return self.table_list
-
     def update_table(self, array):
         self.table.table_data = array
         self.table.create_list_with_data_frames()
         self.table.draw_data_frames()
-
-    def yt_download(self):
-        filename = ''
-        output_path = load_settings()
-
-        for index, link in enumerate(self.yt_list):
-            yt = YouTube(link, on_progress_callback=self.yt_progress_callback)
-            if self.dl_format == 'audio':
-                yt_stream = yt.streams.get_audio_only()
-                filename = handle_audio_extension(yt_stream)
-            else:
-                yt_stream = yt.streams.get_highest_resolution()
-
-            self.info_msg(INFO_MSG['downloading'])
-
-            try:
-                if os.path.exists(os.path.join(load_settings(), filename)):
-                    self.table.frames[index].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                                  command=open_downloads_folder, state='normal')
-                    self.info_msg(INFO_MSG['file_exists'])
-                else:
-                    yt_stream.download(output_path=output_path, filename=filename)
-                    self.dl_speed.configure(text=self.initial_speed)
-                    self.info_msg(INFO_MSG['dl_complete'])
-
-            except (PermissionError, RuntimeError):
-                self.info_msg(INFO_MSG['permission_err'])
-
-    def bc_download(self):
-        output_path = load_settings()
-
-        for i, link in enumerate(self.yt_list):
-            pc = PyChute(url=link)
-            filename = os.path.join(output_path, format_filename(pc.title()))
-
-            # check if file exists before downloading
-            if os.path.exists(filename + '.mp4'):
-                self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                          command=open_downloads_folder, state='normal')
-                self.info_msg(INFO_MSG['file_exists'])
-            else:
-
-                if self.dl_format == 'audio':
-                    self.info_msg(INFO_MSG['downloading'])
-                    pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
-                    self.table.frames[i].delete_btn.configure(state='disabled')
-                    self.bc_convert(filename, i)
-
-                else:
-                    self.info_msg(INFO_MSG['downloading'])
-                    pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
-                    self.dl_speed.configure(self.initial_speed)
-                    self.info_msg(INFO_MSG['dl_complete'])
-
-    def bc_convert(self, filename, i):
-        self.info_msg(INFO_MSG['converting'])
-        convert_to_mp3(f'{filename}.mp4', f'{filename}.mp3')
-        os.remove(f'{filename}.mp4')
-        self.table.frames[i].extension.configure(text='mp3')
-        self.table.frames[i].size.configure(text=f'{format_file_size(os.path.getsize(f'{filename}.mp3'))}')
-        self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24), width=25, height=25,
-                                                  command=open_downloads_folder, state='normal')
-        # check converted file exists
-        if os.path.exists(filename + '.mp3'):
-            self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                      command=open_downloads_folder, state='normal')
-            self.dl_speed.configure(text=self.initial_speed)
-            self.info_msg(INFO_MSG['conversion_done'])
-
-    def yt_progress_callback(self, stream, chunk, bytes_remaining):
-        total_size = stream.filesize
-        bytes_downloaded = total_size - bytes_remaining
-        percentage = bytes_downloaded / total_size
-
-        elapsed_time = (datetime.now() - self.download_start_time).total_seconds()
-        download_speed = bytes_downloaded / (1024 * elapsed_time)
-        for i, item in enumerate(self.table_list):
-            if item[1] == stream.title:
-                self.table.frames[i].progress_bar.set(percentage)
-                self.table.frames[i].change_delete_btn()
-                self.dl_speed.configure(text=format_dl_speed_string(download_speed))
-
-    def bc_progress_callback(self, count, block_size, total_size):
-        percentage = min(1.0, float(count * block_size) / total_size)
-
-        elapsed_time = (datetime.now() - self.download_start_time).total_seconds()
-        download_speed = (count * block_size) / (1024 * elapsed_time)
-
-        for i, item in enumerate(self.table_list):
-            self.table.frames[i].progress_bar.set(percentage)
-            self.dl_speed.configure(text=format_dl_speed_string(download_speed))
 
     @staticmethod
     def check_for_new_version():
