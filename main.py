@@ -157,6 +157,22 @@ class TubeGetter(ctk.CTk):
             data = self.bitchuter.get_bc_data_for_table()
             self.update_table(data)
 
+    def check_urls(self, url):
+        if 'youtube' in url or 'youtu.be' in url:
+            if self.provider == 'bitchute':
+                self.yt_list.clear()
+            self.provider = 'youtube'
+            self.youtuber.add_youtube(url)
+
+        elif 'bitchute' in url:
+            if self.provider == 'youtube':
+                self.yt_list.clear()
+            self.provider = 'bitchute'
+            self.bitchuter.add_bitchute(url)
+
+        else:
+            self.info_msg(INFO_MSG['wrong_url_err'])
+
     def add_action(self, event=None):
         self.info_msg('')
         self.table_list.clear()
@@ -165,20 +181,7 @@ class TubeGetter(ctk.CTk):
         def add_threaded():
             url = self.url_entry.get()
             if url:
-                if 'youtube' in url or 'youtu.be' in url:
-                    if self.provider == 'bitchute':
-                        self.yt_list.clear()
-                    self.provider = 'youtube'
-                    self.youtuber.add_youtube(url)
-
-                elif 'bitchute' in url:
-                    if self.provider == 'youtube':
-                        self.yt_list.clear()
-                    self.provider = 'bitchute'
-                    self.bitchuter.add_bitchute(url)
-
-                else:
-                    self.info_msg(INFO_MSG['wrong_url_err'])
+                self.check_urls(url)
             else:
                 self.info_msg(INFO_MSG['url_detected_err'])
             self.enable_buttons()
