@@ -53,27 +53,27 @@ class Bitchuter:
 
     def bc_download(self):
         output_path = load_settings()
+
         for i, link in enumerate(self.yt_list):
             pc = PyChute(url=link)
             filename = os.path.join(output_path, format_filename(pc.title()))
-            if os.path.exists(filename + '.mp4'):
+            file_exists = os.path.exists(f"{filename}.mp4") or (
+                        self.dl_format == 'audio' and os.path.exists(f"{filename}.mp3"))
+
+            if file_exists:
                 self.table.frames[i].change_delete_btn()
                 self.info_msg(INFO_MSG['file_exists'])
+                continue
+
+            self.info_msg(INFO_MSG['downloading'])
+            pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
+
+            if self.dl_format == 'audio':
+                self.table.frames[i].delete_btn.configure(state='disabled')
+                self.bc_convert(filename, i)
             else:
-                if self.dl_format == 'audio':
-                    if os.path.exists(filename + '.mp3'):
-                        self.table.frames[i].change_delete_btn()
-                        self.info_msg(INFO_MSG['file_exists'])
-                    else:
-                        self.info_msg(INFO_MSG['downloading'])
-                        pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
-                        self.table.frames[i].delete_btn.configure(state='disabled')
-                        self.bc_convert(filename, i)
-                else:
-                    self.info_msg(INFO_MSG['downloading'])
-                    pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
-                    self.dl_speed.configure(self.initial_speed)
-                    self.info_msg(INFO_MSG['dl_complete'])
+                self.dl_speed.configure(self.initial_speed)
+                self.info_msg(INFO_MSG['dl_complete'])
 
     def bc_convert(self, filename, i):
         self.info_msg(INFO_MSG['converting'])
