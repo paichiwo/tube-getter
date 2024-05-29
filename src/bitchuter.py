@@ -1,6 +1,6 @@
 import os
 import urllib.error
-from datetime import datetime
+from datetime import datetime, timedelta
 from pychute import PyChute
 from src.config import INFO_MSG, IMG_PATHS
 from src.helpers import (get_links, format_file_size, load_settings, format_filename, imager, open_downloads_folder,
@@ -22,6 +22,7 @@ class Bitchuter:
 
         self.initial_speed = '0 KiB/s'
         self.download_start_time = datetime.now()
+        self.last_update_time = datetime.now()
 
     def add_bitchute(self, url):
         try:
@@ -89,6 +90,16 @@ class Bitchuter:
         percentage = min(1.0, float(count * block_size) / total_size)
         elapsed_time = (datetime.now() - self.download_start_time).total_seconds()
         download_speed = (count * block_size) / (1024 * elapsed_time)
+
+        current_time = datetime.now()
+        if (current_time - self.last_update_time) >= timedelta(seconds=.5):
+            self.update_progress_bars(percentage, download_speed)
+            self.last_update_time = current_time
+
+        if percentage == 1.0:
+            self.update_progress_bars(1.0, download_speed)
+
+    def update_progress_bars(self, percentage, download_speed):
         for i, item in enumerate(self.table_list):
             self.table.frames[i].progress_bar.set(percentage)
-            self.dl_speed.configure(text=format_dl_speed_string(download_speed))
+        self.dl_speed.configure(text=format_dl_speed_string(download_speed))
