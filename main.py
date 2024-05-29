@@ -194,7 +194,7 @@ class TubeGetter(ctk.CTk):
             if len(self.table.frames) != 0:
                 self.table.delete_all_data_frames()
             self.update_table(data)
-            self.info_msg('Ready.')
+            self.info_msg('Ready')
             self.enable_buttons()
 
     def delete_url_action(self, event=None):
