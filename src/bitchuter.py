@@ -98,6 +98,7 @@ class Bitchuter:
 
         if percentage == 1.0:
             self.update_progress_bars(1.0, download_speed)
+            self.dl_speed.configure(text=self.initial_speed)
 
     def update_progress_bars(self, percentage, download_speed):
         for i, item in enumerate(self.table_list):
