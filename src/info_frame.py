@@ -153,10 +153,10 @@ class DataFrame(CTkFrame):
             self.delete_btn.configure(state='disabled')
 
         elif self.progress_bar.get() >= 1.0:
-            self.delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
+            self.delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24), width=25, height=25,
                                       command=open_downloads_folder, state='normal')
         else:
-            self.delete_btn.configure(image=imager(IMG_PATHS['bin'], 24, 24),
+            self.delete_btn.configure(image=imager(IMG_PATHS['bin'], 24, 24), width=25, height=25,
                                       command=self.delete_action, state='normal')
 
     def draw_elements(self):

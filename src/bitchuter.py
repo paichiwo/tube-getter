@@ -57,15 +57,18 @@ class Bitchuter:
             pc = PyChute(url=link)
             filename = os.path.join(output_path, format_filename(pc.title()))
             if os.path.exists(filename + '.mp4'):
-                self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                          command=open_downloads_folder, state='normal')
+                self.table.frames[i].change_delete_btn()
                 self.info_msg(INFO_MSG['file_exists'])
             else:
                 if self.dl_format == 'audio':
-                    self.info_msg(INFO_MSG['downloading'])
-                    pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
-                    self.table.frames[i].delete_btn.configure(state='disabled')
-                    self.bc_convert(filename, i)
+                    if os.path.exists(filename + '.mp3'):
+                        self.table.frames[i].change_delete_btn()
+                        self.info_msg(INFO_MSG['file_exists'])
+                    else:
+                        self.info_msg(INFO_MSG['downloading'])
+                        pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
+                        self.table.frames[i].delete_btn.configure(state='disabled')
+                        self.bc_convert(filename, i)
                 else:
                     self.info_msg(INFO_MSG['downloading'])
                     pc.download(filename=filename, on_progress_callback=self.bc_progress_callback)
@@ -78,11 +81,10 @@ class Bitchuter:
         os.remove(f'{filename}.mp4')
         self.table.frames[i].extension.configure(text='mp3')
         self.table.frames[i].size.configure(text=f'{format_file_size(os.path.getsize(f'{filename}.mp3'))}')
-        self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24), width=25, height=25,
-                                                  command=open_downloads_folder, state='normal')
+        self.table.frames[i].change_delete_btn()
+
         if os.path.exists(filename + '.mp3'):
-            self.table.frames[i].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                      command=open_downloads_folder, state='normal')
+            self.table.frames[i].change_delete_btn()
             self.dl_speed.configure(text=self.initial_speed)
             self.info_msg(INFO_MSG['conversion_done'])
 

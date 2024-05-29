@@ -73,7 +73,7 @@ class YouTuber:
     def yt_download(self):
         filename = ''
         output_path = load_settings()
-        for index, link in enumerate(self.yt_list):
+        for i, link in enumerate(self.yt_list):
             yt = YouTube(link, on_progress_callback=self.yt_progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()
@@ -83,8 +83,7 @@ class YouTuber:
             self.info_msg(INFO_MSG['downloading'])
             try:
                 if os.path.exists(os.path.join(load_settings(), filename)):
-                    self.table.frames[index].delete_btn.configure(image=imager(IMG_PATHS['folder'], 24, 24),
-                                                                  command=open_downloads_folder, state='normal')
+                    self.table.frames[i].change_delete_btn()
                     self.info_msg(INFO_MSG['file_exists'])
                 else:
                     yt_stream.download(output_path=output_path, filename=filename)
