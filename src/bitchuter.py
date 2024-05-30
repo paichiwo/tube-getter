@@ -2,9 +2,9 @@ import os
 import urllib.error
 from datetime import datetime, timedelta
 from pychute import PyChute
-from src.config import INFO_MSG, IMG_PATHS
-from src.helpers import (get_links, format_file_size, load_settings, format_filename, imager, open_downloads_folder,
-                         convert_to_mp3, format_dl_speed_string)
+from src.config import INFO_MSG
+from src.helpers import (get_links, format_file_size, load_settings, format_filename, convert_to_mp3,
+                         format_dl_speed_string)
 
 
 class Bitchuter:
