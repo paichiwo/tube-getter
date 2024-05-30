@@ -47,7 +47,7 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.1.2
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.1.3
 
 Run the application. 
 
