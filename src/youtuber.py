@@ -3,17 +3,16 @@ import urllib.error
 import pytubefix.exceptions
 from datetime import datetime
 from pytubefix import YouTube, Channel
-
-from src.config import IMG_PATHS, INFO_MSG
-from src.helpers import (get_links, convert_time, convert_date, format_file_size, load_settings, open_downloads_folder,
-                         handle_audio_extension, imager, format_dl_speed_string)
+from src.config import INFO_MSG
+from src.helpers import (get_links, convert_time, convert_date, format_file_size, load_settings,
+                         handle_audio_extension, format_dl_speed_string)
 
 
 class YouTuber:
-    def __init__(self, dl_format, yt_list, table_list, add_update_with_new_data, enable_buttons, info_msg,
+    def __init__(self, dl_format, url_list, table_list, add_update_with_new_data, enable_buttons, info_msg,
                  dl_speed, table):
 
-        self.yt_list = yt_list
+        self.url_list = url_list
         self.table_list = table_list
         self.info_msg = info_msg
         self.add_update_with_new_data = add_update_with_new_data
@@ -27,7 +26,7 @@ class YouTuber:
 
     def add_youtube(self, url):
         try:
-            get_links(url, self.yt_list)
+            get_links(url, self.url_list)
             self.info_msg(INFO_MSG['gathering_data'])
             data = self.get_yt_data_for_table()
             self.add_update_with_new_data(data)
@@ -41,7 +40,7 @@ class YouTuber:
 
     def get_yt_data_for_table(self):
         self.table_list.clear()
-        for url in self.yt_list:
+        for url in self.url_list:
             yt = YouTube(url)
             try:
                 stream = yt.streams.get_by_itag(
@@ -73,7 +72,7 @@ class YouTuber:
     def yt_download(self):
         filename = ''
         output_path = load_settings()
-        for i, link in enumerate(self.yt_list):
+        for i, link in enumerate(self.url_list):
             yt = YouTube(link, on_progress_callback=self.yt_progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()

@@ -8,10 +8,10 @@ from src.helpers import (get_links, format_file_size, load_settings, format_file
 
 
 class Bitchuter:
-    def __init__(self, dl_format, yt_list, table_list, add_update_with_new_data, enable_buttons, info_msg,
+    def __init__(self, dl_format, url_list, table_list, add_update_with_new_data, enable_buttons, info_msg,
                  dl_speed, table):
 
-        self.yt_list = yt_list
+        self.url_list = url_list
         self.table_list = table_list
         self.info_msg = info_msg
         self.add_update_with_new_data = add_update_with_new_data
@@ -26,8 +26,8 @@ class Bitchuter:
 
     def add_bitchute(self, url):
         try:
-            self.yt_list.clear()
-            get_links(url, self.yt_list)
+            self.url_list.clear()
+            get_links(url, self.url_list)
             self.info_msg(INFO_MSG['gathering_data'])
             data = self.get_bc_data_for_table()
             self.add_update_with_new_data(data)
@@ -38,7 +38,7 @@ class Bitchuter:
         self.enable_buttons()
 
     def get_bc_data_for_table(self):
-        pc = PyChute(self.yt_list[0])
+        pc = PyChute(self.url_list[0])
         self.table_list.append([
             pc.thumbnail(),
             pc.title(),
@@ -54,7 +54,7 @@ class Bitchuter:
     def bc_download(self):
         output_path = load_settings()
 
-        for i, link in enumerate(self.yt_list):
+        for i, link in enumerate(self.url_list):
             pc = PyChute(url=link)
             filename = os.path.join(output_path, format_filename(pc.title()))
             file_exists = os.path.exists(f"{filename}.mp4") or (

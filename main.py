@@ -33,7 +33,7 @@ class TubeGetter(ctk.CTk):
 
         self.settings_window = None
 
-        self.yt_list = []
+        self.url_list = []
         self.table_list = []
         self.download_start_time = datetime.now()
         self.dl_format = 'audio'
@@ -64,7 +64,7 @@ class TubeGetter(ctk.CTk):
         self.add_button = CTkButton(self.top_frame_2, text='Add', width=130, command=self.add_action)
 
         # MIDDLE FRAME
-        self.table = Table(self.middle_frame, yt_links=self.yt_list, table_data=self.table_list,
+        self.table = Table(self.middle_frame, yt_links=self.url_list, table_data=self.table_list,
                            fg_color=('grey80', 'grey10'))
 
         # BOTTOM UPPER FRAME
@@ -86,10 +86,10 @@ class TubeGetter(ctk.CTk):
         self.paste_button.pack(expand=True, fill="x", padx=10, pady=0)
 
         # create youtuber object
-        self.youtuber = YouTuber(self.dl_format, self.yt_list, self.table_list, self.add_update_with_new_data,
+        self.youtuber = YouTuber(self.dl_format, self.url_list, self.table_list, self.add_update_with_new_data,
                                  self.enable_buttons, self.info_msg, self.dl_speed, self.table)
         # create bitchuter object
-        self.bitchuter = Bitchuter(self.dl_format, self.yt_list, self.table_list, self.add_update_with_new_data,
+        self.bitchuter = Bitchuter(self.dl_format, self.url_list, self.table_list, self.add_update_with_new_data,
                                    self.enable_buttons, self.info_msg, self.dl_speed, self.table)
         # draw GUI
         self.draw_gui()
@@ -160,13 +160,13 @@ class TubeGetter(ctk.CTk):
     def check_urls(self, url):
         if 'youtube' in url or 'youtu.be' in url:
             if self.provider == 'bitchute':
-                self.yt_list.clear()
+                self.url_list.clear()
             self.provider = 'youtube'
             self.youtuber.add_youtube(url)
 
         elif 'bitchute' in url:
             if self.provider == 'youtube':
-                self.yt_list.clear()
+                self.url_list.clear()
             self.provider = 'bitchute'
             self.bitchuter.add_bitchute(url)
 
@@ -201,7 +201,7 @@ class TubeGetter(ctk.CTk):
         self.url_entry.delete(0, 'end')
 
     def clear_action(self):
-        self.yt_list.clear()
+        self.url_list.clear()
         self.table_list.clear()
         self.table.delete_all_data_frames()
         self.info_msg('')
