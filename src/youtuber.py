@@ -33,10 +33,11 @@ class YouTuber:
         except pytubefix.exceptions.VideoUnavailable:
             self.info_msg(INFO_MSG['age_restricted_err'])
         except (pytubefix.exceptions.RegexMatchError, KeyError):
-            self.info_msg(INFO_MSG['gathering_data'])
+            self.info_msg(INFO_MSG['wrong_url_err'])
         except urllib.error.URLError:
             self.info_msg(INFO_MSG['internal_err'])
-        self.enable_buttons()
+        finally:
+            self.enable_buttons()
 
     def get_yt_data_for_table(self):
         self.table_list.clear()
