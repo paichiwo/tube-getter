@@ -13,6 +13,7 @@ from src.other_windows import SettingsWindow, NewVersionWindow
 from src.info_frame import Table
 from src.popup_menu import CTkPopupMenu
 
+
 if getattr(sys, 'frozen', False):
     import pyi_splash
 
