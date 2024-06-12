@@ -1,27 +1,17 @@
 import os
 import urllib.error
 from datetime import datetime, timedelta
+from src.media_root import MediaRoot
 from pychute import PyChute
 from src.config import INFO_MSG
 from src.helpers import (get_links, format_file_size, load_settings, format_filename, convert_to_mp3,
                          format_dl_speed_string)
 
 
-class Bitchuter:
-    def __init__(self, dl_format, url_list, table_list, add_update_with_new_data, enable_buttons, info_msg,
-                 dl_speed, table):
+class Bitchuter(MediaRoot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        self.url_list = url_list
-        self.table_list = table_list
-        self.info_msg = info_msg
-        self.add_update_with_new_data = add_update_with_new_data
-        self.enable_buttons = enable_buttons
-        self.dl_format = dl_format
-        self.dl_speed = dl_speed
-        self.table = table
-
-        self.initial_speed = '0 KiB/s'
-        self.download_start_time = datetime.now()
         self.last_update_time = datetime.now()
 
     def add_bitchute(self, url):
