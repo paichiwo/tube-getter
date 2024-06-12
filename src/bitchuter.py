@@ -12,8 +12,6 @@ class Bitchuter(MediaRoot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.last_update_time = datetime.now()
-
     def add_bitchute(self, url):
         try:
             self.url_list.clear()
@@ -47,8 +45,8 @@ class Bitchuter(MediaRoot):
         for i, link in enumerate(self.url_list):
             pc = PyChute(url=link)
             filename = os.path.join(output_path, format_filename(pc.title()))
-            file_exists = os.path.exists(f"{filename}.mp4") or (
-                        self.dl_format == 'audio' and os.path.exists(f"{filename}.mp3"))
+            file_exists = os.path.exists(f'{filename}.mp4') or (
+                    self.dl_format == 'audio' and os.path.exists(f'{filename}.mp3'))
 
             if file_exists:
                 self.table.frames[i].change_delete_btn()
