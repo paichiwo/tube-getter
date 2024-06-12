@@ -16,4 +16,5 @@ class MediaRoot:
 
         self.initial_speed = '0 KiB/s'
         self.download_start_time = datetime.now()
+        self.last_update_time = datetime.now()
 
