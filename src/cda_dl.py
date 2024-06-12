@@ -1,83 +1,73 @@
 import os
-import time
-import urllib.request
-from bs4 import BeautifulSoup
-from selenium import webdriver
+import urllib.error
+from pycda import PyCDA
+from src.media_root import MediaRoot
+from src.config import INFO_MSG
+from src.helpers import (get_links, format_file_size, load_settings, format_filename, convert_to_mp3,
+                         format_dl_speed_string)
 
 
-class PyCDA:
-    def __init__(self, url):
-        self.__url = url
-        self.__user_agent = 'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:48.0) Gecko/20100101 Firefox/48.0'
-        self.__qualities = ['1080', '720', '480', '360']
-        self.__quality_urls = {q: f'/vfilm?wersja={q}p' for q in self.__qualities}
+class CDAer(MediaRoot):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-        self.__options = webdriver.ChromeOptions()
-        self.__options.add_argument('headless')
-        self.__options.add_argument(f'user-agent={self.__user_agent}')
-        self.__driver = webdriver.Chrome(options=self.__options)
+    def add_cda(self, url):
+        try:
+            self.url_list.clear()
+            get_links(url, self.url_list)
+            self.info_msg(INFO_MSG['gathering_data'])
+            data = self.get_cda_data_for_table()
+            self.add_update_with_new_data(data)
+        except (KeyError, TypeError):
+            self.info_msg(INFO_MSG['wrong_url_err'])
+        except urllib.error.URLError:
+            self.info_msg(INFO_MSG['internal_err'])
+        self.enable_buttons()
 
-    def __get_video_src(self, quality):
+    def get_cda_data_for_table(self):
+        cda = PyCDA(self.url_list[0])
+        self.table_list.append([
+            cda.thumbnail(),
+            cda.title(),
+            cda.channel(),
+            str(cda.duration()),
+            'N/A',
+            cda.publish_date(),
+            'mp4',
+            format_file_size(cda.filesize())
+        ])
+        return self.table_list
 
-        self.__driver.get(self.__url + self.__quality_urls[quality])
-        page = self.__driver.page_source
+    def cda_download(self):
+        output_path = load_settings()
 
-        if page:
-            soup = BeautifulSoup(page, 'html.parser')
-            video_tag = soup.find('video', class_='pb-video-player')
-            if video_tag:
-                src = video_tag.get('src')
-                return src
-        return None
+        for i, link in enumerate(self.url_list):
+            cda = PyCDA(url=link)
+            filename = str(os.path.join(output_path, format_filename(cda.title())))
+            file_exists = os.path.exists(f'{filename}.mp4') or (
+                    self.dl_format == 'audio' and os.path.exists(f'{filename}.mp3'))
 
-    def __find_best_quality(self):
-        for quality in self.__qualities:
-            target = self.__get_video_src(quality)
-            print(target)
-            if target and len(target.split('/')[-1]) > 4:
-                return target
-        return None
+            if file_exists:
+                self.table.frames[i].change_delete_btn()
+                self.info_msg(INFO_MSG['file_exists'])
+                continue
 
-    @staticmethod
-    def __download_video(target, filename='cda_file.mp4', on_progress_callback=None):
-        if not os.path.exists(filename):
-            print('Downloading...')
-            urllib.request.urlretrieve(target, filename, reporthook=on_progress_callback)
-        else:
-            print('File already downloaded')
+            self.info_msg(INFO_MSG['downloading'])
+            cda.download(filename=filename, on_progress_callback=self.cda_progress_callback)
 
-    def download(self, filename='cda_file.mp4', on_progress_callback=None):
-        target = self.__find_best_quality()
-        if target:
-            print(f"Found video URL: {target}")
-            if not os.path.exists(filename):
-                print('Downloading...')
-                urllib.request.urlretrieve(target, filename, reporthook=on_progress_callback)
+            if self.dl_format == 'audio':
+                self.table.frames[i].delete_btn.configure(state='disabled')
+                self.cda_convert(filename, i)
             else:
-                print('File already downloaded')
-        else:
-            print("No valid video URL found.")
-        self.__driver.quit()
+                self.dl_speed.configure(self.initial_speed)
+                self.info_msg(INFO_MSG['dl_complete'])
 
+    def cda_convert(self, filename, i):
+        pass
 
-if __name__ == '__main__':
+    def cda_progress_callback(self, count, block_size, total_size):
+        pass
 
-    start_time = time.time()
+    def update_progress_bars(self):
+        pass
 
-    def report_hook(count, block_size, total_size):
-        # progress percentage
-        progress = min(1.0, float(count * block_size) / total_size)
-        print(f'progress: {progress:.2f}')
-
-        # download speed
-        elapsed_time = time.time() - start_time
-        if elapsed_time > 0:
-            speed = (count * block_size) / (1024 * elapsed_time)  # speed in KB/s
-            print(f'Download speed: {speed:.2f} KB/s')
-
-    url1 = 'https://www.cda.pl/video/14967539bc'
-    url2 = 'https://www.cda.pl/video/192935076e'
-    url3 = 'https://www.cda.pl/video/295066274/'
-
-    cda = PyCDA(url1)
-    cda.download(on_progress_callback=report_hook)
