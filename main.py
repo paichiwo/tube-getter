@@ -9,7 +9,7 @@ from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.youtuber import YouTuber
 from src.bitchuter import Bitchuter
 from src.config import VERSION, IMG_PATHS, INFO_MSG
-from src.helpers import center_window, imager, check_for_new_version
+from src.helpers import center_window, imager, check_for_new_version, unzip_ffmpeg
 from src.other_windows import SettingsWindow, NewVersionWindow
 from src.info_frame import Table
 from src.popup_menu import CTkPopupMenu
@@ -98,6 +98,9 @@ class TubeGetter(ctk.CTk):
 
         # check for the newest release
         self.check_for_new_version()
+
+        # unzip ffmpeg
+        unzip_ffmpeg()
 
     def draw_gui(self):
         self.top_frame_1.pack(fill='x')
