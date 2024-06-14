@@ -6,8 +6,8 @@ class Bitchuter(MediaRoot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def add_bitchute(self, url):
+    def add(self, url):
         self.add_media(url, 'bitchute')
 
-    def bc_download(self):
+    def download(self):
         self.download_media('bitchute')

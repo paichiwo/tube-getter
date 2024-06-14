@@ -24,7 +24,7 @@ class YouTuber:
         self.initial_speed = '0 KiB/s'
         self.download_start_time = datetime.now()
 
-    def add_youtube(self, url):
+    def add(self, url):
         try:
             get_links(url, self.url_list)
             self.info_msg(INFO_MSG['gathering_data'])
@@ -70,7 +70,7 @@ class YouTuber:
                 ])
         return self.table_list
 
-    def yt_download(self):
+    def download(self):
         filename = ''
         output_path = load_settings()
         for i, link in enumerate(self.url_list):

@@ -5,8 +5,8 @@ class CDAer(MediaRoot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-    def add_cda(self, url):
+    def add(self, url):
         self.add_media(url, 'cda')
 
-    def cda_download(self):
+    def download(self):
         self.download_media('cda')
