@@ -2,6 +2,7 @@
 import sys
 import threading
 import customtkinter as ctk
+from pychute import PyChute
 from io import StringIO
 from datetime import datetime
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
@@ -142,21 +143,24 @@ class TubeGetter(ctk.CTk):
         self.url_entry.insert('end', self.clipboard_get())
 
     def switch_action(self):
-        self.table.delete_all_data_frames()
-        self.table_list.clear()
-
         if self.dl_format == 'audio':
             self.dl_format = 'video'
         else:
             self.dl_format = 'audio'
+
         self.switch.configure(text=self.dl_format)
+        self.update_table()
+
+    def update_table(self):
+        self.table.delete_all_data_frames()
+        self.table_list.clear()
 
         if self.provider == 'youtube':
             data = self.youtuber.get_yt_data_for_table()
-            self.update_table(data)
+            self.draw_table(data)
         elif self.provider == 'bitchute':
-            data = self.bitchuter.get_bc_data_for_table()
-            self.update_table(data)
+            data = self.bitchuter.create_media_table(PyChute)
+            self.draw_table(data)
 
     def check_urls(self, url):
         if 'youtube' in url or 'youtu.be' in url:
@@ -194,7 +198,7 @@ class TubeGetter(ctk.CTk):
         if data:
             if len(self.table.frames) != 0:
                 self.table.delete_all_data_frames()
-            self.update_table(data)
+            self.draw_table(data)
             self.info_msg('Ready')
             self.enable_buttons()
 
@@ -227,7 +231,7 @@ class TubeGetter(ctk.CTk):
         else:
             self.settings_window.focus()
 
-    def update_table(self, array):
+    def draw_table(self, array):
         self.table.table_data = array
         self.table.create_list_with_data_frames()
         self.table.draw_data_frames()
