@@ -2,13 +2,15 @@ import json
 import os
 import re
 import requests
+import zipfile
 from datetime import datetime
 from pytubefix import Playlist
 from customtkinter import CTkImage
 from PIL import Image
-from moviepy.audio.io.AudioFileClip import AudioFileClip
+from pydub import AudioSegment
 from bs4 import BeautifulSoup
 from src.config import GITHUB_URL
+from src.resource_path import resource_path
 
 
 def get_downloads_folder_path():
@@ -32,14 +34,6 @@ def center_window(window, width, height):
 
 def imager(path, x, y):
     return CTkImage(Image.open(path), size=(x, y))
-
-
-def format_file_size(size_bytes) -> str:
-    """Convert bytes to MB / GB"""
-    if size_bytes >= 1024 ** 3:
-        return f'{(size_bytes / (1024 ** 3)):.2f} GB'
-    else:
-        return f'{(size_bytes / (1024 ** 2)):.2f} MB'
 
 
 def get_links(url, array):
@@ -76,6 +70,14 @@ def open_downloads_folder():
     os.startfile(load_settings())
 
 
+def format_file_size(size_bytes) -> str:
+    """Convert bytes to MB / GB"""
+    if size_bytes >= 1024 ** 3:
+        return f'{(size_bytes / (1024 ** 3)):.2f} GB'
+    else:
+        return f'{(size_bytes / (1024 ** 2)):.2f} MB'
+
+
 def format_dl_speed_string(download_speed):
     if download_speed < 1000:
         return f'{download_speed:.2f} KiB/s'
@@ -83,11 +85,17 @@ def format_dl_speed_string(download_speed):
         return f'{download_speed / 1024:.2f} MiB/s'
 
 
-def handle_audio_extension(stream):
-    if stream.mime_type == 'audio/mp4':
-        return stream.default_filename.rsplit('.', 1)[0] + '.mp3'
-    else:
-        return stream.default_filename
+def format_filename(filename):
+    chars_removed_title = re.sub(r'[^\w ]', '', filename)
+    words = chars_removed_title.split()
+    new_words = []
+    for word in words:
+        new_words.append(word.capitalize())
+    return ' '.join(new_words)
+
+
+def format_date(date):
+    return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
 
 
 def convert_time(time_in_sec):
@@ -98,23 +106,22 @@ def convert_time(time_in_sec):
     return f'{hours:02d}:{minutes:02d}:{time_in_sec:02d}'
 
 
-def convert_date(date):
-    return datetime.strptime(str(date).split(' ')[0], '%Y-%m-%d').strftime('%d-%m-%Y')
+def handle_audio_extension(stream):
+    if stream.mime_type == 'audio/mp4':
+        return stream.default_filename.rsplit('.', 1)[0] + '.mp3'
+    else:
+        return stream.default_filename
+
+
+def unzip_ffmpeg():
+    with zipfile.ZipFile(resource_path('./ffmpeg/ffmpeg.zip'), 'r') as zip_ref:
+        zip_ref.extract('ffmpeg.exe', './ffmpeg/')
 
 
 def convert_to_mp3(mp4_filepath, mp3_filepath):
-    file_to_convert = AudioFileClip(mp4_filepath)
-    file_to_convert.write_audiofile(mp3_filepath)
-    file_to_convert.close()
-
-
-def format_filename(filename):
-    chars_removed_title = re.sub(r'[^\w ]', '', filename)
-    words = chars_removed_title.split()
-    new_words = []
-    for word in words:
-        new_words.append(word.capitalize())
-    return ' '.join(new_words)
+    AudioSegment.converter = resource_path('./ffmpeg/ffmpeg.exe')
+    audio = AudioSegment.from_file(mp4_filepath, format='mp4')
+    audio.export(mp3_filepath, format='mp3', bitrate=128)
 
 
 def check_for_new_version():
