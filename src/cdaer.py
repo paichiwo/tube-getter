@@ -91,4 +91,6 @@ class CDAer(MediaRoot):
             self.dl_speed.configure(text=self.initial_speed)
 
     def update_progress_bars(self, percentage, download_speed):
-        pass
+        for i, item in enumerate(self.table_list):
+            self.table.frames[i].progress_bar.set(percentage)
+        self.dl_speed.configure(text=format_dl_speed_string(download_speed))
