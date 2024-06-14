@@ -4,3 +4,6 @@ pillow
 moviepy
 pychute
 beautifulsoup4
+requests
+future
+cda_download
