@@ -2,8 +2,10 @@
 /venv/
 /.idea/
 /__pycache__/
+
 # Application Output
 /.mp4
 /.mp3
 /output
 
+/ffmpeg/ffmpeg.exe
