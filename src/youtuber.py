@@ -4,7 +4,7 @@ import pytubefix.exceptions
 from datetime import datetime
 from pytubefix import YouTube, Channel
 from src.config import INFO_MSG
-from src.helpers import (get_links, convert_time, convert_date, format_file_size, load_settings,
+from src.helpers import (get_links, convert_time, format_date, format_file_size, load_settings,
                          handle_audio_extension, format_dl_speed_string)
 
 
@@ -53,7 +53,7 @@ class YouTuber:
                     Channel(yt.channel_url).channel_name,
                     convert_time(yt.length),
                     yt.views,
-                    convert_date(yt.publish_date),
+                    format_date(yt.publish_date),
                     file_format,
                     format_file_size(stream.filesize)
                 ])
@@ -64,7 +64,7 @@ class YouTuber:
                     Channel(yt.channel_url).channel_name,
                     convert_time(yt.length),
                     yt.views,
-                    convert_date(yt.publish_date),
+                    format_date(yt.publish_date),
                     'mp4',
                     format_file_size(yt.streams.get_highest_resolution().filesize)
                 ])
