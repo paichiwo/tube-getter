@@ -1,5 +1,6 @@
 import os
 import urllib.error
+from datetime import datetime, timedelta
 from cda_download import CdaDownload
 from src.media_root import MediaRoot
 from src.config import INFO_MSG
@@ -76,8 +77,18 @@ class CDAer(MediaRoot):
             self.info_msg(INFO_MSG['conversion_done'])
 
     def cda_progress_callback(self, count, block_size, total_size):
+        percentage = min(1.0, float(count * block_size) / total_size)
+        elapsed_time = (datetime.now() - self.download_start_time).total_seconds()
+        download_speed = (count * block_size) / (1024 * elapsed_time)
 
+        current_time = datetime.now()
+        if (current_time - self.last_update_time) >= timedelta(seconds=.5):
+            self.update_progress_bars(percentage, download_speed)
+            self.last_update_time = current_time
 
-    def update_progress_bars(self):
+        if percentage == 1.0:
+            self.update_progress_bars(1.0, download_speed)
+            self.dl_speed.configure(text=self.initial_speed)
+
+    def update_progress_bars(self, percentage, download_speed):
         pass
-
