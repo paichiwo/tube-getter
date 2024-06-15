@@ -13,6 +13,8 @@ from bs4 import BeautifulSoup
 from src.config import GITHUB_URL
 from src.resource_path import resource_path
 
+ffmpeg_exe = 'ffmpeg.exe'
+
 
 def get_downloads_folder_path():
     """Get the path to the Downloads folder on Windows"""
@@ -124,18 +126,18 @@ def handle_audio_extension(stream):
 def unzip_ffmpeg():
     """Unzip ffmpeg file"""
     dir_path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter')
-    exe_path = os.path.join(dir_path, 'ffmpeg.exe')
+    exe_path = os.path.join(dir_path, ffmpeg_exe)
 
     if not os.path.exists(exe_path):
         os.makedirs(dir_path, exist_ok=True)
 
     with zipfile.ZipFile(resource_path('ffmpeg/ffmpeg.zip'), 'r') as zip_ref:
-        zip_ref.extract('ffmpeg.exe', dir_path)
+        zip_ref.extract(ffmpeg_exe, dir_path)
 
 
 def convert_to_mp3(input_file, output_file, progress_callback=None):
     """Use ffmpeg to convert mp4 to mp3. Output progress"""
-    ffmpeg_path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', 'ffmpeg.exe')
+    ffmpeg_path = os.path.join(os.environ['LOCALAPPDATA'], 'Tube-Getter', ffmpeg_exe)
 
     ffmpeg_command = [ffmpeg_path, '-i', input_file, '-b:a', '128k', '-y', output_file]
 
