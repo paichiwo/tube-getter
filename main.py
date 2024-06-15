@@ -4,7 +4,6 @@ import threading
 import customtkinter as ctk
 from pychute import PyChute
 from cda_download import CdaDownload
-from io import StringIO
 from datetime import datetime
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.youtuber import YouTuber
