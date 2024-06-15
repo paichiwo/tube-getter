@@ -8,26 +8,28 @@
 ![](screenshots/screenshot_1.png)
 ![](screenshots/screenshot_2.png)
 ![](screenshots/screenshot_3.png)
+![](screenshots/screenshot_4.png)
 
 ---
-Tube Getter is a Python application that allows you to download videos and audio from YouTube and BitChute.
-It provides a simple user interface built with customtkinter, pychute and the pytubefix library.
+Tube Getter is a Python application that allows you to download videos and audio from YouTube, BitChute and cda.pl.
+Interface is built with `customtkinter` and media downloaders are built with `pychute`,
+`cda_download` and the `pytubefix` library.
 ---
 ## **Features**
 
-*   Download video and audio from YouTube or BitChute.
+*   Download video and audio from YouTube, BitChute or cda.pl.
 *   Support for downloading individual videos or entire playlists (only for YouTube).
 *   Choose the output format (video or audio).
-*   Monitor the download progress, including progress, download speed, and completion status.
-*   Choose the download folder in the settings window
+*   Monitor the download progress, including progress, download speed, completion status and conversion status.
+*   Choose the output folder in the settings window.
 
 ## **Prerequisites**
 
 * pytubefix
 * pychute
+* cda_download
 * customtkinter
 * pillow
-* moviepy
 * beautifulsoup4
 
 
@@ -47,7 +49,7 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.1.3
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.2.1
 
 Run the application. 
 
@@ -63,9 +65,9 @@ Exemption might have to be added in windows defender or other antivirus software
 - Run the application, the window will appear.
 
 
-- Enter the YouTube video URL or playlist URL in the input field and click "Add" or press Enter, 
+- Enter the **YouTube** video URL or playlist URL in the input field and click "Add" or press Enter, 
 you can also add URLs one by one.
-  You can also enter BitChute URL (BitChute supports only one media at a time).
+  You can also enter **BitChute** or **cda.pl** URL (_BitChute and cda supports only one media at a time_).
 
   
 - Switch to Audio or Video to update the table with relevant information.
@@ -82,10 +84,8 @@ you can also add URLs one by one.
 _I'm constantly working on this application, this code might change a lot._
 _If you find any bugs, please feel free to open an issue._
 
-If you are interested in contributing to the development of the YouTube Downloader,
-you are welcome to create a pull request on the project's GitHub repository. 
-By contributing to the project, you can help improve the functionality, 
-stability, and overall quality of the Tube Getter application, which is much appreciated.
+If you are interested in contributing to the development of the Tube Getter,
+you are welcome to create a pull request on the project's GitHub repository.
 
 ## **License**
 
@@ -95,3 +95,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 *   [pytubefix](https://pytubefix.readthedocs.io/en/latest/) - library for downloading YouTube videos
 *   [pychute](http://github.com/paichiwo/pychute) - library for downloading BitChute videos
+*   [cda_download](https://github.com/paichiwo/cda_download) - library for downloading cda.pl videos
