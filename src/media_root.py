@@ -52,7 +52,7 @@ class MediaRoot:
             media.channel(),
             str(media.duration()),
             'N/A' if media_class == CdaDownload else media.views(),
-            media.publish_date().split(' ')[0] if media_class == PyChute else media.publish_date(),
+            media.publish_date().split(' ')[0],
             'mp4',
             format_file_size(media.filesize())
         ]
@@ -85,13 +85,18 @@ class MediaRoot:
 
     def convert_media(self, filename, i):
         self.info_msg(INFO_MSG['converting'])
-        convert_to_mp3(f'{filename}.mp4', f'{filename}.mp3')
-        os.remove(f'{filename}.mp4')
+
+        def progress(percentage):
+            for index, item in enumerate(self.table_list):
+                self.table.frames[index].progress_bar.set(percentage)
+
+        convert_to_mp3(f'{filename}.mp4', f'{filename}.mp3', progress)
         self.table.frames[i].extension.configure(text='mp3')
         self.table.frames[i].size.configure(text=f'{format_file_size(os.path.getsize(f'{filename}.mp3'))}')
         self.table.frames[i].change_delete_btn()
 
         if os.path.exists(filename + '.mp3'):
+            os.remove(f'{filename}.mp4')
             self.table.frames[i].change_delete_btn()
             self.dl_speed.configure(text=self.initial_speed)
             self.info_msg(INFO_MSG['conversion_done'])
