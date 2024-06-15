@@ -111,8 +111,8 @@ class MediaRoot:
             self.update_progress_bars(percentage, download_speed)
             self.last_update_time = current_time
 
-        if percentage == 1.0:
-            self.update_progress_bars(1.0, download_speed)
+        if percentage == 1:
+            self.update_progress_bars(1, download_speed)
             self.dl_speed.configure(text=self.initial_speed)
 
     def update_progress_bars(self, percentage, download_speed):
