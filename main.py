@@ -2,24 +2,22 @@
 import sys
 import threading
 import customtkinter as ctk
-from io import StringIO
+from pychute import PyChute
+from cda_download import CdaDownload
 from datetime import datetime
 from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.youtuber import YouTuber
 from src.bitchuter import Bitchuter
+from src.cdaer import CDAer
 from src.config import VERSION, IMG_PATHS, INFO_MSG
-from src.helpers import center_window, imager, check_for_new_version
+from src.helpers import center_window, imager, check_for_new_version, unzip_ffmpeg
 from src.other_windows import SettingsWindow, NewVersionWindow
 from src.info_frame import Table
 from src.popup_menu import CTkPopupMenu
 
+
 if getattr(sys, 'frozen', False):
     import pyi_splash
-
-# write console output to a memory buffer
-output_buffer = StringIO()
-sys.stdout = output_buffer
-sys.stderr = output_buffer
 
 
 class TubeGetter(ctk.CTk):
@@ -33,7 +31,7 @@ class TubeGetter(ctk.CTk):
 
         self.settings_window = None
 
-        self.yt_list = []
+        self.url_list = []
         self.table_list = []
         self.download_start_time = datetime.now()
         self.dl_format = 'audio'
@@ -64,7 +62,7 @@ class TubeGetter(ctk.CTk):
         self.add_button = CTkButton(self.top_frame_2, text='Add', width=130, command=self.add_action)
 
         # MIDDLE FRAME
-        self.table = Table(self.middle_frame, yt_links=self.yt_list, table_data=self.table_list,
+        self.table = Table(self.middle_frame, yt_links=self.url_list, table_data=self.table_list,
                            fg_color=('grey80', 'grey10'))
 
         # BOTTOM UPPER FRAME
@@ -86,16 +84,23 @@ class TubeGetter(ctk.CTk):
         self.paste_button.pack(expand=True, fill="x", padx=10, pady=0)
 
         # create youtuber object
-        self.youtuber = YouTuber(self.dl_format, self.yt_list, self.table_list, self.add_update_with_new_data,
+        self.youtuber = YouTuber(self.dl_format, self.url_list, self.table_list, self.add_update_with_new_data,
                                  self.enable_buttons, self.info_msg, self.dl_speed, self.table)
         # create bitchuter object
-        self.bitchuter = Bitchuter(self.dl_format, self.yt_list, self.table_list, self.add_update_with_new_data,
+        self.bitchuter = Bitchuter(self.dl_format, self.url_list, self.table_list, self.add_update_with_new_data,
                                    self.enable_buttons, self.info_msg, self.dl_speed, self.table)
+        # create cda object
+        self.cdaer = CDAer(self.dl_format, self.url_list, self.table_list, self.add_update_with_new_data,
+                           self.enable_buttons, self.info_msg, self.dl_speed, self.table)
+
         # draw GUI
         self.draw_gui()
 
         # check for the newest release
         self.check_for_new_version()
+
+        # unzip ffmpeg
+        unzip_ffmpeg()
 
     def draw_gui(self):
         self.top_frame_1.pack(fill='x')
@@ -141,37 +146,53 @@ class TubeGetter(ctk.CTk):
         self.url_entry.insert('end', self.clipboard_get())
 
     def switch_action(self):
+        if self.dl_format == 'audio':
+            self.dl_format = 'video'
+            self.youtuber.dl_format = 'video'
+            self.cdaer.dl_format = 'video'
+            self.bitchuter.dl_format = 'video'
+        else:
+            self.dl_format = 'audio'
+            self.youtuber.dl_format = 'audio'
+            self.cdaer.dl_format = 'audio'
+            self.bitchuter.dl_format = 'audio'
+
+        self.switch.configure(text=self.dl_format)
+        self.update_table()
+
+    def update_table(self):
         self.table.delete_all_data_frames()
         self.table_list.clear()
 
-        if self.dl_format == 'audio':
-            self.dl_format = 'video'
-        else:
-            self.dl_format = 'audio'
-        self.switch.configure(text=self.dl_format)
-
         if self.provider == 'youtube':
-            data = self.youtuber.get_yt_data_for_table()
-            self.update_table(data)
-        elif self.provider == 'bitchute':
-            data = self.bitchuter.get_bc_data_for_table()
-            self.update_table(data)
+            data = self.youtuber.create_yt_media_table()
+            self.draw_table(data)
+        if self.provider == 'bitchute':
+            data = self.bitchuter.create_media_table(PyChute)
+            self.draw_table(data)
+        if self.provider == 'cda':
+            data = self.cdaer.create_media_table(CdaDownload)
+            self.draw_table(data)
 
     def check_urls(self, url):
         if 'youtube' in url or 'youtu.be' in url:
-            if self.provider == 'bitchute':
-                self.yt_list.clear()
-            self.provider = 'youtube'
-            self.youtuber.add_youtube(url)
-
+            new_provider = 'youtube'
+            processor = self.youtuber
         elif 'bitchute' in url:
-            if self.provider == 'youtube':
-                self.yt_list.clear()
-            self.provider = 'bitchute'
-            self.bitchuter.add_bitchute(url)
-
+            new_provider = 'bitchute'
+            processor = self.bitchuter
+        elif 'cda' in url:
+            new_provider = 'cda'
+            processor = self.cdaer
         else:
             self.info_msg(INFO_MSG['wrong_url_err'])
+            return
+
+        if self.provider != new_provider:
+            self.provider = new_provider
+            self.url_list.clear()
+
+        processor.add(url)
 
     def add_action(self, event=None):
         self.info_msg('')
@@ -193,7 +214,7 @@ class TubeGetter(ctk.CTk):
         if data:
             if len(self.table.frames) != 0:
                 self.table.delete_all_data_frames()
-            self.update_table(data)
+            self.draw_table(data)
             self.info_msg('Ready')
             self.enable_buttons()
 
@@ -201,7 +222,7 @@ class TubeGetter(ctk.CTk):
         self.url_entry.delete(0, 'end')
 
     def clear_action(self):
-        self.yt_list.clear()
+        self.url_list.clear()
         self.table_list.clear()
         self.table.delete_all_data_frames()
         self.info_msg('')
@@ -213,9 +234,11 @@ class TubeGetter(ctk.CTk):
                 data_frame.delete_btn.configure(state='disabled')
 
             if self.provider == 'youtube':
-                self.youtuber.yt_download()
+                self.youtuber.download()
             elif self.provider == 'bitchute':
-                self.bitchuter.bc_download()
+                self.bitchuter.download()
+            elif self.provider == 'cda':
+                self.cdaer.download()
 
         download_thread = threading.Thread(target=download_task)
         download_thread.start()
@@ -226,7 +249,7 @@ class TubeGetter(ctk.CTk):
         else:
             self.settings_window.focus()
 
-    def update_table(self, array):
+    def draw_table(self, array):
         self.table.table_data = array
         self.table.create_list_with_data_frames()
         self.table.draw_data_frames()
