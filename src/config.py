@@ -23,7 +23,7 @@ INFO_MSG = {
     'permission_err': 'ERROR: Permission Error',
     'file_exists': 'File already downloaded',
     'dl_complete': 'Download complete',
-    'converting': 'Converting bitchute video to mp3 file',
+    'converting': 'Converting video to mp3 file',
     'conversion_done': 'Conversion complete',
     'gathering_data': 'Gathering data, please wait...',
     'downloading': 'Downloading...',
