@@ -1,7 +1,6 @@
 pytubefix
 customtkinter
 pillow
-pydub
 pychute
 beautifulsoup4
 requests
