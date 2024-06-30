@@ -89,11 +89,11 @@ class YouTuber(MediaRoot):
         elapsed_time = (datetime.now() - self.download_start_time).total_seconds()
         download_speed = bytes_downloaded / (1024 * elapsed_time)
 
-        self.update_progress_bars(percentage, download_speed)
+        self.update_progress_gui(stream, percentage, download_speed)
 
-    def update_progress_bars(self, percentage, download_speed):
+    def update_progress_gui(self, stream, percentage, download_speed):
         for i, item in enumerate(self.table_list):
-            # if item[1] == stream.title:
-            self.table.frames[i].progress_bar.set(percentage)
-            self.table.frames[i].change_delete_btn()
-            self.dl_speed.configure(text=format_dl_speed_string(download_speed))
+            if item[1] == stream.title:
+                self.table.frames[i].progress_bar.set(percentage)
+                self.table.frames[i].change_delete_btn()
+                self.dl_speed.configure(text=format_dl_speed_string(download_speed))
