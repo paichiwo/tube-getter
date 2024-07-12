@@ -96,7 +96,7 @@ class TubeGetter(CTk, TkinterDnD.DnDWrapper):
 
         # draw GUI
         self.draw_gui()
-        self.enable_drag_and_drop()
+        self.enable_drag_and_drop([self.url_entry, self.middle_frame])
 
         # check for the newest release
         self.check_for_new_version()
@@ -129,8 +129,7 @@ class TubeGetter(CTk, TkinterDnD.DnDWrapper):
         self.info_for_user_label.pack(side='left', fill='x', padx=10)
         self.dl_speed.pack(side='right', fill='x', padx=10)
 
-    def enable_drag_and_drop(self):
-        widgets = [self.url_entry, self.middle_frame]
+    def enable_drag_and_drop(self, widgets):
         for widget in widgets:
             widget.drop_target_register(DND_ALL)
             widget.dnd_bind('<<Drop>>', self.drop_action)
