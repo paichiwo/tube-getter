@@ -27,6 +27,7 @@ INFO_MSG = {
     'conversion_done': 'Conversion complete',
     'gathering_data': 'Gathering data, please wait...',
     'downloading': 'Downloading...',
+    'no_connection': 'Please check your network connection'
 }
 
 
