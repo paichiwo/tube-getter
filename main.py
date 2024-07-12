@@ -55,7 +55,7 @@ class TubeGetter(CTk, TkinterDnD.DnDWrapper):
         self.switch = CTkSwitch(self.top_frame_1, width=88, text='audio', command=self.switch_action,
                                 fg_color='#2b719e', progress_color='#2b719e')
         self.settings_button = CTkButton(self.top_frame_1, image=imager(IMG_PATHS['settings'], 19, 19),
-                                         text='', width=40, command=self.settings_action)
+                                         text='', width=41, command=self.settings_action)
 
         # TOP FRAME 2
         self.url_entry = CTkEntry(self.top_frame_2, border_width=1)
@@ -219,20 +219,18 @@ class TubeGetter(CTk, TkinterDnD.DnDWrapper):
         add_thread = threading.Thread(target=add_threaded)
         add_thread.start()
 
-    def add_action(self):
+    def add_action(self, event=None):
         """Handle URL entered manually."""
-        url = self.url_entry.get()
-        self.process_url(url)
+        if not event:
+            url = self.url_entry.get()
+            self.process_url(url)
 
     def drop_action(self, event):
         """Handle URL dropped."""
-        dropped_data = event.data
-        if dropped_data:
+        if event.data:
             self.url_entry.delete(0, 'end')
-            self.url_entry.insert(0, dropped_data)
-            self.process_url(dropped_data)
-        else:
-            self.info_msg(INFO_MSG['url_detected_err'])
+            self.url_entry.insert(0, event.data)
+            self.process_url(event.data)
 
     def add_update_with_new_data(self, data):
         if data:
@@ -242,7 +240,7 @@ class TubeGetter(CTk, TkinterDnD.DnDWrapper):
             self.info_msg('Ready')
             self.enable_buttons()
 
-    def delete_url_action(self, event=None):
+    def delete_url_action(self, event):
         if event:
             self.url_entry.delete(0, 'end')
 
