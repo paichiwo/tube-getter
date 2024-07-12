@@ -181,11 +181,8 @@ def track_progress(ffmpeg_output, duration, progress_callback):
 
 def check_for_new_version():
     """Check for new version in GitHub repo"""
-    try:
-        response = requests.get(GITHUB_URL)
-        response.raise_for_status()
-        soup = BeautifulSoup(response.content, 'html.parser')
-        return soup.find(class_='css-truncate css-truncate-target text-bold mr-2').text.split()[2][1:]
+    response = requests.get(GITHUB_URL)
+    response.raise_for_status()
+    soup = BeautifulSoup(response.content, 'html.parser')
+    return soup.find(class_='css-truncate css-truncate-target text-bold mr-2').text.split()[2][1:]
 
-    except Exception as e:
-        print(f'Error occurred: {str(e)}')

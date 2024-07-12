@@ -1,6 +1,8 @@
 #!/usr/bin/python3
 import sys
 import threading
+
+from requests import RequestException
 from tkinterdnd2 import TkinterDnD, DND_ALL
 from pychute import PyChute
 from cda_download import CdaDownload
@@ -277,11 +279,13 @@ class TubeGetter(CTk, TkinterDnD.DnDWrapper):
         self.table.create_list_with_data_frames()
         self.table.draw_data_frames()
 
-    @staticmethod
-    def check_for_new_version():
-        release = check_for_new_version()
-        if release != VERSION:
-            NewVersionWindow(release)
+    def check_for_new_version(self):
+        try:
+            release = check_for_new_version()
+            if release and release != VERSION:
+                NewVersionWindow(release)
+        except (ConnectionError, RequestException):
+            self.info_msg(INFO_MSG['no_connection'])
 
     if getattr(sys, 'frozen', False):
         pyi_splash.close()
