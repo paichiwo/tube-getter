@@ -1,11 +1,11 @@
 #!/usr/bin/python3
 import sys
 import threading
-import customtkinter as ctk
+from tkinterdnd2 import TkinterDnD, DND_ALL
 from pychute import PyChute
 from cda_download import CdaDownload
 from datetime import datetime
-from customtkinter import CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
+from customtkinter import CTk, CTkFrame, CTkButton, CTkEntry, CTkLabel, CTkSwitch
 from src.youtuber import YouTuber
 from src.bitchuter import Bitchuter
 from src.cdaer import CDAer
@@ -20,9 +20,10 @@ if getattr(sys, 'frozen', False):
     import pyi_splash
 
 
-class TubeGetter(ctk.CTk):
+class TubeGetter(CTk, TkinterDnD.DnDWrapper):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.TkdndVersion = TkinterDnD._require(self)
 
         self.iconbitmap(bitmap=IMG_PATHS['icon'])
         self.title(f'Tube Getter v{VERSION}')
@@ -95,6 +96,7 @@ class TubeGetter(ctk.CTk):
 
         # draw GUI
         self.draw_gui()
+        self.enable_drag_and_drop()
 
         # check for the newest release
         self.check_for_new_version()
@@ -126,6 +128,12 @@ class TubeGetter(ctk.CTk):
         self.info_for_user_frame.pack(fill='x')
         self.info_for_user_label.pack(side='left', fill='x', padx=10)
         self.dl_speed.pack(side='right', fill='x', padx=10)
+
+    def enable_drag_and_drop(self):
+        widgets = [self.url_entry, self.middle_frame]
+        for widget in widgets:
+            widget.drop_target_register(DND_ALL)
+            widget.dnd_bind('<<Drop>>', self.drop_action)
 
     def info_msg(self, text):
         self.info_for_user_label.configure(text=text)
@@ -194,21 +202,36 @@ class TubeGetter(ctk.CTk):
 
         processor.add(url)
 
-    def add_action(self, event=None):
+    def process_url(self, url):
+        if not url:
+            self.info_msg(INFO_MSG['url_detected_err'])
+            return
+
         self.info_msg('')
         self.table_list.clear()
         self.disable_buttons()
 
         def add_threaded():
-            url = self.url_entry.get()
-            if url:
-                self.check_urls(url)
-            else:
-                self.info_msg(INFO_MSG['url_detected_err'])
+            self.check_urls(url)
             self.enable_buttons()
 
         add_thread = threading.Thread(target=add_threaded)
         add_thread.start()
+
+    def add_action(self):
+        """Handle URL entered manually."""
+        url = self.url_entry.get()
+        self.process_url(url)
+
+    def drop_action(self, event):
+        """Handle URL dropped."""
+        dropped_data = event.data
+        if dropped_data:
+            self.url_entry.delete(0, 'end')
+            self.url_entry.insert(0, dropped_data)
+            self.process_url(dropped_data)
+        else:
+            self.info_msg(INFO_MSG['url_detected_err'])
 
     def add_update_with_new_data(self, data):
         if data:
@@ -219,7 +242,8 @@ class TubeGetter(ctk.CTk):
             self.enable_buttons()
 
     def delete_url_action(self, event=None):
-        self.url_entry.delete(0, 'end')
+        if event:
+            self.url_entry.delete(0, 'end')
 
     def clear_action(self):
         self.url_list.clear()
