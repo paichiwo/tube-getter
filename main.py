@@ -221,9 +221,8 @@ class TubeGetter(CTk, TkinterDnD.DnDWrapper):
 
     def add_action(self, event=None):
         """Handle URL entered manually."""
-        if not event:
-            url = self.url_entry.get()
-            self.process_url(url)
+        url = self.url_entry.get()
+        self.process_url(url)
 
     def drop_action(self, event):
         """Handle URL dropped."""
