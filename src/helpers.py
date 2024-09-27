@@ -43,7 +43,7 @@ def imager(path, x, y):
 def get_links(url, array):
     """Retrieve individual video links from a YouTube playlist and add them to a list"""
     if "list=" in url:
-        p = Playlist(url)
+        p = Playlist(url, client='MWEB')
         for link in p.video_urls:
             array.append(link)
     else:
