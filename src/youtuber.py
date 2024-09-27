@@ -19,8 +19,8 @@ class YouTuber(MediaRoot):
             self.info_msg(INFO_MSG['gathering_data'])
             data = self.create_yt_media_table()
             self.add_update_with_new_data(data)
-        except pytubefix.exceptions.VideoUnavailable:
-            self.info_msg(INFO_MSG['age_restricted_err'])
+        except pytubefix.exceptions.VideoUnavailable as e:
+            self.info_msg(e)
         except (pytubefix.exceptions.RegexMatchError, KeyError):
             self.info_msg(INFO_MSG['wrong_url_err'])
         except urllib.error.URLError:
@@ -31,7 +31,7 @@ class YouTuber(MediaRoot):
     def create_yt_media_table(self):
         self.table_list.clear()
         for url in self.url_list:
-            yt = YouTube(url)
+            yt = YouTube(url, client='MWEB')
             try:
                 stream = yt.streams.get_by_itag(
                     140) if self.dl_format == 'audio' else yt.streams.get_highest_resolution()
@@ -62,7 +62,7 @@ class YouTuber(MediaRoot):
     def download(self):
         output_path = load_settings()
         for i, link in enumerate(self.url_list):
-            yt = YouTube(link, on_progress_callback=self.progress_callback)
+            yt = YouTube(link, client='MWEB', on_progress_callback=self.progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()
                 filename = handle_audio_extension(yt_stream)
