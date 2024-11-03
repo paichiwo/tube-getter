@@ -1,7 +1,7 @@
 from src.resource_path import resource_path
 
 
-VERSION = '2.2.9'
+VERSION = '2.3.0'
 
 IMG_PATHS = {
     'icon': resource_path('images/yt3d.ico'),
