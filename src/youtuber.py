@@ -62,7 +62,7 @@ class YouTuber(MediaRoot):
     def download(self):
         output_path = load_settings()
         for i, link in enumerate(self.url_list):
-            yt = YouTube(link, client='MWEB', on_progress_callback=self.progress_callback)
+            yt = YouTube(link, client='IOS', on_progress_callback=self.progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()
                 filename = handle_audio_extension(yt_stream)
