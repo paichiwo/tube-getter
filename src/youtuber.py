@@ -31,7 +31,7 @@ class YouTuber(MediaRoot):
     def create_yt_media_table(self):
         self.table_list.clear()
         for url in self.url_list:
-            yt = YouTube(url, client='MWEB')
+            yt = YouTube(url, client='WEB')
             try:
                 stream = yt.streams.get_by_itag(
                     140) if self.dl_format == 'audio' else yt.streams.get_highest_resolution()
@@ -62,7 +62,7 @@ class YouTuber(MediaRoot):
     def download(self):
         output_path = load_settings()
         for i, link in enumerate(self.url_list):
-            yt = YouTube(link, client='IOS', on_progress_callback=self.progress_callback)
+            yt = YouTube(link, client='WEB', on_progress_callback=self.progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()
                 filename = handle_audio_extension(yt_stream)
