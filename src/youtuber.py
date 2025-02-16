@@ -31,7 +31,7 @@ class YouTuber(MediaRoot):
     def create_yt_media_table(self):
         self.table_list.clear()
         for url in self.url_list:
-            yt = YouTube(url, client='WEB')
+            yt = YouTube(url)
             try:
                 stream = yt.streams.get_by_itag(
                     140) if self.dl_format == 'audio' else yt.streams.get_highest_resolution()
@@ -62,7 +62,7 @@ class YouTuber(MediaRoot):
     def download(self):
         output_path = load_settings()
         for i, link in enumerate(self.url_list):
-            yt = YouTube(link, client='WEB', on_progress_callback=self.progress_callback)
+            yt = YouTube(link, on_progress_callback=self.progress_callback)
             if self.dl_format == 'audio':
                 yt_stream = yt.streams.get_audio_only()
                 filename = handle_audio_extension(yt_stream)
@@ -76,7 +76,7 @@ class YouTuber(MediaRoot):
                     self.table.frames[i].change_delete_btn()
                     self.info_msg(INFO_MSG['file_exists'])
                 else:
-                    yt_stream.download(output_path=output_path, filename=filename)
+                    yt_stream.download(output_path=output_path, filename=filename, max_retries=3)
                     self.dl_speed.configure(text=self.initial_speed)
                     self.info_msg(INFO_MSG['dl_complete'])
             except (PermissionError, RuntimeError):
