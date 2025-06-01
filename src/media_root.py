@@ -43,6 +43,7 @@ class MediaRoot:
             return self.create_media_table(CdaDownload)
         elif media_type == 'bitchute':
             return self.create_media_table(PyChute)
+        return None
 
     def create_media_table(self, media_class):
         media = media_class(self.url_list[0])
