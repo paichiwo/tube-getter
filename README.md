@@ -49,7 +49,7 @@ Run the application:
 
 ### WINDOWS:
 
-Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.3.4
+Download `tube_getter.exe` from https://github.com/paichiwo/tube-getter/releases/tag/v2.3.6
 
 Run the application. 
 
