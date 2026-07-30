@@ -9,7 +9,6 @@ from datetime import datetime
 from pytubefix import Playlist
 from customtkinter import CTkImage
 from PIL import Image
-from bs4 import BeautifulSoup
 from src.config import GITHUB_URL
 from src.resource_path import resource_path
 
@@ -75,7 +74,7 @@ def open_downloads_folder():
     os.startfile(load_settings())
 
 
-def format_file_size(size_bytes) -> str:
+def format_file_size(size_bytes: int | float) -> str:
     """Convert bytes to MB / GB"""
     if size_bytes >= 1024 ** 3:
         return f'{(size_bytes / (1024 ** 3)):.2f} GB'
@@ -83,7 +82,7 @@ def format_file_size(size_bytes) -> str:
         return f'{(size_bytes / (1024 ** 2)):.2f} MB'
 
 
-def format_dl_speed_string(download_speed):
+def format_dl_speed_string(download_speed: int | float):
     """Format dl speed to KB/s and MB/s"""
     if download_speed < 1000:
         return f'{download_speed:.2f} KiB/s'
@@ -165,6 +164,7 @@ def extract_duration(ffmpeg_output):
             if match:
                 hours, minutes, seconds = map(int, match.groups())
                 return hours * 3600 + minutes * 60 + seconds
+    return None
 
 
 def track_progress(ffmpeg_output, duration, progress_callback):
@@ -180,9 +180,8 @@ def track_progress(ffmpeg_output, duration, progress_callback):
 
 
 def check_for_new_version():
-    """Check for new version in GitHub repo"""
     response = requests.get(GITHUB_URL)
     response.raise_for_status()
-    soup = BeautifulSoup(response.content, 'html.parser')
-    return soup.find(class_='css-truncate css-truncate-target text-bold mr-2').text.split()[2][1:]
+
+    return response.json()["tag_name"].lstrip("v")
 
