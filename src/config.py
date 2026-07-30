@@ -1,7 +1,7 @@
 from src.resource_path import resource_path
 
 
-VERSION = '2.3.6'
+VERSION = '2.3.8'
 
 IMG_PATHS = {
     'icon': resource_path('images/yt3d.ico'),
@@ -42,7 +42,7 @@ I'm constantly working on the updates, but should you find any bugs
 please visit my github by clicking an icon below and open an 'issue' to let me know.
 """
 
-GITHUB_URL = 'https://github.com/paichiwo/tube-getter'
+GITHUB_URL = 'https://api.github.com/repos/paichiwo/tube-getter/releases/latest'
 
 # new version window
 NEW_VERSION_MSG = 'New version available.\n\n Would you like to download it ?\n'
