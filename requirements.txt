@@ -2,6 +2,7 @@ pytubefix
 customtkinter
 pillow
 pychute
+beautifulsoup4
 requests
 future
 cda_download
